@@ -1,0 +1,14 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ABC Corporation//NONSGML My Product//EN
+BEGIN:VJOURNAL
+DTSTAMP:19970324T120000Z
+UID:uid5@host1.com
+ORGANIZER;SENT-BY="MAILTO:jane_doe@host.com";CN=JohnSmith
+STATUS:FINAL
+CLASS:PRIVATE
+CATEGORY:Project Report, XYZ, Weekly Meeting
+DESCRIPTION:Project xyz Review Meeting Minutes.
+SUMMARY:Project xyz Review Meeting
+END:VJOURNAL
+END:VCALENDAR
