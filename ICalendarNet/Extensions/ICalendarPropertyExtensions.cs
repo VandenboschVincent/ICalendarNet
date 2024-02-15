@@ -14,6 +14,12 @@ namespace ICalendarNet.Extensions
                 return UtcTime;
             return null;
         }
+        private static TimeSpan? TryParseToTimeSpan(string value, string format)
+        {
+            if (TimeSpan.TryParseExact(value, format, new CultureInfo("en-US"), out TimeSpan ts))
+                return ts;
+            return null;
+        }
 
         public static string? GetContentlineProperty(this List<ICalendarProperty> lines, string key)
         {
@@ -22,6 +28,15 @@ namespace ICalendarNet.Extensions
         public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, string key)
         {
             return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+        }
+        public static double? GetContentlineDouble(this List<ICalendarProperty> lines, string key)
+        {
+            string? value = lines.GetContentlineProperty(key);
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            if (double.TryParse(value, out double result))
+                return result;
+            return null;
         }
         public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, string key)
         {
@@ -33,6 +48,19 @@ namespace ICalendarNet.Extensions
                 TryParseToDateTime(value, "yyyyMMddHHmm") ??
                 TryParseToDateTime(value, "yyyyMMdd")) is DateTimeOffset offset)
                 return offset;
+            return null;
+        }
+        public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, string key)
+        {
+            string? value = lines.GetContentlineProperty(key);
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            if ((TryParseToTimeSpan(value, "'PT'%h'H'%m'M'%s'S'") ??
+                TryParseToTimeSpan(value, "'PT'%h'H'%m'M'") ??
+                TryParseToTimeSpan(value, "'PT'%m'M'%s'S'") ??
+                TryParseToTimeSpan(value, "'PT'%m'M'"))
+                is TimeSpan ts)
+                return ts;
             return null;
         }
         public static IEnumerable<string> GetContentlinesProperty(this List<ICalendarProperty> lines, string key)
@@ -51,6 +79,20 @@ namespace ICalendarNet.Extensions
             }
             lines.Add(GetPropertyType(key).GetContentLine(key, value, null));
         }
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, TimeSpan? value, string key)
+        {
+            if (!value.HasValue)
+                return;
+            key = key.ToUpper();
+            string stringValue = value.Value.ToString("'PT'%h'H'%m'M'%s'S'");
+            var foundLines = lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+            if (foundLines.Any())
+            {
+                foundLines.First().Value = stringValue;
+                return;
+            }
+            lines.Add(GetPropertyType(key).GetContentLine(key, stringValue, null));
+        }
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, DateTimeOffset? value, string key)
         {
             if (!value.HasValue)
@@ -64,6 +106,12 @@ namespace ICalendarNet.Extensions
                 return;
             }
             lines.Add(GetPropertyType(key).GetContentLine(key, sValue, null));
+        }
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)
+        {
+            key = key.ToUpper();
+            lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+            lines.AddRange(value);
         }
         public static void UpdateLinesProperty(this List<ICalendarProperty> lines, IList<string> value, string key)
         {

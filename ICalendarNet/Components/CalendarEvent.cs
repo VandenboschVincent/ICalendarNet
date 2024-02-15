@@ -58,6 +58,10 @@ namespace iCalNET
         {
             return Properties.GetContentlines("ATTACH").Cast<CalendarAttachment>();
         }
+        public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
+        {
+            Properties.UpdateLineProperty(attachments, "ATTACH");
+        }
 
         public IEnumerable<CalendarAlarm> GetAlarms() => SubComponents.Where(t => t.ComponentType == ICalComponent.VALARM).Cast<CalendarAlarm>();
 
