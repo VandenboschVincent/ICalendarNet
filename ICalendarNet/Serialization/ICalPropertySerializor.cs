@@ -12,7 +12,7 @@ namespace ICalendarNet.Serialization
         }
         private void AddContentLines(ICalComponent calComponent, string source, ICalendarComponent parentObject)
         {
-            string content = GetContentRegex(calComponent).Match(source).Groups[0].Value;
+            string content = GetComponentContent(source, calComponent);
             if (content == string.Empty)
                 content = source;
             string[] lines = content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);

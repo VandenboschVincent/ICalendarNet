@@ -1,10 +1,6 @@
-﻿using FluentAssertions;
-using ICalendarNet.Base;
-using ICalendarNet.Components;
+﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
-using ICalendarNet.Serialization;
 using ICalendarNet.UnitTest.Base;
-using iCalNET;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {

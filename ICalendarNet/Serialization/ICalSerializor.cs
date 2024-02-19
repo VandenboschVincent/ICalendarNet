@@ -14,10 +14,8 @@ namespace ICalendarNet.Serialization
         {
             source = ReplaceAllNewLinesRegex().Replace(source, Environment.NewLine);
             return await Task.WhenAll(
-                GetObjectRegex(ICalComponent.VCALENDAR)
-                    .Matches(source)
-                    .Cast<Match>()
-                    .Select(t => DeserializeComponentsToICalObject(t.Groups[1].ToString(), new Calendar())));
+                GetObjectSources(source, ICalComponent.VCALENDAR)
+                    .Select(t => DeserializeComponentsToICalObject(t, new Calendar())));
         }
         public Task<T> DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
         {

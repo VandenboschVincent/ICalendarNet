@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using BenchmarkDotNet.Running;
-using ICal.UnitTest;
+using ICalendarNet.Benchmarking;
 
 Console.WriteLine("Hello, World!");
 

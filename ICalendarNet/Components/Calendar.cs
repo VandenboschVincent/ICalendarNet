@@ -1,7 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using ICalendarNet.Serialization;
-using iCalNET;
 
 namespace ICalendarNet.Components
 {

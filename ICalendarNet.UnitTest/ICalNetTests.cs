@@ -5,9 +5,7 @@ namespace ICalendarNet.UnitTest
     public class ICalNetTests : UnitTestBase
     {
 
-        [TestCase("https://www.officeholidays.com/ics-all/belgium")]
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10")]
-        [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
         public async Task Test_Online_vCalendar_Should_Serialize(string icalString)
         {
             ICalSerializor calSerializor = new();

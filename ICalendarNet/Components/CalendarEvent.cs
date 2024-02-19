@@ -4,7 +4,7 @@ using ICalendarNet.Components;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
 
-namespace iCalNET
+namespace ICalendarNet.Components
 {
     public class CalendarEvent : CalendarObject
     {

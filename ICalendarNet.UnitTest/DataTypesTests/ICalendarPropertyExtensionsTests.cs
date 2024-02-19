@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
+using System.Globalization;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
@@ -31,22 +32,27 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             }
         }
 
-        [TestCase("19950712T140715Z", 629411620350000000)]
-        [TestCase("19950712T140715", 629411548350000000)]
-        [TestCase("199507121407", 629411548200000000)]
-        [TestCase("19950712", 629411040000000000)]
-        [TestCase("PT", null)]
-        [TestCase("T15M", null)]
-        [TestCase("46qsd54f9q4df63a64dsfq", null)]
-        public void Test_GetContentlineDateTime_ShouldReturnTimespan(string value, long? ticks)
+        [TestCase("19950712T140715Z", "07/12/1995 14:07:15", true)]
+        [TestCase("19950712T140715", "07/12/1995 14:07:15", false)]
+        [TestCase("199507121407", "07/12/1995 14:07:00", false)]
+        [TestCase("19950712", "07/12/1995", false)]
+        [TestCase("PT", null, false)]
+        [TestCase("T15M", null, false)]
+        [TestCase("46qsd54f9q4df63a64dsfq", null, false)]
+        public void Test_GetContentlineDateTime_ShouldReturnTimespan(string value, string? time, bool utc)
         {
             List<ICalendarProperty> lines = [new CalendarDefaultDataType("key", value, null)];
-            if (ticks.HasValue)
+            if (time != null)
             {
-                lines.GetContentlineDateTime("key").Should().Be(new DateTimeOffset(ticks.Value, TimeZoneInfo.Local.BaseUtcOffset));
+                DateTimeStyles timeStyles = utc ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;
+                if (!DateTime.TryParse(time, CultureInfo.InvariantCulture, timeStyles, out DateTime dt))
+                    throw new InvalidDataException(time.ToString());
+                DateTimeOffset offset = new(dt);
+
+                lines.GetContentlineDateTime("key")!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
                 lines.Clear();
-                lines.UpdateLineProperty(new DateTimeOffset(ticks.Value, TimeZoneInfo.Local.BaseUtcOffset), "key");
-                lines.GetContentlineDateTime("key").Should().Be(new DateTimeOffset(ticks.Value, TimeZoneInfo.Local.BaseUtcOffset));
+                lines.UpdateLineProperty(offset, "key");
+                lines.GetContentlineDateTime("key")!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
             }
             else
             {
