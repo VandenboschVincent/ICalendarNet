@@ -1,6 +1,5 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
-using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
@@ -15,7 +14,7 @@ namespace ICalendarNet.Serialization
             source = ReplaceAllNewLinesRegex().Replace(source, Environment.NewLine);
             return await Task.WhenAll(
                 GetObjectSources(source, ICalComponent.VCALENDAR)
-                    .Select(t => DeserializeComponentsToICalObject(t, new Calendar())));
+                    .Select(t => DeserializeComponentsToICalObject(string.Join(Environment.NewLine, t.Skip(1)), new Calendar())));
         }
         public Task<T> DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
         {

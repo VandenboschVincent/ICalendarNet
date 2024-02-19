@@ -6,58 +6,55 @@ namespace ICalendarNet.Serialization
     {
         private static int? GetFirstStringIndex(string source, string target)
         {
-            int indexfound = source.IndexOf(target);
+            int indexfound = source.IndexOf(target, StringComparison.OrdinalIgnoreCase);
             return indexfound == -1 ? null : indexfound;
         }
-        private static int? GetLastStringIndex(string source, string target)
+        public static Tuple<int, int> FindIndexes(IEnumerable<KeyValuePair<int, string>> source, string[] delims)
         {
-            int indexfound = source.LastIndexOf(target);
-            return indexfound == -1 ? null : indexfound;
+            return new(
+                source.FirstOrDefault(t => t.Value.Equals(delims[0], StringComparison.OrdinalIgnoreCase)).Key,
+                source.FirstOrDefault(t => t.Value.Equals(delims[1], StringComparison.OrdinalIgnoreCase)).Key);
         }
-        public static IEnumerable<IEnumerable<string>> SplitAndKeep(string s, string[] delims)
+        private static IEnumerable<IEnumerable<string>> GetStrings(Dictionary<int, string> source, params string[] targets)
         {
-            int start = 0, index;
-
-            while ((index = s.IndexOf(delims, start)) != -1)
+            List<Tuple<int, int>> filterIndexes = [];
+            while (true)
             {
-                if (index - start > 0)
-                    yield return s.Substring(start, index - start);
-                yield return s.Substring(index, 1);
-                start = index + 1;
+                Tuple<int, int> indexesFound = FindIndexes(source.Skip((filterIndexes.LastOrDefault()?.Item2 + 1) ?? 0), targets);
+                if (indexesFound.Item2 == 0)
+                    break;
+                filterIndexes.Add(indexesFound);
+                if (filterIndexes[^1].Item2 >= source.Count)
+                    break;
             }
-
-            if (start < s.Length)
-            {
-                yield return s.Substring(start);
-            }
-        }
-        private static string[] GetStrings(string source, params string[] targets)
-        {
-            string[] splitted = SplitAndKeep(source, targets);
+            IEnumerable<IEnumerable<string>> splitted = filterIndexes.Select(x => source.Where(t => t.Key >= x.Item1 && t.Key <= x.Item2).Select(t => t.Value));
             return splitted;
         }
-        private string[] GetObjectSources(string source, ICalComponent component)
+        private IEnumerable<IEnumerable<string>> GetObjectSources(string source, ICalComponent component)
         {
+            Dictionary<int, string> allLines = source.Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+                .Select((value, index) => new { value, index })
+                .ToDictionary(pair => pair.index, pair => pair.value);
             switch (component)
             {
                 case ICalComponent.VCALENDAR:
-                    return GetStrings(source, vCalendarBegin, vCalendarEnd);
+                    return GetStrings(allLines, vCalendarBegin, vCalendarEnd);
                 case ICalComponent.VEVENT:
-                    return GetStrings(source, vEventBegin, vEventEnd);
+                    return GetStrings(allLines, vEventBegin, vEventEnd);
                 case ICalComponent.VTODO:
-                    return GetStrings(source, vTodoBegin, vTodoEnd);
+                    return GetStrings(allLines, vTodoBegin, vTodoEnd);
                 case ICalComponent.VJOURNAL:
-                    return GetStrings(source, vJournalBegin, vJournalEnd);
+                    return GetStrings(allLines, vJournalBegin, vJournalEnd);
                 case ICalComponent.VFREEBUSY:
-                    return GetStrings(source, vFreeBusyBegin, vFreeBusyEnd);
+                    return GetStrings(allLines, vFreeBusyBegin, vFreeBusyEnd);
                 case ICalComponent.VTIMEZONE:
-                    return GetStrings(source, vTimezoneBegin, vTimezoneEnd);
+                    return GetStrings(allLines, vTimezoneBegin, vTimezoneEnd);
                 case ICalComponent.STANDARD:
-                    return GetStrings(source, vStandardBegin, vStandardEnd);
+                    return GetStrings(allLines, vStandardBegin, vStandardEnd);
                 case ICalComponent.DAYLIGHT:
-                    return GetStrings(source, vDaylightBegin, vDaylightEnd);
+                    return GetStrings(allLines, vDaylightBegin, vDaylightEnd);
                 case ICalComponent.VALARM:
-                    return GetStrings(source, vAlarmBegin, vAlarmEnd);
+                    return GetStrings(allLines, vAlarmBegin, vAlarmEnd);
                 default:
                     break;
             }
@@ -112,22 +109,22 @@ namespace ICalendarNet.Serialization
         internal const string vDaylightBegin = "BEGIN:DAYLIGHT";
         internal const string vAlarmBegin = "BEGIN:VALARM";
 
-        [GeneratedRegex("(\\r\\n )", RegexOptions.None, 200)]
+        [GeneratedRegex("(\\r\\n )", RegexOptions.None)]
         internal static partial Regex ReplaceNewLinesRegex();
-        [GeneratedRegex(@"\r\n?|\n", RegexOptions.None, 200)]
+        [GeneratedRegex(@"\r\n?|\n", RegexOptions.None)]
         internal static partial Regex ReplaceAllNewLinesRegex();
-        [GeneratedRegex("(?=[,;])", RegexOptions.IgnorePatternWhitespace, 200)]
+        [GeneratedRegex("(?=[,;])", RegexOptions.IgnorePatternWhitespace)]
         internal static partial Regex EscapeSpecialCharRegex();
-        [GeneratedRegex("(.+?)((;.+?)*):(.+)", RegexOptions.Singleline, 200)]
+        [GeneratedRegex("(.+?)((;.+?)*):(.+)", RegexOptions.Singleline)]
         internal static partial Regex ContentLineRegex();
-        [GeneratedRegex("(.+?)=(.+)", RegexOptions.None, 200)]
+        [GeneratedRegex("(.+?)=(.+)", RegexOptions.None)]
         internal static partial Regex ContentLineNameRegex();
-        [GeneratedRegex("([^,]+)(?=,|$)", RegexOptions.None, 200)]
+        [GeneratedRegex("([^,]+)(?=,|$)", RegexOptions.None)]
         internal static partial Regex ContentLineValuesRegex();
-        [GeneratedRegex("([^;]+)(?=;|$)", RegexOptions.None, 200)]
+        [GeneratedRegex("([^;]+)(?=;|$)", RegexOptions.None)]
         internal static partial Regex ContentLineParametersRegex();
 
-        [GeneratedRegex(@"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None, 200)]
+        [GeneratedRegex(@"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None)]
         public static partial Regex Base64Regex();
     }
 }

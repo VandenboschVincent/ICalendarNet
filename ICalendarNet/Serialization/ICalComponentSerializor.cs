@@ -2,7 +2,6 @@
 using ICalendarNet.Components;
 using ICalendarNet.Extensions;
 using System.Text;
-using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
@@ -53,7 +52,7 @@ namespace ICalendarNet.Serialization
             };
         private IEnumerable<Task> DeserializeToICalComponents<T>(ICalComponent calComponent, string source, ICalendarComponent parentObject) where T : ICalendarComponent, new()
         {
-            return GetObjectSources(source, calComponent).Select(t => GetComponent<T>(t, parentObject));
+            return GetObjectSources(source, calComponent).Select(t => GetComponent<T>(string.Join(Environment.NewLine, t.Skip(1)), parentObject));
         }
         private async Task<T> GetComponent<T>(string source, ICalendarComponent parentObject) where T : ICalendarComponent, new()
         {
