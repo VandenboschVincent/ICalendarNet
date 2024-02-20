@@ -1,17 +1,20 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private ContentLineParameters GetParameters(List<string> keys, List<string> values)
+        private ContentLineParameters? GetParameters(CaptureCollection keys, CaptureCollection values)
         {
+            if (keys.Count == 0)
+                return null;
             ContentLineParameters keyValuePairs = new();
             for (int i = 0; i < keys.Count; i++)
             {
-                keyValuePairs.SetOrAddValue(keys[i], values[i]);
+                keyValuePairs.SetOrAddValue(keys[i].Value, values[i].Value);
             }
 
             return keyValuePairs;

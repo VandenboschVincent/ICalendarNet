@@ -41,14 +41,14 @@ namespace ICalendarNet.Serialization
             Match match = ContentLineRegex().Match(source);
             return CreateProperty(match.Groups[1].ToString().Trim(),
                 match.Groups[6].ToString().Trim(),
-                match.Groups[4].Captures.Select(t => t.Value),
-                match.Groups[5].Captures.Select(t => t.Value)
+                match.Groups[4].Captures,
+                match.Groups[5].Captures
                 );
         }
 
-        private ICalendarProperty CreateProperty(string key, string value, IEnumerable<string> paramkey, IEnumerable<string> paramvalue)
+        private ICalendarProperty CreateProperty(string key, string value, CaptureCollection paramkey, CaptureCollection paramvalue)
         {
-            return ICalendarPropertyExtensions.GetPropertyType(key).GetContentLine(key, value, GetParameters(paramkey.ToList(), paramvalue.ToList()));
+            return ICalendarPropertyExtensions.GetPropertyType(key).GetContentLine(key, value, GetParameters(paramkey, paramvalue));
         }
     }
 }

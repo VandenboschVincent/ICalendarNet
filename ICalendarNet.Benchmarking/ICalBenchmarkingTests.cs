@@ -32,6 +32,14 @@ namespace ICalendarNet.Benchmarking
         }
 
         [Benchmark]
+        public string BenchMark_Load_And_Serialize_Tiny_Calendar()
+        {
+            var icalvar = GetIcalStrings()[^1];
+            Calendar? calendar = Calendar.LoadCalendar(icalvar);
+            return new ICalSerializor().SerializeCalendar(calendar!);
+        }
+
+        [Benchmark]
         public void BenchMark_Load_And_Serialize_all_Calendars()
         {
             var serializer = new ICalSerializor();
