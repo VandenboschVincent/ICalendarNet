@@ -34,11 +34,10 @@ namespace ICalendarNet.Benchmarking
         [Benchmark]
         public void BenchMark_Load_And_Serialize_all_Calendars()
         {
-            foreach (var icalvar in GetIcalStrings())
-            {
-                Calendar? calendar = Calendar.LoadCalendar(icalvar);
-                new ICalSerializor().SerializeCalendar(calendar!);
-            }
+            var serializer = new ICalSerializor();
+            var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
+            _ = calendars.Select(serializer.SerializeCalendar);
+
         }
 
         [Benchmark]

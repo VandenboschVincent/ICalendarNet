@@ -31,15 +31,16 @@ namespace ICalendarNet.UnitTest
         public void Test_Offline_vCalendar_Should_Serialize()
         {
             ICalSerializor calSerializor = new();
-            foreach (var icalvar in GetIcalStrings())
+            var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
+            calendars.Should().HaveCount(139);
+            foreach (var calendar in calendars)
             {
-                Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
-                calendar!.Properties.Should().NotBeEmpty(icalvar);
+                calendar!.Properties.Should().NotBeEmpty();
 
                 string serializedCalendar = calSerializor.SerializeCalendar(calendar);
                 Calendar? calendarAfterSerialize = calSerializor.DeserializeCalendar(serializedCalendar);
                 calendarAfterSerialize!.Properties.Should().BeEquivalentTo(calendar.Properties);
-                calendarAfterSerialize.SubComponents.Count.Should().Be(calendar.SubComponents.Count);
+                calendarAfterSerialize.SubComponents.Should().HaveCount(calendar.SubComponents.Count);
 
                 //Assertions max size
                 if (calendar.SubComponents.Exists(x => x.Properties.Count >= 30)
