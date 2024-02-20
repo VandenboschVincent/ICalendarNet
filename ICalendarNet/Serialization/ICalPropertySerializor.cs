@@ -1,6 +1,5 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
-using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
@@ -38,15 +37,32 @@ namespace ICalendarNet.Serialization
         }
         private ICalendarProperty GetProperty(string source)
         {
-            Match match = ContentLineRegex().Match(source);
-            return CreateProperty(match.Groups[1].ToString().Trim(),
-                match.Groups[4].ToString().Trim(),
-                match.Groups[2].ToString().Trim()
-                );
+            ReadOnlySpan<char> chars = source.AsSpan();
+            int keyIndex = chars.IndexOf(':');
+            List<int> paramIndexes = chars.FindAllIndexes(';', keyIndex).ToList();
+            if (paramIndexes.Count > 0)
+            {
+                List<int> paramSepertorIndexes = chars.FindAllIndexes('=', keyIndex).ToList();
+                List<int> MultipleParamSepertors = chars.FindAllIndexes(',', keyIndex).ToList();
+
+                return CreateProperty(source[..(paramIndexes.Any() ? paramIndexes[0] : keyIndex)],
+                    source.Substring(keyIndex + 1, source.Length - keyIndex),
+                    source.GetParametersOfString(paramIndexes, keyIndex, paramSepertorIndexes, MultipleParamSepertors).ToDictionary()
+                    );
+            }
+            else
+            {
+
+                return CreateProperty(source[..(paramIndexes.Any() ? paramIndexes[0] : keyIndex)],
+                    source.Substring(keyIndex + 1, source.Length - keyIndex),
+                    null
+                    );
+            }
         }
-        private ICalendarProperty CreateProperty(string key, string name, string param)
+
+        private ICalendarProperty CreateProperty(string key, string value, Dictionary<string, IEnumerable<string>>? param)
         {
-            return ICalendarPropertyExtensions.GetPropertyType(key).GetContentLine(key, name, GetParameters(param));
+            return ICalendarPropertyExtensions.GetPropertyType(key).GetContentLine(key, value, GetParameters(param));
         }
     }
 }
