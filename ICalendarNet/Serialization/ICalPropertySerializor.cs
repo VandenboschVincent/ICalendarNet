@@ -6,16 +6,12 @@ namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private Task DeserializePropertiesToICalObject<T>(string source, T parentObject) where T : ICalendarComponent, new()
+        private IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ICalComponent calComponent, ReadOnlySpan<string> source)
         {
-            return Task.Run(() => AddContentLines(parentObject.ComponentType, source, parentObject));
-        }
-        private void AddContentLines(ICalComponent calComponent, string source, ICalendarComponent parentObject)
-        {
-            string content = GetComponentContent(source, calComponent);
-            if (content == string.Empty)
-                content = source;
-            string[] lines = content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            List<ICalendarProperty> calendarProperties = [];
+            ReadOnlySpan<string> lines = GetComponentContent(source, calComponent);
+            if (lines.Length <= 0)
+                lines = source;
             int currentWorkingLine = 0;
             int linesToWork = 1;
             for (int x = 0; x < lines.Length; x++)
@@ -24,20 +20,21 @@ namespace ICalendarNet.Serialization
                 if (x == 0) continue;
                 else if (line.IsNewProperty())
                 {
-                    ICalendarProperty contentLine = GetProperty(string.Join(Environment.NewLine, lines.Skip(currentWorkingLine).Take(linesToWork)));
+                    ICalendarProperty contentLine = GetProperty(string.Join(Environment.NewLine, lines.Slice(currentWorkingLine, linesToWork).ToArray()));
                     currentWorkingLine = x;
                     linesToWork = 1;
                     if (string.IsNullOrEmpty(contentLine.Name) ||
                         (string.IsNullOrEmpty(contentLine.Value) && !contentLine.Parameters.Any()))
                         continue;
-                    parentObject.contentLines.Enqueue(contentLine);
+                    calendarProperties.Add(contentLine);
                 }
                 else linesToWork++;
             }
-            ICalendarProperty finalcontentLine = GetProperty(string.Join(Environment.NewLine, lines.Skip(currentWorkingLine).Take(linesToWork)));
+            ICalendarProperty finalcontentLine = GetProperty(string.Join(Environment.NewLine, lines.Slice(currentWorkingLine, linesToWork).ToArray()));
             if (!string.IsNullOrEmpty(finalcontentLine.Name) &&
                 (!string.IsNullOrEmpty(finalcontentLine.Value) || finalcontentLine.Parameters.Any()))
-                parentObject.contentLines.Enqueue(finalcontentLine);
+                calendarProperties.Add(finalcontentLine);
+            return calendarProperties;
         }
         private ICalendarProperty GetProperty(string source)
         {

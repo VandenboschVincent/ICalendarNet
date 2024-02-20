@@ -34,12 +34,12 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             calSerializor.SerializeICalProperty(attachment).Should().Be(value);
         }
         [Test]
-        public async Task Test_Attachment_FromEvent()
+        public void Test_Attachment_FromEvent()
         {
             ICalSerializor calSerializor = new();
             foreach (var icalvar in GetIcalStrings("Serialization\\Attachment*"))
             {
-                Calendar? calendar = await calSerializor.DeserializeCalendar(icalvar);
+                Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
                 calendar.Should().NotBeNull();
                 CalendarEvent? calendarEvent = calendar!.GetEvents().FirstOrDefault();
                 calendarEvent.Should().NotBeNull();

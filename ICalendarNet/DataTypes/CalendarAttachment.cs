@@ -1,6 +1,5 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
-using ICalendarNet.Serialization;
 using System.Text;
 
 namespace ICalendarNet.DataTypes
@@ -31,7 +30,7 @@ namespace ICalendarNet.DataTypes
         /// <returns></returns>
         public byte[]? GetData()
         {
-            if ((Value.Length % 4 == 0) && ICalSerializor.Base64Regex().IsMatch(Value))
+            if ((Value.Length % 4 == 0) && Value.IsBase64())
                 return dataEncoding.GetBytes(Value);
             return null;
         }

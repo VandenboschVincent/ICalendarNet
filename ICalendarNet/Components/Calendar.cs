@@ -6,13 +6,13 @@ namespace ICalendarNet.Components
 {
     public class Calendar : CalendarObject
     {
-        public static async Task<Calendar?> LoadCalendarAsync(string source)
+        public static Calendar? LoadCalendar(string source)
         {
-            return await new ICalSerializor().DeserializeCalendar(source);
+            return new ICalSerializor().DeserializeCalendar(source);
         }
-        public static async Task<IEnumerable<Calendar>> LoadCalendarsAsync(string source)
+        public static IEnumerable<Calendar> LoadCalendars(string source)
         {
-            return await new ICalSerializor().DeserializeCalendars(source);
+            return new ICalSerializor().DeserializeCalendars(source);
         }
 
 

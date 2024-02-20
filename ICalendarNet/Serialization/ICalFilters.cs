@@ -4,90 +4,91 @@ namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private static int? GetFirstStringIndex(string source, string target)
+        private static int? FindInString(ReadOnlySpan<string> source)
         {
-            int indexfound = source.IndexOf(target, StringComparison.OrdinalIgnoreCase);
-            return indexfound == -1 ? null : indexfound;
+            int search = source.IndexOfAny(new ReadOnlySpan<string>(searchBeginKeys));
+            return search >= 0 ? search : null;
         }
-        public static Tuple<int, int> FindIndexes(IEnumerable<KeyValuePair<int, string>> source, string[] delims)
+        private static int? FindIndex(ReadOnlySpan<string> source, string target)
+        {
+            int search = source.IndexOf(target);
+            return search >= 0 ? search : null;
+        }
+        private static Tuple<int, int> FindIndexes(ReadOnlySpan<string> source, string[] delims)
         {
             return new(
-                source.FirstOrDefault(t => t.Value.Equals(delims[0], StringComparison.OrdinalIgnoreCase)).Key,
-                source.FirstOrDefault(t => t.Value.Equals(delims[1], StringComparison.OrdinalIgnoreCase)).Key);
+                FindIndex(source, delims[0]) ?? -1,
+                FindIndex(source, delims[1]) ?? -1);
         }
-        private static IEnumerable<IEnumerable<string>> GetStrings(Dictionary<int, string> source, params string[] targets)
+        private static List<Tuple<int, int>> GetIndexes(ReadOnlySpan<string> source, params string[] targets)
         {
             List<Tuple<int, int>> filterIndexes = [];
             while (true)
             {
-                Tuple<int, int> indexesFound = FindIndexes(source.Skip((filterIndexes.LastOrDefault()?.Item2 + 1) ?? 0), targets);
-                if (indexesFound.Item2 == 0)
+                int currentIndex = (filterIndexes.LastOrDefault()?.Item2 + 1) ?? 0;
+                Tuple<int, int> indexesFound = FindIndexes(source[currentIndex..], targets);
+                if (indexesFound.Item2 == -1)
                     break;
-                filterIndexes.Add(indexesFound);
-                if (filterIndexes[^1].Item2 >= source.Count)
+                filterIndexes.Add(new Tuple<int, int>(currentIndex + indexesFound.Item1, currentIndex + indexesFound.Item2));
+                if (filterIndexes[^1].Item2 >= source.Length)
                     break;
             }
-            IEnumerable<IEnumerable<string>> splitted = filterIndexes.Select(x => source.Where(t => t.Key >= x.Item1 && t.Key <= x.Item2).Select(t => t.Value));
-            return splitted;
+            return filterIndexes;
         }
-        private IEnumerable<IEnumerable<string>> GetObjectSources(string source, ICalComponent component)
+        private static List<Tuple<int, int>> GetObjectSourceIndexes<T>(ReadOnlySpan<string> source, ICalComponent component)
         {
-            Dictionary<int, string> allLines = source.Split(Environment.NewLine, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
-                .Select((value, index) => new { value, index })
-                .ToDictionary(pair => pair.index, pair => pair.value);
             switch (component)
             {
                 case ICalComponent.VCALENDAR:
-                    return GetStrings(allLines, vCalendarBegin, vCalendarEnd);
+                    return GetIndexes(source, vCalendarBegin, vCalendarEnd);
                 case ICalComponent.VEVENT:
-                    return GetStrings(allLines, vEventBegin, vEventEnd);
+                    return GetIndexes(source, vEventBegin, vEventEnd);
                 case ICalComponent.VTODO:
-                    return GetStrings(allLines, vTodoBegin, vTodoEnd);
+                    return GetIndexes(source, vTodoBegin, vTodoEnd);
                 case ICalComponent.VJOURNAL:
-                    return GetStrings(allLines, vJournalBegin, vJournalEnd);
+                    return GetIndexes(source, vJournalBegin, vJournalEnd);
                 case ICalComponent.VFREEBUSY:
-                    return GetStrings(allLines, vFreeBusyBegin, vFreeBusyEnd);
+                    return GetIndexes(source, vFreeBusyBegin, vFreeBusyEnd);
                 case ICalComponent.VTIMEZONE:
-                    return GetStrings(allLines, vTimezoneBegin, vTimezoneEnd);
+                    return GetIndexes(source, vTimezoneBegin, vTimezoneEnd);
                 case ICalComponent.STANDARD:
-                    return GetStrings(allLines, vStandardBegin, vStandardEnd);
+                    return GetIndexes(source, vStandardBegin, vStandardEnd);
                 case ICalComponent.DAYLIGHT:
-                    return GetStrings(allLines, vDaylightBegin, vDaylightEnd);
+                    return GetIndexes(source, vDaylightBegin, vDaylightEnd);
                 case ICalComponent.VALARM:
-                    return GetStrings(allLines, vAlarmBegin, vAlarmEnd);
+                    return GetIndexes(source, vAlarmBegin, vAlarmEnd);
                 default:
                     break;
             }
             throw new NotSupportedException(component.ToString());
         }
-        private string GetComponentContent(string source, ICalComponent component)
+        private ReadOnlySpan<string> GetComponentContent(ReadOnlySpan<string> source, ICalComponent component)
         {
             switch (component)
             {
                 case ICalComponent.VCALENDAR:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vCalendarEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vCalendarEnd) ?? source.Length)];
                 case ICalComponent.VEVENT:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vEventEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vEventEnd) ?? source.Length)];
                 case ICalComponent.VTODO:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vTodoEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vTodoEnd) ?? source.Length)];
                 case ICalComponent.VJOURNAL:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vJournalEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vJournalEnd) ?? source.Length)];
                 case ICalComponent.VFREEBUSY:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vFreeBusyEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vFreeBusyEnd) ?? source.Length)];
                 case ICalComponent.VTIMEZONE:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vTimezoneEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vTimezoneEnd) ?? source.Length)];
                 case ICalComponent.STANDARD:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vStandardEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vStandardEnd) ?? source.Length)];
                 case ICalComponent.DAYLIGHT:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vDaylightEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vDaylightEnd) ?? source.Length)];
                 case ICalComponent.VALARM:
-                    return source[..(GetFirstStringIndex(source, vBegin) ?? GetFirstStringIndex(source, vAlarmEnd) ?? source.Length)];
+                    return source[..(FindInString(source) ?? FindIndex(source, vAlarmEnd) ?? source.Length)];
                 default:
                     break;
             }
             throw new NotSupportedException(component.ToString());
         }
-        internal const string vBegin = "BEGIN:";
 
         internal const string vCalendarEnd = "END:VCALENDAR";
         internal const string vEventEnd = "END:VEVENT";
@@ -109,12 +110,12 @@ namespace ICalendarNet.Serialization
         internal const string vDaylightBegin = "BEGIN:DAYLIGHT";
         internal const string vAlarmBegin = "BEGIN:VALARM";
 
-        [GeneratedRegex("(\\r\\n )", RegexOptions.None)]
-        internal static partial Regex ReplaceNewLinesRegex();
+        internal static readonly string[] searchBeginKeys = { vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin };
+        internal static readonly string[] searchEndKeys = { vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd };
+        internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys];
+
         [GeneratedRegex(@"\r\n?|\n", RegexOptions.None)]
         internal static partial Regex ReplaceAllNewLinesRegex();
-        [GeneratedRegex("(?=[,;])", RegexOptions.IgnorePatternWhitespace)]
-        internal static partial Regex EscapeSpecialCharRegex();
         [GeneratedRegex("(.+?)((;.+?)*):(.+)", RegexOptions.Singleline)]
         internal static partial Regex ContentLineRegex();
         [GeneratedRegex("(.+?)=(.+)", RegexOptions.None)]
@@ -124,7 +125,5 @@ namespace ICalendarNet.Serialization
         [GeneratedRegex("([^;]+)(?=;|$)", RegexOptions.None)]
         internal static partial Regex ContentLineParametersRegex();
 
-        [GeneratedRegex(@"^[a-zA-Z0-9\+/]*={0,3}$", RegexOptions.None)]
-        public static partial Regex Base64Regex();
     }
 }

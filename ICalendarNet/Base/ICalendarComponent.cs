@@ -1,13 +1,7 @@
-﻿using System.Collections.Concurrent;
-
-namespace ICalendarNet.Base
+﻿namespace ICalendarNet.Base
 {
     public interface ICalendarComponent
     {
-        internal ConcurrentQueue<ICalendarProperty> contentLines { get; set; }
-        internal ConcurrentBag<ICalendarComponent> components { get; set; }
-
-
         ICalComponent ComponentType { get; }
         List<ICalendarProperty> Properties { get; }
         List<ICalendarComponent> SubComponents { get; }

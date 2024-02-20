@@ -5,20 +5,29 @@ namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        public async Task<Calendar?> DeserializeCalendar(string source)
+        public Calendar? DeserializeCalendar(string source)
         {
-            return (await DeserializeCalendars(source)).FirstOrDefault();
+            return DeserializeICalComponent<Calendar>(source);
         }
-        public async Task<IEnumerable<Calendar>> DeserializeCalendars(string source)
+        public IEnumerable<Calendar> DeserializeCalendars(string source)
+        {
+            return DeserializeICalComponents<Calendar>(source);
+        }
+        public T? DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
+        {
+            return DeserializeICalComponents<T>(source).FirstOrDefault();
+        }
+
+        public IEnumerable<T> DeserializeICalComponents<T>(string source) where T : ICalendarComponent, new()
         {
             source = ReplaceAllNewLinesRegex().Replace(source, Environment.NewLine);
-            return await Task.WhenAll(
-                GetObjectSources(source, ICalComponent.VCALENDAR)
-                    .Select(t => DeserializeComponentsToICalObject(string.Join(Environment.NewLine, t.Skip(1)), new Calendar())));
-        }
-        public Task<T> DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
-        {
-            return DeserializeComponentsToICalObject(source, new T());
+            string[] sourceLines = source.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            for (int i = 0; i < sourceLines.Length; i++)
+            {
+                if (allKeys.Contains(sourceLines[i], StringComparer.OrdinalIgnoreCase))
+                    sourceLines[i] = sourceLines[i].ToUpper();
+            }
+            return InternalDeserializeComponents<T>(sourceLines);
         }
         public ICalendarProperty DeserializeICalProperty(string source)
         {
