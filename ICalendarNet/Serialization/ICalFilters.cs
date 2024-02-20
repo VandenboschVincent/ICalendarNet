@@ -110,20 +110,14 @@ namespace ICalendarNet.Serialization
         internal const string vDaylightBegin = "BEGIN:DAYLIGHT";
         internal const string vAlarmBegin = "BEGIN:VALARM";
 
-        internal static readonly string[] searchBeginKeys = { vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin };
-        internal static readonly string[] searchEndKeys = { vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd };
+        internal static readonly string[] searchBeginKeys = [vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin];
+        internal static readonly string[] searchEndKeys = [vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd];
         internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys];
 
         [GeneratedRegex(@"\r\n?|\n", RegexOptions.None)]
         internal static partial Regex ReplaceAllNewLinesRegex();
-        [GeneratedRegex("(.+?)((;.+?)*):(.+)", RegexOptions.Singleline)]
+        [GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline)]
         internal static partial Regex ContentLineRegex();
-        [GeneratedRegex("(.+?)=(.+)", RegexOptions.None)]
-        internal static partial Regex ContentLineNameRegex();
-        [GeneratedRegex("([^,]+)(?=,|$)", RegexOptions.None)]
-        internal static partial Regex ContentLineValuesRegex();
-        [GeneratedRegex("([^;]+)(?=;|$)", RegexOptions.None)]
-        internal static partial Regex ContentLineParametersRegex();
 
     }
 }

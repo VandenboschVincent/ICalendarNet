@@ -6,14 +6,22 @@ namespace ICalendarNet.Extensions
     {
         public static string? GetValue(this ContentLineParameters parameters, string key)
         {
+            return parameters.GetValueOrDefault(key)?.FirstOrDefault();
+        }
+
+        public static IEnumerable<string>? GetValues(this ContentLineParameters parameters, string key)
+        {
             return parameters.GetValueOrDefault(key);
         }
 
         public static void SetOrAddValue(this ContentLineParameters parameters, string key, string value)
         {
-            if (parameters.ContainsKey(key))
-                parameters.Remove(key);
-            parameters.Add(key, value);
+            parameters.SetOrAddValue(key, new List<string>() { value });
         }
+        public static void SetOrAddValue(this ContentLineParameters parameters, string key, IEnumerable<string> value)
+        {
+            parameters[key] = value;
+        }
+
     }
 }

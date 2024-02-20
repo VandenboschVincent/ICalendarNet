@@ -68,17 +68,17 @@ namespace ICalendarNet.DataTypes
             : base("ATTACH", uri.ToString(), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.Add("FMTTYPE", new ContentLineParameter("FMTTYPE", fmttype));
+                Parameters.SetOrAddValue("FMTTYPE", fmttype);
         }
         public CalendarAttachment(byte[] data, string? fmttype, string valueType = "BINARY", string encoding = "BASE64")
             : base("ATTACH", dataEncoding.GetString(data), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.Add("FMTTYPE", new ContentLineParameter("FMTTYPE", fmttype));
+                Parameters.SetOrAddValue("FMTTYPE", fmttype);
             if (!string.IsNullOrEmpty(valueType))
-                Parameters.Add("VALUE", new ContentLineParameter("VALUE", valueType));
+                Parameters.SetOrAddValue("VALUE", valueType);
             if (!string.IsNullOrEmpty(encoding))
-                Parameters.Add("ENCODING", new ContentLineParameter("ENCODING", encoding));
+                Parameters.SetOrAddValue("ENCODING", encoding);
         }
     }
 }

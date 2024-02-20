@@ -1,13 +1,20 @@
 ﻿using ICalendarNet.Base;
+using ICalendarNet.Extensions;
 using System.Text;
 
 namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private ContentLineParameters GetParameters(Dictionary<string, IEnumerable<string>> source)
+        private ContentLineParameters GetParameters(List<string> keys, List<string> values)
         {
-            return (ContentLineParameters)source;
+            ContentLineParameters keyValuePairs = new();
+            for (int i = 0; i < keys.Count; i++)
+            {
+                keyValuePairs.SetOrAddValue(keys[i], values[i]);
+            }
+
+            return keyValuePairs;
         }
 
         private string SerializeProperty(ICalendarProperty parentObject)

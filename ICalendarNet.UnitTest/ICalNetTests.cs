@@ -30,6 +30,17 @@ namespace ICalendarNet.UnitTest
         [Test]
         public void Test_Offline_vCalendar_Should_Serialize()
         {
+            foreach (var icalvar in GetIcalStrings())
+            {
+                var calendar = Calendar.LoadCalendar(icalvar);
+                calendar!.Properties.Should().NotBeEmpty();
+                calendar!.SubComponents.Should().NotBeEmpty();
+            }
+        }
+
+        [Test]
+        public void Test_Offline_vCalendar_Should_Serialize_Combined()
+        {
             ICalSerializor calSerializor = new();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
             calendars.Should().HaveCount(139);
