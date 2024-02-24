@@ -6,7 +6,7 @@ namespace ICalendarNet.Serialization
     {
         private static int? FindInString(ReadOnlySpan<string> source)
         {
-            int search = source.IndexOfAny(new ReadOnlySpan<string>(searchBeginKeys));
+            int search = source.IndexOfAny(searchBeginKeys.AsSpan());
             return search >= 0 ? search : null;
         }
         private static int? FindIndex(ReadOnlySpan<string> source, string target)
