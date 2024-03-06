@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
@@ -10,8 +11,8 @@ namespace ICalendarNet.Components
 
         public virtual string? Description
         {
-            get => Properties.GetContentlineProperty("Description");
-            set => UpdateProperty("Description", value!);
+            get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
 
         /// <summary>
@@ -19,8 +20,8 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual string? Summary
         {
-            get => Properties.GetContentlineProperty("SUMMARY");
-            set => UpdateProperty("SUMMARY", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
 
         /// <summary>
@@ -31,24 +32,27 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual string? Action
         {
-            get => Properties.GetContentlineProperty("Action");
-            set => UpdateProperty("Action", value!);
+            get => Properties.GetContentlineValue(ICalProperty.ACTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.ACTION);
         }
 
         /// <summary>
-        /// Relative to the DTStart of the parent object
+        /// Relative to the DTStart or DTEnd or an absolute datetime of the parent object
         /// Can be repeated if Duration(delay) and Repeat are present
         /// </summary>
-        public virtual DateTimeOffset? Trigger
+        public virtual string? Trigger
         {
-            get => Properties.GetContentlineDateTime("Trigger");
-            set => Properties.UpdateLineProperty(value!, "Trigger");
+            get => Properties.GetContentlineValue(ICalProperty.TRIGGER);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.TRIGGER);
         }
 
+        /// <summary>
+        /// Delay for the next alarm
+        /// </summary>
         public virtual TimeSpan? Duration
         {
-            get => Properties.GetContentlineTimeSpan("Duration");
-            set => Properties.UpdateLineProperty(value, "DURATION");
+            get => Properties.GetContentlineTimeSpan(ICalProperty.DURATION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DURATION);
         }
 
         /// <summary>
@@ -56,8 +60,8 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual double? Repeat
         {
-            get => Properties.GetContentlineDouble("Repeat");
-            set => UpdateProperty("Repeat", value.ToString()!);
+            get => Properties.GetContentlineDouble(ICalProperty.REPEAT);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.REPEAT);
         }
 
         /// <summary>
@@ -65,18 +69,18 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual IEnumerable<string>? Attendee
         {
-            get => Properties.GetContentlinesProperty("ATTENDEE");
-            set => UpdateProperty("ATTENDEE", value!);
+            get => Properties.GetContentlinesValue(ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesProperty(value!.ToList(), ICalProperty.ATTENDEE);
         }
 
         public IEnumerable<CalendarAttachment> GetAttachments()
         {
-            return Properties.GetContentlines("ATTACH").Cast<CalendarAttachment>();
+            return Properties.GetContentlines(ICalProperty.ATTACH).Cast<CalendarAttachment>();
         }
 
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
-            Properties.UpdateLineProperty(attachments, "ATTACH");
+            Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
         }
 
         /// <summary>

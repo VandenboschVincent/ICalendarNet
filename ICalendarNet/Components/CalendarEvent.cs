@@ -1,8 +1,7 @@
-﻿using ICalendarNet;
-using ICalendarNet.Base;
-using ICalendarNet.Components;
+﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
@@ -11,56 +10,56 @@ namespace ICalendarNet.Components
         public override ICalComponent ComponentType => ICalComponent.VEVENT;
         public string? Name
         {
-            get => Properties.GetContentlineProperty("Name");
-            set => UpdateProperty("Name", value!);
+            get => Properties.GetContentlineValue(ICalProperty.NAME);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
         }
         public string? Summary
         {
-            get => Properties.GetContentlineProperty("Summary");
-            set => UpdateProperty("Summary", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
         public string? Description
         {
-            get => Properties.GetContentlineProperty("Description");
-            set => UpdateProperty("Description", value!);
+            get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
         public string? Uid
         {
-            get => Properties.GetContentlineProperty("Uid");
-            set => UpdateProperty("Uid", value!);
+            get => Properties.GetContentlineValue(ICalProperty.UID);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
         public string? Url
         {
-            get => Properties.GetContentlineProperty("URL");
-            set => UpdateProperty("URL", value!);
+            get => Properties.GetContentlineValue(ICalProperty.URL);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.URL);
         }
         public IEnumerable<string> Categories
         {
-            get => Properties.GetContentlinesProperty("Categories");
-            set => UpdateProperty("Categories", value!);
+            get => Properties.GetContentlinesValue(ICalProperty.CATEGORIES);
+            set => Properties.UpdateLinesProperty(value!, ICalProperty.CATEGORIES);
         }
         public DateTimeOffset? DTSTART
         {
-            get => Properties.GetContentlineDateTime("DTSTART");
-            set => Properties.UpdateLineProperty(value!, "DTSTART");
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
         }
         public DateTimeOffset? DTEND
         {
-            get => Properties.GetContentlineDateTime("DTEND");
-            set => Properties.UpdateLineProperty(value!, "DTEND");
+            get => Properties.GetContentlineDateTime(ICalProperty.DTEND);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DTEND);
         }
         public DateTimeOffset? DTSTAMP
         {
-            get => Properties.GetContentlineDateTime("DTSTAMP");
-            set => Properties.UpdateLineProperty(value!, "DTSTAMP");
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTAMP);
         }
         public IEnumerable<CalendarAttachment> GetAttachments()
         {
-            return Properties.GetContentlines("ATTACH").Cast<CalendarAttachment>();
+            return Properties.GetContentlines(ICalProperty.ATTACH).Cast<CalendarAttachment>();
         }
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
-            Properties.UpdateLineProperty(attachments, "ATTACH");
+            Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
         }
 
         public IEnumerable<CalendarAlarm> GetAlarms() => SubComponents.Where(t => t.ComponentType == ICalComponent.VALARM).Cast<CalendarAlarm>();

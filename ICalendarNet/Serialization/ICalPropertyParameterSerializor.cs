@@ -11,10 +11,10 @@ namespace ICalendarNet.Serialization
         {
             if (keys.Count == 0)
                 return null;
-            ContentLineParameters keyValuePairs = new();
+            ContentLineParameters keyValuePairs = [];
             for (int i = 0; i < keys.Count; i++)
             {
-                keyValuePairs.SetOrAddValue(keys[i].Value, values[i].Value);
+                keyValuePairs.SetOrAddValue(keys[i].Value, values[i].Value.Split(','));
             }
 
             return keyValuePairs;

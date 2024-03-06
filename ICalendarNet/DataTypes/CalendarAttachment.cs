@@ -61,7 +61,8 @@ namespace ICalendarNet.DataTypes
             get => Parameters.GetValue("VALUE");
             set => Parameters.SetOrAddValue("VALUE", value!);
         }
-
+        public CalendarAttachment(Statics.ICalProperty key, string value, ContentLineParameters? param) : base(Statics.ICalProperties[(int)key], value, param)
+        { }
         public CalendarAttachment(string key, string value, ContentLineParameters? param) : base(key, value, param)
         { }
         public CalendarAttachment(Uri uri, string? fmttype)
