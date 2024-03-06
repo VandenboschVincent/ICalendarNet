@@ -23,5 +23,13 @@ namespace ICalendarNet.Extensions
             parameters[key] = value;
         }
 
+        public static ContentLineParameters ToDictionary(this IEnumerable<KeyValuePair<string, IEnumerable<string>>> source) =>
+           source.ToDictionary(null);
+
+        public static ContentLineParameters ToDictionary(this IEnumerable<KeyValuePair<string, IEnumerable<string>>> source, IEqualityComparer<string>? comparer)
+        {
+            return new(source, comparer);
+        }
+
     }
 }

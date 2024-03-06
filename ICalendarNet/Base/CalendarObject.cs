@@ -1,4 +1,6 @@
-﻿using ICalendarNet.Extensions;
+﻿
+using ICalendarNet.Extensions;
+using static ICalendarNet.Statics;
 using System.Runtime.InteropServices;
 
 namespace ICalendarNet.Base
@@ -9,19 +11,20 @@ namespace ICalendarNet.Base
         public List<ICalendarProperty> Properties { get; } = [];
         public List<ICalendarComponent> SubComponents { get; } = [];
 
-        public void AddProperty(string key, string value)
+        public void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null)
         {
-            Properties.UpdateLineProperty(value, key);
+            Properties.UpdateLineProperty(value!, key, parameters);
         }
 
-        public void UpdateProperty(string key, string value)
+        public void UpdateProperty(ICalProperty key, IEnumerable<string> value, ContentLineParameters? parameters = null)
         {
-            Properties.UpdateLineProperty(value, key);
+            Properties.UpdateLinesProperty(value!, key, parameters);
         }
 
-        public void UpdateProperty(string key, IEnumerable<string> value)
+        protected virtual void Dispose(bool disposing)
         {
-            Properties.UpdateLinesProperty(value.ToList(), key);
+            Properties.Clear();
+            SubComponents.Clear();
         }
 
         public void Dispose()
@@ -30,9 +33,5 @@ namespace ICalendarNet.Base
             GC.SuppressFinalize(this);
         }
 
-        protected virtual void Dispose(bool disposing)
-        {
-
-        }
     }
 }

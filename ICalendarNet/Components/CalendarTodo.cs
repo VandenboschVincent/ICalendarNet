@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
@@ -8,18 +9,18 @@ namespace ICalendarNet.Components
         public override ICalComponent ComponentType => ICalComponent.VTODO;
         public string? Summary
         {
-            get => Properties.GetContentlineProperty("Summary");
-            set => UpdateProperty("Summary", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
         public string? Uid
         {
-            get => Properties.GetContentlineProperty("Uid");
-            set => UpdateProperty("Uid", value!);
+            get => Properties.GetContentlineValue(ICalProperty.UID);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
         public DateTimeOffset? DTSTAMP
         {
-            get => Properties.GetContentlineDateTime("DTSTAMP");
-            set => Properties.UpdateLineProperty(value!, "DTSTAMP");
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTAMP);
         }
         /// <summary>
         /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.2

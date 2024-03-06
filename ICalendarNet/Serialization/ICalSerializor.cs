@@ -29,7 +29,7 @@ namespace ICalendarNet.Serialization
 
             return InternalDeserializeComponents<T>(handler);
         }
-        public ICalendarProperty DeserializeICalProperty(string source)
+        public ICalendarProperty? DeserializeICalProperty(string source)
         {
             return GetProperty(source);
         }

@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using ICalendarNet.Serialization;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
@@ -22,58 +23,58 @@ namespace ICalendarNet.Components
 
         public string? Name
         {
-            get => Properties.GetContentlineProperty("Name");
-            set => UpdateProperty("Name", value!);
+            get => Properties.GetContentlineValue(ICalProperty.NAME);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
         }
         public string? Summary
         {
-            get => Properties.GetContentlineProperty("Summary");
-            set => UpdateProperty("Summary", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
         public string? Description
         {
-            get => Properties.GetContentlineProperty("Description");
-            set => UpdateProperty("Description", value!);
+            get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
         public string? Uid
         {
-            get => Properties.GetContentlineProperty("Uid");
-            set => UpdateProperty("Uid", value!);
+            get => Properties.GetContentlineValue(ICalProperty.UID);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
         public string? Url
         {
-            get => Properties.GetContentlineProperty("URL");
-            set => UpdateProperty("URL", value!);
+            get => Properties.GetContentlineValue(ICalProperty.NAME);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
         }
         public string? Owner
         {
-            get => Properties.GetContentlineProperty("X-Owner");
-            set => UpdateProperty("X-Owner", value!);
+            get => Properties.GetContentlineValue(ICalProperty.X_OWNER);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.X_OWNER);
         }
         public string? ETag
         {
-            get => Properties.GetContentlineProperty("ETag");
-            set => UpdateProperty("ETag", value!);
+            get => Properties.GetContentlineValue(ICalProperty.ETAG);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.ETAG);
         }
         public DateTimeOffset? LastModified
         {
-            get => Properties.GetContentlineDateTime("LAST-MODIFIED");
-            set => Properties.UpdateLineProperty(value, "LAST-MODIFIED");
+            get => Properties.GetContentlineDateTime(ICalProperty.LAST_MODIFIED);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.LAST_MODIFIED);
         }
         public string? SyncToken
         {
-            get => Properties.GetContentlineProperty("SyncToken");
-            set => UpdateProperty("SyncToken", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SYNCTOKEN);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SYNCTOKEN);
         }
         public string? Color
         {
-            get => Properties.GetContentlineProperty("Color");
-            set => UpdateProperty("Color", value!);
+            get => Properties.GetContentlineValue(ICalProperty.COLOR);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.COLOR);
         }
         public DateTimeOffset? Created
         {
-            get => Properties.GetContentlineDateTime("Created");
-            set => Properties.UpdateLineProperty(value, "Created");
+            get => Properties.GetContentlineDateTime(ICalProperty.CREATED);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.CREATED);
         }
 
         public IEnumerable<CalendarEvent> GetEvents() => SubComponents.Where(t => t.ComponentType == ICalComponent.VEVENT).Cast<CalendarEvent>();

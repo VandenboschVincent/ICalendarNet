@@ -17,18 +17,18 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("46qsd54f9q4df63a64dsfq", null)]
         public void Test_GetContentlineTimeSpan_ShouldReturnTimespan(string value, double? totalSeconds)
         {
-            List<ICalendarProperty> lines = [new CalendarDefaultDataType("key", value, null)];
+            List<ICalendarProperty> lines = [new CalendarDefaultDataType(Statics.ICalProperty.DURATION, value, null)];
 
             if (totalSeconds.HasValue)
             {
-                lines.GetContentlineTimeSpan("key").Should().Be(TimeSpan.FromSeconds(totalSeconds.Value));
+                lines.GetContentlineTimeSpan(Statics.ICalProperty.DURATION).Should().Be(TimeSpan.FromSeconds(totalSeconds.Value));
                 lines.Clear();
-                lines.UpdateLineProperty(TimeSpan.FromSeconds(totalSeconds.Value), "key");
-                lines.GetContentlineTimeSpan("key").Should().Be(TimeSpan.FromSeconds(totalSeconds.Value));
+                lines.UpdateLineProperty(TimeSpan.FromSeconds(totalSeconds.Value), Statics.ICalProperty.DURATION);
+                lines.GetContentlineTimeSpan(Statics.ICalProperty.DURATION).Should().Be(TimeSpan.FromSeconds(totalSeconds.Value));
             }
             else
             {
-                lines.GetContentlineTimeSpan("key").Should().BeNull();
+                lines.GetContentlineTimeSpan(Statics.ICalProperty.DURATION).Should().BeNull();
             }
         }
 
@@ -39,9 +39,9 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("PT", null, false)]
         [TestCase("T15M", null, false)]
         [TestCase("46qsd54f9q4df63a64dsfq", null, false)]
-        public void Test_GetContentlineDateTime_ShouldReturnTimespan(string value, string? time, bool utc)
+        public void Test_GetContentlineDateTime_ShouldReturnDateTime(string value, string? time, bool utc)
         {
-            List<ICalendarProperty> lines = [new CalendarDefaultDataType("key", value, null)];
+            List<ICalendarProperty> lines = [new CalendarDefaultDataType(Statics.ICalProperty.DTEND, value, null)];
             if (time != null)
             {
                 DateTimeStyles timeStyles = utc ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;
@@ -49,14 +49,14 @@ namespace ICalendarNet.UnitTest.DataTypesTests
                     throw new InvalidDataException(time.ToString());
                 DateTimeOffset offset = new(dt);
 
-                lines.GetContentlineDateTime("key")!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
+                lines.GetContentlineDateTime(Statics.ICalProperty.DTEND)!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
                 lines.Clear();
-                lines.UpdateLineProperty(offset, "key");
-                lines.GetContentlineDateTime("key")!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
+                lines.UpdateLineProperty(offset, Statics.ICalProperty.DTEND);
+                lines.GetContentlineDateTime(Statics.ICalProperty.DTEND)!.Value.UtcDateTime.Should().Be(offset.UtcDateTime);
             }
             else
             {
-                lines.GetContentlineTimeSpan("key").Should().BeNull();
+                lines.GetContentlineTimeSpan(Statics.ICalProperty.DTEND).Should().BeNull();
             }
         }
     }

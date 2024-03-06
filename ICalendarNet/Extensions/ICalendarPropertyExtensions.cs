@@ -1,151 +1,136 @@
 ﻿using ICalendarNet.Base;
+using ICalendarNet.Converters;
 using ICalendarNet.DataTypes;
 using System;
-using System.Globalization;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Extensions
 {
     public static class ICalendarPropertyExtensions
     {
-        private static DateTimeOffset? TryParseToDateTime(string value, string format)
+        public static string? GetContentlineValue(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            DateTimeStyles timeStyles = format.EndsWith('Z') ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;
-            if (DateTime.TryParseExact(value, format, CultureInfo.InvariantCulture, timeStyles, out DateTime UtcTime))
-                return UtcTime;
-            return null;
+            return lines.GetContentlineValue(ICalProperties[(int)key]);
         }
-        private static TimeSpan? TryParseToTimeSpan(string value, string format)
-        {
-            if (TimeSpan.TryParseExact(value, format, new CultureInfo("en-US"), out TimeSpan ts))
-                return ts;
-            return null;
-        }
-
-        public static string? GetContentlineProperty(this List<ICalendarProperty> lines, string key)
+        public static string? GetContentlineValue(this List<ICalendarProperty> lines, string key)
         {
             return lines.Find(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase))?.Value;
         }
-        public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, string key)
+        public static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+            return lines.GetContentlinesValue(ICalProperties[(int)key]);
         }
-        public static double? GetContentlineDouble(this List<ICalendarProperty> lines, string key)
-        {
-            string? value = lines.GetContentlineProperty(key);
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-            if (double.TryParse(value, out double result))
-                return result;
-            return null;
-        }
-        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, string key)
-        {
-            string? value = lines.GetContentlineProperty(key);
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-            if ((TryParseToDateTime(value, "yyyyMMddTHHmmssZ") ??
-                TryParseToDateTime(value, "yyyyMMddTHHmmss") ??
-                TryParseToDateTime(value, "yyyyMMddHHmm") ??
-                TryParseToDateTime(value, "yyyyMMdd")) is DateTimeOffset offset)
-                return offset;
-            return null;
-        }
-        public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, string key)
-        {
-            string? value = lines.GetContentlineProperty(key);
-            if (string.IsNullOrWhiteSpace(value))
-                return null;
-            if ((TryParseToTimeSpan(value, "'PT'%h'H'%m'M'%s'S'") ??
-                TryParseToTimeSpan(value, "'PT'%h'H'%m'M'") ??
-                TryParseToTimeSpan(value, "'PT'%m'M'%s'S'") ??
-                TryParseToTimeSpan(value, "'PT'%m'M'"))
-                is TimeSpan ts)
-                return ts;
-            return null;
-        }
-        public static IEnumerable<string> GetContentlinesProperty(this List<ICalendarProperty> lines, string key)
+        internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, string key)
         {
             return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(','));
         }
 
-        public static void UpdateLineProperty(this List<ICalendarProperty> lines, string value, string key)
+        public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            key = key.ToUpper();
-            var foundLines = lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-            if (foundLines.Any())
+            return lines.GetContentlines(ICalProperties[(int)key]);
+        }
+        internal static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, string key)
+        {
+            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public static int? GetContentlineInt(this List<ICalendarProperty> lines, ICalProperty key)
+        {
+            return TypeConverters.ConvertToInt(lines.GetContentlineValue(ICalProperties[(int)key]));
+        }
+        public static double? GetContentlineDouble(this List<ICalendarProperty> lines, ICalProperty key)
+        {
+            return TypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
+        }
+        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key)
+        {
+            return TypeConverters.ConvertToDateTimeOffset(lines.GetContentlineValue(ICalProperties[(int)key]));
+        }
+        public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)
+        {
+            return TypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(ICalProperties[(int)key]));
+        }
+
+
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, string value, ICalProperty key, ContentLineParameters? parameters = null)
+        {
+            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (foundLine != null)
             {
-                foundLines.First().Value = value;
+                if (parameters != null)
+                    foundLine.Parameters = parameters;
+                foundLine.Value = value;
                 return;
             }
-            lines.Add(GetPropertyType(key).GetContentLine(key, value, null));
+            lines.Add(key.GetContentLine(value, parameters));
         }
-        public static void UpdateLineProperty(this List<ICalendarProperty> lines, TimeSpan? value, string key)
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, TimeSpan? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             if (!value.HasValue)
                 return;
-            key = key.ToUpper();
-            string stringValue = value.Value.ToString("'PT'%h'H'%m'M'%s'S'");
-            var foundLines = lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-            if (foundLines.Any())
-            {
-                foundLines.First().Value = stringValue;
-                return;
-            }
-            lines.Add(GetPropertyType(key).GetContentLine(key, stringValue, null));
+            lines.UpdateLineProperty(TypeConverters.ConvertFromTimeSpan(value.Value), key, parameters);
         }
-        public static void UpdateLineProperty(this List<ICalendarProperty> lines, DateTimeOffset? value, string key)
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, int? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             if (!value.HasValue)
                 return;
-            key = key.ToUpper();
-            string sValue = value.Value.ToUniversalTime().ToString("yyyyMMddTHHmmssZ");
-            var foundLines = lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-            if (foundLines.Any())
-            {
-                foundLines.First().Value = sValue;
-                return;
-            }
-            lines.Add(GetPropertyType(key).GetContentLine(key, sValue, null));
+            lines.UpdateLineProperty(TypeConverters.ConvertFromInt(value.Value), key, parameters);
         }
-        public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, double? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            key = key.ToUpper();
+            if (!value.HasValue)
+                return;
+            lines.UpdateLineProperty(TypeConverters.ConvertFromDouble(value.Value), key, parameters);
+        }
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, DateTimeOffset? value, ICalProperty key, ContentLineParameters? parameters = null)
+        {
+            if (!value.HasValue)
+                return;
+            lines.UpdateLineProperty(TypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
+        }
+        internal static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)
+        {
             lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
             lines.AddRange(value);
         }
-        public static void UpdateLinesProperty(this List<ICalendarProperty> lines, IList<string> value, string key)
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, ICalProperty key)
         {
-            key = key.ToUpper();
-            lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-            lines.AddRange(value.Select(t => GetPropertyType(key).GetContentLine(key, t, null)));
+            lines.UpdateLineProperty(value, ICalProperties[(int)key]);
         }
-        public static bool IsNewProperty(this ReadOnlySpan<char> line)
+        public static void UpdateLinesProperty(this List<ICalendarProperty> lines, IEnumerable<string> value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            if (line.StartsWith("X-"))
-                return true;
+            lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            lines.AddRange(value.Select(t => key.GetContentLine(t, parameters)));
+        }
+        public static bool TryGetNewProperty(this ReadOnlySpan<char> line, out ICalProperty? property)
+        {
+            property = null;
             for (int i = 0; i < ICalProperties.Length; i++)
             {
                 if (line.StartsWith(ICalProperties[i]))
+                {
+                    property = (ICalProperty)i;
                     return true;
+                }
             }
+            if (line.StartsWith("X-"))
+                return true;
             return false;
         }
 
-        public static int NewLineIndex(this ReadOnlySpan<char> line)
+        internal static ICalProperty? GetPropertyType(ReadOnlySpan<char> key)
         {
-            int index1 = line.IndexOf('\n');
-            int index2 = line.IndexOf('\r');
-            return index1 < index2 ? index1 : index2;
-        }
-
-        public static ICalProperty? GetPropertyType(string key)
-        {
-            if (Enum.TryParse<ICalProperty>(key.Replace("-", "_"), out var property))
+            if (TryGetNewProperty(key, out ICalProperty? property))
                 return property;
             return null;
         }
-        public static ICalendarProperty GetContentLine(this ICalProperty? property, string key, string value, ContentLineParameters? parameters)
+        internal static ICalendarProperty GetContentLine(this ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value, ContentLineParameters? parameters)
+        {
+            if (property == null)
+                return new CalendarDefaultDataType(key.ToString(), value.ToString(), parameters);
+            return property.Value.GetContentLine(value, parameters);
+        }
+        internal static ICalendarProperty GetContentLine(this ICalProperty property, ReadOnlySpan<char> value, ContentLineParameters? parameters)
         {
             switch (property)
             {
@@ -263,10 +248,11 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.SYNCTOKEN:
                 case ICalProperty.ETAG:
                 case ICalProperty.CATEGORY:
-                default:
-                    return new CalendarDefaultDataType(key, value, parameters);
+                    return new CalendarDefaultDataType(ICalProperties[(int)property], value.ToString(), parameters);
 
-                case ICalProperty.ATTACH: return new CalendarAttachment(key, value, parameters);
+                case ICalProperty.ATTACH: return new CalendarAttachment(ICalProperties[(int)property], value.ToString(), parameters);
+                default:
+                    throw new NotSupportedException(property.ToString());
             }
         }
     }
