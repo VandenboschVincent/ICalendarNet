@@ -94,7 +94,7 @@ namespace ICalendarNet.Serialization
                 key.Slice(Statics.ICalProperties[(int)property].Length, key.Length - Statics.ICalProperties[(int)property].Length).ToString().Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
                 {
                     var splitted = x.Split('=');
-                    return new KeyValuePair<string, IEnumerable<string>>(splitted.First(), splitted.Skip(1));
+                    return new KeyValuePair<string, IEnumerable<string>>(splitted.First(), splitted.Last().Split(','));
                 }).ToDictionary());
         }
 

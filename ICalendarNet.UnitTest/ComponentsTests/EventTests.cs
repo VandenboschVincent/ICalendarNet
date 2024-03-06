@@ -1,4 +1,5 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -11,7 +12,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var icalvar = @"
 BEGIN:VEVENT
 CREATED:20060717T210517Z
-LAST-MODIFIED:20060717T210718Z
+LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
 DTSTAMP:20060717T210718Z
 UID:uuid1153170430406
 SUMMARY:Test event
@@ -23,6 +24,9 @@ LOCATION:Daywest
 END:VEVENT";
             CalendarEvent? calendar = calSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
             calendar!.Properties.Should().HaveCount(8);
+            calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.Should().HaveCount(1);
+            calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Key.Should().Be("testparam");
+            calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Value.Should().BeEquivalentTo(new List<string>() { "paramvalue", "paramvalue2" }); ;
         }
 
         [Test]
