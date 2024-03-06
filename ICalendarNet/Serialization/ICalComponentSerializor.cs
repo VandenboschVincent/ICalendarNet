@@ -1,58 +1,58 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
 using ICalendarNet.Extensions;
+using System.Collections.Generic;
 using System.Text;
 
 namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private T InternalDeserialize<T>(ReadOnlySpan<string> source, T parentObject) where T : ICalendarComponent, new()
+        private ICalendarComponent InternalDesirializeComponents(StringHandler handler, CalCompontentBlock parentBlock)
         {
-            parentObject.Properties.AddRange(InternalDeserializeContentLines(parentObject.ComponentType, source));
-            switch (parentObject.ComponentType)
+            return parentBlock.CalComponent!.Value switch
             {
-                case ICalComponent.VCALENDAR:
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarEvent>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarTodo>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarJournal>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarFreeBusy>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarTimeZone>(source));
-                    break;
-                case ICalComponent.VEVENT:
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarAlarm>(source));
-                    break;
-                case ICalComponent.VTODO:
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarAlarm>(source));
-                    break;
-                case ICalComponent.VJOURNAL:
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarAlarm>(source));
-                    break;
-                case ICalComponent.VFREEBUSY:
-                    break;
-                case ICalComponent.VTIMEZONE:
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarAlarm>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarStandard>(source));
-                    parentObject.SubComponents.AddRange(InternalDeserializeComponents<CalendarDaylight>(source));
-                    break;
-                case ICalComponent.STANDARD:
-                    break;
-                case ICalComponent.DAYLIGHT:
-                    break;
-                case ICalComponent.VALARM:
-                    break;
-                default: throw new ArgumentException(message: "invalid component", paramName: parentObject.ComponentType.ToString());
-            }
-            return parentObject;
+                ICalComponent.VCALENDAR => InternalDesirializeComponentsBlock(handler, new Calendar(), parentBlock),
+                ICalComponent.VEVENT => InternalDesirializeComponentsBlock(handler, new CalendarEvent(), parentBlock),
+                ICalComponent.VTODO => InternalDesirializeComponentsBlock(handler, new CalendarTodo(), parentBlock),
+                ICalComponent.VJOURNAL => InternalDesirializeComponentsBlock(handler, new CalendarJournal(), parentBlock),
+                ICalComponent.VFREEBUSY => InternalDesirializeComponentsBlock(handler, new CalendarFreeBusy(), parentBlock),
+                ICalComponent.VTIMEZONE => InternalDesirializeComponentsBlock(handler, new CalendarTimeZone(), parentBlock),
+                ICalComponent.STANDARD => InternalDesirializeComponentsBlock(handler, new CalendarStandard(), parentBlock),
+                ICalComponent.DAYLIGHT => InternalDesirializeComponentsBlock(handler, new CalendarDaylight(), parentBlock),
+                ICalComponent.VALARM => InternalDesirializeComponentsBlock(handler, new CalendarAlarm(), parentBlock),
+                _ => throw new ArgumentException(message: "invalid component", paramName: parentBlock.CalComponent!.Value.ToString()),
+            };
         }
-        private IEnumerable<T> InternalDeserializeComponents<T>(ReadOnlySpan<string> source) where T : ICalendarComponent, new()
+        private IEnumerable<T> InternalDeserializeComponents<T>(StringHandler handler) where T : ICalendarComponent, new()
         {
-            List<T> components = [];
-            foreach (var index in GetObjectSourceIndexes<T>(source, new T().ComponentType))
+            while (handler.BlocksLeft > 0)
             {
-                components.Add(InternalDeserialize(source.Slice(1 + index.Item1, index.Item2 - index.Item1), new T()));
+                yield return InternalDesirializeComponentsBlock(handler, new T());
             }
-            return components;
+        }
+
+        private T InternalDesirializeComponentsBlock<T>(StringHandler handler, T parent) where T : ICalendarComponent, new()
+        {
+            CalCompontentBlock parentBlock = handler.GetNextBlock();
+            return InternalDesirializeComponentsBlock(handler, parent, parentBlock);
+        }
+
+        private T InternalDesirializeComponentsBlock<T>(StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
+        {
+            if (!parentBlock.CalComponent.HasValue)
+                throw new ArgumentException($"Could not desirialize to {nameof(parent)}");
+            parent.Properties.AddRange(InternalDeserializeContentLines(parentBlock.CalComponent.Value, parentBlock.Properties));
+            for (int i = 0; i < parentBlock.ComponentCount; i++)
+            {
+                CalCompontentBlock block = handler.GetNextBlock();
+                if (!block.CalComponent.HasValue)
+                    continue;
+                if (handler.BlocksLeft <= 0)
+                    break;
+                parent.SubComponents.Add(InternalDesirializeComponents(handler, block));
+            }
+            return parent;
         }
 
         private StringBuilder SerializeComponent(ICalendarComponent component, StringBuilder builder)

@@ -1,4 +1,6 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Globalization;
+using System;
+using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
@@ -90,6 +92,34 @@ namespace ICalendarNet.Serialization
             throw new NotSupportedException(component.ToString());
         }
 
+        public static int GetEndLength(ICalComponent component)
+        {
+            switch (component)
+            {
+                case ICalComponent.VCALENDAR:
+                    return 13;
+                case ICalComponent.VEVENT:
+                    return 10;
+                case ICalComponent.VTODO:
+                    return 9;
+                case ICalComponent.VJOURNAL:
+                    return 12;
+                case ICalComponent.VFREEBUSY:
+                    return 13;
+                case ICalComponent.VTIMEZONE:
+                    return 13;
+                case ICalComponent.STANDARD:
+                    return 12;
+                case ICalComponent.DAYLIGHT:
+                    return 12;
+                case ICalComponent.VALARM:
+                    return 10;
+                default:
+                    break;
+            }
+            throw new NotSupportedException(component.ToString());
+        }
+
         internal const string vCalendarEnd = "END:VCALENDAR";
         internal const string vEventEnd = "END:VEVENT";
         internal const string vTodoEnd = "END:VTODO";
@@ -99,7 +129,7 @@ namespace ICalendarNet.Serialization
         internal const string vStandardEnd = "END:STANDARD";
         internal const string vDaylightEnd = "END:DAYLIGHT";
         internal const string vAlarmEnd = "END:VALARM";
-
+        public const string vBeginString = "BEGIN:";
         internal const string vCalendarBegin = "BEGIN:VCALENDAR";
         internal const string vEventBegin = "BEGIN:VEVENT";
         internal const string vTodoBegin = "BEGIN:VTODO";
@@ -114,9 +144,9 @@ namespace ICalendarNet.Serialization
         internal static readonly string[] searchEndKeys = [vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd];
         internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys];
 
-        [GeneratedRegex(@"\r\n?|\n", RegexOptions.None)]
+        [GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
         internal static partial Regex ReplaceAllNewLinesRegex();
-        [GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline)]
+        [GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline| RegexOptions.Compiled)]
         internal static partial Regex ContentLineRegex();
 
     }

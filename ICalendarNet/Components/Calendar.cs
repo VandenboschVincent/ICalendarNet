@@ -8,11 +8,13 @@ namespace ICalendarNet.Components
     {
         public static Calendar? LoadCalendar(string source)
         {
-            return new ICalSerializor().DeserializeCalendar(source);
+            using ICalSerializor serializor = new();
+            return serializor.DeserializeCalendar(source);
         }
         public static IEnumerable<Calendar> LoadCalendars(string source)
         {
-            return new ICalSerializor().DeserializeCalendars(source);
+            using ICalSerializor serializor = new();
+            return serializor.DeserializeCalendars(source);
         }
 
 

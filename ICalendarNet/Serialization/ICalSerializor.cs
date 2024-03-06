@@ -1,10 +1,13 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
+using System.Runtime.InteropServices;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class ICalSerializor : IDisposable
     {
+        private StringHandler? handler;
+
         public Calendar? DeserializeCalendar(string source)
         {
             return DeserializeICalComponent<Calendar>(source);
@@ -20,14 +23,11 @@ namespace ICalendarNet.Serialization
 
         public IEnumerable<T> DeserializeICalComponents<T>(string source) where T : ICalendarComponent, new()
         {
-            source = ReplaceAllNewLinesRegex().Replace(source, Environment.NewLine);
-            string[] sourceLines = source.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-            for (int i = 0; i < sourceLines.Length; i++)
-            {
-                if (allKeys.Contains(sourceLines[i], StringComparer.OrdinalIgnoreCase))
-                    sourceLines[i] = sourceLines[i].ToUpper();
-            }
-            return InternalDeserializeComponents<T>(sourceLines);
+            handler = new(source);
+            if (handler.BlocksLeft < 1)
+                throw new ArgumentException("Could not desirialize source");
+
+            return InternalDeserializeComponents<T>(handler);
         }
         public ICalendarProperty DeserializeICalProperty(string source)
         {
@@ -46,5 +46,22 @@ namespace ICalendarNet.Serialization
         {
             return SerializeProperty(contentLine);
         }
+
+        // Public implementation of Dispose pattern callable by consumers.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                handler?.Dispose();
+            }
+        }
+
     }
 }

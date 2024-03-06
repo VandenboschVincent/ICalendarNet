@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
+using System;
 using System.Globalization;
 using static ICalendarNet.Statics;
 
@@ -119,14 +120,23 @@ namespace ICalendarNet.Extensions
             lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
             lines.AddRange(value.Select(t => GetPropertyType(key).GetContentLine(key, t, null)));
         }
-        public static bool IsNewProperty(this string line)
+        public static bool IsNewProperty(this ReadOnlySpan<char> line)
         {
-            if (string.IsNullOrWhiteSpace(line))
-                return false;
-            string _line = line.Trim();
-            if (_line.StartsWith("X-") || Array.Exists(Statics.ICalProperties, _line.StartsWith))
+            if (line.StartsWith("X-"))
                 return true;
+            for (int i = 0; i < ICalProperties.Length; i++)
+            {
+                if (line.StartsWith(ICalProperties[i]))
+                    return true;
+            }
             return false;
+        }
+
+        public static int NewLineIndex(this ReadOnlySpan<char> line)
+        {
+            int index1 = line.IndexOf('\n');
+            int index2 = line.IndexOf('\r');
+            return index1 < index2 ? index1 : index2;
         }
 
         public static ICalProperty? GetPropertyType(string key)

@@ -1,8 +1,9 @@
 ﻿using ICalendarNet.Extensions;
+using System.Runtime.InteropServices;
 
 namespace ICalendarNet.Base
 {
-    public abstract class CalendarObject : ICalendarComponent
+    public abstract class CalendarObject : ICalendarComponent, IDisposable
     {
         public abstract ICalComponent ComponentType { get; }
         public List<ICalendarProperty> Properties { get; } = [];
@@ -21,6 +22,17 @@ namespace ICalendarNet.Base
         public void UpdateProperty(string key, IEnumerable<string> value)
         {
             Properties.UpdateLinesProperty(value.ToList(), key);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+
         }
     }
 }
