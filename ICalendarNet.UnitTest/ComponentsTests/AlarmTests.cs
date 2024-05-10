@@ -17,6 +17,10 @@ END:VALARM";
             CalendarAlarm? calendar = calSerializor.DeserializeICalComponent<CalendarAlarm>(icalvar);
             calendar.Should().NotBeNull();
             calendar!.Properties.Should().HaveCount(3);
+            //TODO create other class for trigger
+            calendar.Trigger.Should().Be("-PT30M");
+            calendar.Action.Should().Be("DISPLAY");
+            calendar.Description.Should().Be("Breakfast meeting with executive\\nteam at 8:30 AM EST.");
         }
 
         [Test]

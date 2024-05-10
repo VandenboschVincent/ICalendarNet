@@ -1,7 +1,10 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using ICalendarNet.Serialization;
+using System;
+using System.Globalization;
 using static ICalendarNet.Statics;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ICalendarNet.Components
 {
@@ -26,36 +29,86 @@ namespace ICalendarNet.Components
             get => Properties.GetContentlineValue(ICalProperty.NAME);
             set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
         }
+
         public string? Summary
         {
             get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
             set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
+
         public string? Description
         {
             get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
+
         public string? Uid
         {
             get => Properties.GetContentlineValue(ICalProperty.UID);
             set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
+
         public string? Url
         {
-            get => Properties.GetContentlineValue(ICalProperty.NAME);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
+            get => Properties.GetContentlineValue(ICalProperty.URL);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.URL);
         }
+
         public string? Owner
         {
             get => Properties.GetContentlineValue(ICalProperty.X_OWNER);
             set => Properties.UpdateLineProperty(value!, ICalProperty.X_OWNER);
         }
+
         public string? ETag
         {
             get => Properties.GetContentlineValue(ICalProperty.ETAG);
             set => Properties.UpdateLineProperty(value!, ICalProperty.ETAG);
         }
+
+        /// <summary>
+        /// This property defines the calendar scale used for the
+        /// calendar information specified in the iCalendar object.
+        /// default "GREGORIAN"
+        /// </summary>
+        public string? Scale
+        {
+            get => Properties.GetContentlineValue(ICalProperty.CALSCALE);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.CALSCALE);
+        }
+
+        /// <summary>
+        /// This property defines the iCalendar object method
+        /// associated with the calendar object.
+        /// </summary>
+        public string? Method
+        {
+            get => Properties.GetContentlineValue(ICalProperty.METHOD);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.METHOD);
+        }
+
+        /// <summary>
+        /// This property specifies the identifier for the product that
+        /// created the iCalendar object.
+        /// </summary>
+        public string? ProdId
+        {
+            get => Properties.GetContentlineValue(ICalProperty.METHOD);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.METHOD);
+        }
+
+        /// <summary>
+        /// This property specifies the identifier corresponding to the
+        /// highest version number or the minimum and maximum range of the
+        /// iCalendar specification that is required in order to interpret the
+        /// iCalendar object.
+        /// </summary>
+        public string? Version
+        {
+            get => Properties.GetContentlineValue(ICalProperty.VERSION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.VERSION);
+        }
+
         public DateTimeOffset? LastModified
         {
             get => Properties.GetContentlineDateTime(ICalProperty.LAST_MODIFIED);

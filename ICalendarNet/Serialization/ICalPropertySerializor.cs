@@ -56,7 +56,9 @@ namespace ICalendarNet.Serialization
                 }
                 else if (calendarProperties.Count > 0)
                 {
-                    calendarProperties[^1].Value += toProcess.ToString();
+                    calendarProperties[^1].Value += 
+                        (calendarProperties[^1].Value.Length > 0 ? Environment.NewLine : "") + 
+                        toProcess.ToString();
                 }
                 else
                 {

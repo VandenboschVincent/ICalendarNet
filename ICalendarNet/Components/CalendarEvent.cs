@@ -33,11 +33,21 @@ namespace ICalendarNet.Components
             get => Properties.GetContentlineValue(ICalProperty.URL);
             set => Properties.UpdateLineProperty(value!, ICalProperty.URL);
         }
+        public string? Location
+        {
+            get => Properties.GetContentlineValue(ICalProperty.LOCATION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.LOCATION);
+        }
+
+        /// <summary>
+        /// This property defines the categories for a calendar component.
+        /// </summary>
         public IEnumerable<string> Categories
         {
             get => Properties.GetContentlinesValue(ICalProperty.CATEGORIES);
             set => Properties.UpdateLinesProperty(value!, ICalProperty.CATEGORIES);
         }
+
         public DateTimeOffset? DTSTART
         {
             get => Properties.GetContentlineDateTime(ICalProperty.DTSTART);
@@ -53,10 +63,27 @@ namespace ICalendarNet.Components
             get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTAMP);
         }
+        public DateTimeOffset? Created
+        {
+            get => Properties.GetContentlineDateTime(ICalProperty.CREATED);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.CREATED);
+        }
+
+        /// <summary>
+        /// This property provides the capability to associate a
+        /// document object with a calendar component.
+        /// </summary>
+        /// <returns></returns>
         public IEnumerable<CalendarAttachment> GetAttachments()
         {
             return Properties.GetContentlines(ICalProperty.ATTACH).Cast<CalendarAttachment>();
         }
+
+        /// <summary>
+        /// This property provides the capability to associate a
+        /// document object with a calendar component.
+        /// </summary>
+        /// <returns></returns>
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
