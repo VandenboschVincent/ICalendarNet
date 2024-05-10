@@ -1,4 +1,5 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -20,6 +21,14 @@ SUMMARY:Project xyz Review Meeting
 END:VJOURNAL";
             CalendarJournal? calendar = calSerializor.DeserializeICalComponent<CalendarJournal>(icalvar);
             calendar!.Properties.Should().HaveCount(8);
+            calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(859204800));
+            calendar.Uid.Should().Be("uid5@host1.com");
+            calendar.Description.Should().Be("Project xyz Review Meeting Minutes.");
+            //TODO Add organizer
+            //calendar.Properties.GetContentlineValue(Statics.ICalProperty.ORGANIZER).Should().Be("")
+            calendar.Properties.GetContentlineValue(Statics.ICalProperty.STATUS).Should().Be("FINAL");
+            calendar.Properties.GetContentlineValue(Statics.ICalProperty.CATEGORY).Should().Be("Project Report, XYZ, Weekly Meeting");
+            calendar.Properties.GetContentlineValue(Statics.ICalProperty.SUMMARY).Should().Be("Project xyz Review Meeting");
         }
 
         [Test]

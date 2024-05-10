@@ -32,9 +32,16 @@ namespace ICalendarNet.UnitTest
         {
             foreach (var icalvar in GetIcalStrings())
             {
-                var calendar = Calendar.LoadCalendar(icalvar);
-                calendar!.Properties.Should().NotBeEmpty();
-                calendar!.SubComponents.Should().NotBeEmpty();
+                try
+                {
+                    var calendar = Calendar.LoadCalendar(icalvar);
+                    calendar!.Properties.Should().NotBeEmpty(icalvar);
+                    calendar!.SubComponents.Should().NotBeEmpty(icalvar);
+                }
+                catch (Exception ex)
+                {
+                    Assert.Fail(ex.Message + Environment.NewLine + icalvar);
+                }
             }
         }
 
@@ -50,8 +57,8 @@ namespace ICalendarNet.UnitTest
 
                 string serializedCalendar = calSerializor.SerializeCalendar(calendar);
                 Calendar? calendarAfterSerialize = calSerializor.DeserializeCalendar(serializedCalendar);
-                calendarAfterSerialize!.Properties.Should().BeEquivalentTo(calendar.Properties);
-                calendarAfterSerialize.SubComponents.Should().HaveCount(calendar.SubComponents.Count);
+                calendarAfterSerialize!.Properties.Should().BeEquivalentTo(calendar.Properties, serializedCalendar);
+                calendarAfterSerialize.SubComponents.Should().HaveCount(calendar.SubComponents.Count, serializedCalendar);
 
                 //Assertions max size
                 if (calendar.SubComponents.Exists(x => x.Properties.Count >= 30)
@@ -60,7 +67,7 @@ namespace ICalendarNet.UnitTest
                     continue;
                 }
 
-                calendarAfterSerialize.SubComponents.Should().BeEquivalentTo(calendar.SubComponents);
+                calendarAfterSerialize.SubComponents.Should().BeEquivalentTo(calendar.SubComponents, serializedCalendar);
             }
         }
 

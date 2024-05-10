@@ -31,7 +31,7 @@ namespace ICalendarNet.Serialization
         }
         public ICalendarProperty? DeserializeICalProperty(string source)
         {
-            return GetProperty(source);
+            return InternalDeserializeContentLines(source).FirstOrDefault();
         }
 
         public string SerializeCalendar(Calendar calendar)

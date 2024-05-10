@@ -24,6 +24,7 @@ namespace ICalendarNet.Serialization
                 _ => throw new ArgumentException(message: "invalid component", paramName: parentBlock.CalComponent!.Value.ToString()),
             };
         }
+
         private IEnumerable<T> InternalDeserializeComponents<T>(StringHandler handler) where T : ICalendarComponent, new()
         {
             while (handler.BlocksLeft > 0)
@@ -42,15 +43,15 @@ namespace ICalendarNet.Serialization
         {
             if (!parentBlock.CalComponent.HasValue)
                 throw new ArgumentException($"Could not desirialize to {nameof(parent)}");
-            parent.Properties.AddRange(InternalDeserializeContentLines(parentBlock.CalComponent.Value, parentBlock.Properties));
+            parent.Properties.AddRange(InternalDeserializeContentLines(parentBlock.Properties));
             for (int i = 0; i < parentBlock.ComponentCount; i++)
             {
                 CalCompontentBlock block = handler.GetNextBlock();
                 if (!block.CalComponent.HasValue)
                     continue;
+                parent.SubComponents.Add(InternalDesirializeComponents(handler, block));
                 if (handler.BlocksLeft <= 0)
                     break;
-                parent.SubComponents.Add(InternalDesirializeComponents(handler, block));
             }
             return parent;
         }
@@ -71,6 +72,7 @@ namespace ICalendarNet.Serialization
 
             return builder;
         }
+
         private string SerializeComponent(ICalendarComponent parentObject)
         {
             return SerializeComponent(parentObject, new StringBuilder()).ToString();

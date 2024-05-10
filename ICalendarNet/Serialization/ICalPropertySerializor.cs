@@ -1,17 +1,16 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
-using System.ComponentModel;
 using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ICalComponent calComponent, ReadOnlySpan<char> source)
+        private IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
         {
             List<ICalendarProperty> calendarProperties = [];
-            var lineEnumerator = source.EnumerateLines();
+            System.Text.SpanLineEnumerator lineEnumerator = source.EnumerateLines();
             bool needvalue = false;
             int nextPropertySeparator;
             while (lineEnumerator.MoveNext())
@@ -28,11 +27,11 @@ namespace ICalendarNet.Serialization
                 {
                     if (nextPropertySeparator >= 0)
                     {
-                        calendarProperties.Last().Value = toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1).ToString();
+                        calendarProperties[^1].Value = toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1).ToString();
                     }
                     else
                     {
-                        calendarProperties.Last().Value = toProcess.ToString();
+                        calendarProperties[^1].Value = toProcess.ToString();
                     }
                     needvalue = false;
                     continue;
@@ -61,14 +60,13 @@ namespace ICalendarNet.Serialization
                 }
                 else
                 {
-
                 }
             }
 
             return calendarProperties;
         }
 
-        public static ContentLine ToContentLine(Statics.ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
+        public static ICalendarProperty ToContentLine(Statics.ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
             if (property != null)
             {
@@ -83,36 +81,22 @@ namespace ICalendarNet.Serialization
                     null);
             }
         }
-        public static ContentLine ToInternalContentLine(Statics.ICalProperty property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
+
+        private static ICalendarProperty ToInternalContentLine(Statics.ICalProperty property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
-            if(key.Length == Statics.ICalProperties[(int)property].Length)
-                return new CalendarDefaultDataType(property,
-                    value.ToString(),
+            if (key.Length == Statics.ICalProperties[(int)property].Length)
+                return ICalendarPropertyExtensions.GetContentLine(property,
+                    value,
                     null);
-            return new CalendarDefaultDataType(property,
-                value.ToString(),
-                key.Slice(Statics.ICalProperties[(int)property].Length, key.Length - Statics.ICalProperties[(int)property].Length).ToString().Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
-                {
-                    var splitted = x.Split('=');
-                    return new KeyValuePair<string, IEnumerable<string>>(splitted.First(), splitted.Last().Split(','));
-                }).ToDictionary());
-        }
-
-        private ICalendarProperty? GetProperty(string source)
-        {
-            Match match = ContentLineRegex().Match(source);
-            if (!match.Success)
-                return null;
-            return CreateProperty(match.Groups[1].ValueSpan,
-                match.Groups[6].ValueSpan,
-                match.Groups[4].Captures,
-                match.Groups[5].Captures
-                );
-        }
-
-        private ICalendarProperty CreateProperty(ReadOnlySpan<char> key, ReadOnlySpan<char> value, CaptureCollection paramkey, CaptureCollection paramvalue)
-        {
-            return ICalendarPropertyExtensions.GetPropertyType(key.ToString()).GetContentLine(key, value, GetParameters(paramkey, paramvalue));
+            return ICalendarPropertyExtensions.GetContentLine(property,
+                value,
+                key.Slice(Statics.ICalProperties[(int)property].Length, key.Length - Statics.ICalProperties[(int)property].Length)
+                    .ToString()
+                    .Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
+                    {
+                        string[] splitted = x.Split('=');
+                        return new KeyValuePair<string, IEnumerable<string>>(splitted[0], splitted[^1].Split(','));
+                    }).ToDictionary());
         }
     }
 }

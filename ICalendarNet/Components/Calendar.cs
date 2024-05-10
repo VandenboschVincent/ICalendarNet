@@ -15,7 +15,7 @@ namespace ICalendarNet.Components
         public static IEnumerable<Calendar> LoadCalendars(string source)
         {
             using ICalSerializor serializor = new();
-            return serializor.DeserializeCalendars(source);
+            return serializor.DeserializeCalendars(source).ToList();
         }
 
 

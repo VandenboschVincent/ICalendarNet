@@ -1,25 +1,24 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.Components;
-using System;
-using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ICalendarNet.Serialization
+﻿namespace ICalendarNet.Serialization
 {
+    /// <summary>
+    /// Block that contains content and properties
+    /// </summary>
+    /// <param name="content"></param>
+    /// <param name="componentCount"></param>
+    /// <param name="calComponent"></param>
+    /// <param name="properties"></param>
     public ref struct CalCompontentBlock(ReadOnlySpan<char> content, int componentCount, ICalComponent? calComponent, ReadOnlySpan<char> properties)
     {
         public ICalComponent? CalComponent { get; set; } = calComponent;
         public ReadOnlySpan<char> Content { get; set; } = content;
         public ReadOnlySpan<char> Properties { get; set; } = properties;
         public int ComponentCount { get; set; } = componentCount;
-
     }
-    // This class implements a text reader that reads from a string.
+
+    /// <summary>
+    /// This class implements a text reader that reads from a string.
+    /// Will output that string in blocks that start with BEGIN: and END:
+    /// </summary>
     public class StringHandler : IDisposable
     {
         private string? reader;
@@ -31,13 +30,14 @@ namespace ICalendarNet.Serialization
         public StringHandler(string s)
         {
             reader = s;
-            for (int i = 0; i < s.Length;)
+            int i = 0;
+            while (i < s.Length)
             {
                 int indexFound = s.IndexOf(ICalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
 
                 if (indexes.Count > 0)
                 {
-                    CalComponentIndex previOuseWorkingItem = indexes.Last();
+                    CalComponentIndex previOuseWorkingItem = indexes[^1];
                     previOuseWorkingItem.EndContentIndex = indexFound == -1 ? (s.Length - 1) : (indexFound - 1);
                 }
 
@@ -55,7 +55,7 @@ namespace ICalendarNet.Serialization
                 if (currentWorkingItem.CalComponent == null)
                     continue;
 
-                currentWorkingItem.EndIndex = 
+                currentWorkingItem.EndIndex =
                     s.IndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + ICalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
 
                 indexes.Add(currentWorkingItem);
@@ -84,32 +84,41 @@ namespace ICalendarNet.Serialization
         {
             switch (component)
             {
-               case ICalComponent.VCALENDAR:
+                case ICalComponent.VCALENDAR:
                     return t => t.CalComponent == ICalComponent.VEVENT ||
                         t.CalComponent == ICalComponent.VTODO ||
                         t.CalComponent == ICalComponent.VJOURNAL ||
                         t.CalComponent == ICalComponent.VFREEBUSY ||
                         t.CalComponent == ICalComponent.VTIMEZONE;
+
                 case ICalComponent.VEVENT:
                     return t => t.CalComponent == ICalComponent.VALARM;
+
                 case ICalComponent.VTODO:
                     return t => t.CalComponent == ICalComponent.VALARM;
+
                 case ICalComponent.VJOURNAL:
                     return t => t.CalComponent == ICalComponent.VALARM;
+
                 case ICalComponent.VFREEBUSY:
                     break;
+
                 case ICalComponent.VTIMEZONE:
                     return t => t.CalComponent == ICalComponent.VALARM ||
                         t.CalComponent == ICalComponent.STANDARD ||
                         t.CalComponent == ICalComponent.DAYLIGHT;
+
                 case ICalComponent.STANDARD:
                     break;
+
                 case ICalComponent.DAYLIGHT:
                     break;
+
                 case ICalComponent.VALARM:
                     break;
+
                 default: throw new ArgumentException(message: "invalid component", paramName: component.ToString());
-                };
+            }
             return t => false;
         }
 
@@ -136,7 +145,7 @@ namespace ICalendarNet.Serialization
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -146,8 +155,7 @@ namespace ICalendarNet.Serialization
             }
         }
 
-
-        private class CalComponentIndex
+        private sealed class CalComponentIndex
         {
             public int StartIndex { get; set; } = -1;
             public int EndIndex { get; set; } = -1;

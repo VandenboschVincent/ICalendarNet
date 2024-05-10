@@ -30,7 +30,7 @@ namespace ICalendarNet.DataTypes
         /// <returns></returns>
         public byte[]? GetData()
         {
-            if ((Value.Length % 4 == 0) && Value.IsBase64())
+            if (!string.IsNullOrWhiteSpace(Value) && Value.IsBase64())
                 return dataEncoding.GetBytes(Value);
             return null;
         }

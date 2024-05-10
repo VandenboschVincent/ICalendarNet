@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 
 namespace ICalendarNet.Base
 {
-    public class ContentLineParameters : Dictionary<string, IEnumerable<string>>, IDictionary<string, IEnumerable<string>>
+    public class ContentLineParameters : Dictionary<string, IEnumerable<string>>
     {
         public ContentLineParameters() : base() { }
 
