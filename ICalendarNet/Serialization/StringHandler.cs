@@ -27,16 +27,22 @@
 
         public int BlocksLeft => indexes.Count - currentWorkingBlock;
 
+        /// <summary>
+        /// Initializes and parses a string in ical format
+        /// </summary>
+        /// <param name="s"></param>
         public StringHandler(string s)
         {
             reader = s;
             int i = 0;
             while (i < s.Length)
             {
+                //Find the next BEGIN statement
                 int indexFound = s.IndexOf(ICalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
 
                 if (indexes.Count > 0)
                 {
+                    //Sets the previous End index (only of the parameters) to just after this BEGIN
                     CalComponentIndex previOuseWorkingItem = indexes[^1];
                     previOuseWorkingItem.EndContentIndex = indexFound == -1 ? (s.Length - 1) : (indexFound - 1);
                 }
@@ -44,6 +50,7 @@
                 if (indexFound == -1)
                     break;
 
+                //Move the index to after BEGIN:
                 i = indexFound + 6;
 
                 CalComponentIndex currentWorkingItem = new()
@@ -55,6 +62,7 @@
                 if (currentWorkingItem.CalComponent == null)
                     continue;
 
+                //Sets the End index (including subcomponents) to just after this BEGIN
                 currentWorkingItem.EndIndex =
                     s.IndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + ICalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
 
@@ -62,24 +70,39 @@
             }
         }
 
+        /// <summary>
+        /// Get the next component of the ical string
+        /// </summary>
+        /// <returns></returns>
         public CalCompontentBlock GetNextBlock()
         {
             if (indexes.Count < currentWorkingBlock)
                 return new CalCompontentBlock();
 
-            CalComponentIndex lastblock = indexes[currentWorkingBlock];
+            CalComponentIndex nextBlock = indexes[currentWorkingBlock];
             currentWorkingBlock++;
 
-            if (lastblock.CalComponent == null)
+            if (nextBlock.CalComponent == null)
                 return new CalCompontentBlock();
 
+            //Reads the next block
             return new CalCompontentBlock(
-                reader.AsSpan().Slice(lastblock.StartIndex, lastblock.EndIndex - lastblock.StartIndex),
-                indexes.Where(FilterSubComponents(lastblock.CalComponent!.Value)).Count(t => t.StartIndex > lastblock.StartIndex && t.EndIndex < lastblock.EndIndex),
-                lastblock.CalComponent.Value,
-                reader.AsSpan().Slice(lastblock.StartIndex, lastblock.EndContentIndex - lastblock.StartIndex));
+                //Content (including subcomponents)
+                reader.AsSpan().Slice(nextBlock.StartIndex, nextBlock.EndIndex - nextBlock.StartIndex),
+                //Gets the count of al subcomponents
+                indexes.Where(FilterSubComponents(nextBlock.CalComponent!.Value)).Count(t => t.StartIndex > nextBlock.StartIndex && t.EndIndex < nextBlock.EndIndex),
+                //Type of the component
+                nextBlock.CalComponent.Value,
+                //The Content (not including subcomponents)
+                reader.AsSpan().Slice(nextBlock.StartIndex, nextBlock.EndContentIndex - nextBlock.StartIndex));
         }
 
+        /// <summary>
+        /// Get all types of component that can be found in the parent component
+        /// </summary>
+        /// <param name="component"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException"></exception>
         private static Func<CalComponentIndex, bool> FilterSubComponents(ICalComponent component)
         {
             switch (component)
@@ -122,6 +145,12 @@
             return t => false;
         }
 
+        /// <summary>
+        /// Tries to find out what type the next block is
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         private static ICalComponent? GetComponent(int startIndex, ReadOnlySpan<char> source)
         {
             return TryGetComponent(startIndex, 7, source)
@@ -130,6 +159,13 @@
                 ?? TryGetComponent(startIndex, 6, source);
         }
 
+        /// <summary>
+        /// Tries to find out what type by trying to parse an enum
+        /// </summary>
+        /// <param name="startIndex"></param>
+        /// <param name="length"></param>
+        /// <param name="source"></param>
+        /// <returns></returns>
         private static ICalComponent? TryGetComponent(int startIndex, int length, ReadOnlySpan<char> source)
         {
             if (Enum.TryParse(source.Slice(startIndex, length), true, out ICalComponent foundComponent))
