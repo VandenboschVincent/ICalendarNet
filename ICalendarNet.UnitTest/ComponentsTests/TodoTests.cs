@@ -21,6 +21,27 @@ DTSTAMP:20060728T195437Z
 END:VTODO";
             CalendarTodo? calendar = calSerializor.DeserializeICalComponent<CalendarTodo>(icalvar);
             calendar!.Properties.Should().HaveCount(9);
+            calendar.Uid.Should().Be("fed50a1c-1e72-11db-a465-aae271be3660");
+            calendar.Summary.Should().Be("Test Todo");
+            calendar.Location.Should().Be("Test");
+            //calendar.Status.Should().Be("COMPLETED");
+            //calendar.Completed.Should().Be("COMPLETED");
+            //calendar.Class.Should().Be("PRIVATE");
+            //calendar.DTSTART.Should().Be("PRIVATE");
+            //calendar.RRULE.Should().Be("PRIVATE");
+            calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(1154116477));
+            string serialized = calSerializor.SerializeICalObjec(calendar);
+            serialized.Should().Be(@"BEGIN:VTODO
+UID:fed50a1c-1e72-11db-a465-aae271be3660
+SUMMARY:Test Todo
+LOCATION:Test
+STATUS:COMPLETED
+COMPLETED;TZID=US-Eastern:20060730T090000
+CLASS:PRIVATE
+DTSTART;TZID=US-Eastern:20060728T090000
+RRULE:FREQ=MONTHLY;COUNT=10;BYDAY=1FR
+DTSTAMP:20060728T195437Z
+END:VTODO");
         }
 
         [Test]

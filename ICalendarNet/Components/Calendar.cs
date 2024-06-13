@@ -37,30 +37,12 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        ///   <see cref="ICalProperty.SUMMARY" />
-        /// </summary>
-        public string? Summary
-        {
-            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
-        }
-
-        /// <summary>
         ///   <see cref="ICalProperty.DESCRIPTION" />
         /// </summary>
         public string? Description
         {
             get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.UID" />
-        /// </summary>
-        public string? Uid
-        {
-            get => Properties.GetContentlineValue(ICalProperty.UID);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
 
         /// <summary>
@@ -109,12 +91,12 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        ///   <see cref="ICalProperty.METHOD" />
+        ///   <see cref="ICalProperty.PRODID" />
         /// </summary>
         public string? ProdId
         {
-            get => Properties.GetContentlineValue(ICalProperty.METHOD);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.METHOD);
+            get => Properties.GetContentlineValue(ICalProperty.PRODID);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.PRODID);
         }
 
         /// <summary>
@@ -124,15 +106,6 @@ namespace ICalendarNet.Components
         {
             get => Properties.GetContentlineValue(ICalProperty.VERSION);
             set => Properties.UpdateLineProperty(value!, ICalProperty.VERSION);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.LAST_MODIFIED" />
-        /// </summary>
-        public DateTimeOffset? LastModified
-        {
-            get => Properties.GetContentlineDateTime(ICalProperty.LAST_MODIFIED);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.LAST_MODIFIED);
         }
 
         /// <summary>

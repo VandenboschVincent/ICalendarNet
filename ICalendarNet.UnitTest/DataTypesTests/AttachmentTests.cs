@@ -17,6 +17,8 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             attachment.Should().NotBeNull();
             attachment.GetData().Should().NotBeNull();
             attachment.Value.Should().Be(bytevalue);
+            attachment.ENCODING.Should().Be("BASE64");
+            attachment.ValueType.Should().Be("BINARY");
         }
 
         [TestCase("ATTACH:http://ical.mac.com/ical/US32Holidays.ics", "http://ical.mac.com/ical/US32Holidays.ics")]
@@ -32,6 +34,17 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             attachment.GetUri().Should().NotBeNull();
             attachment.GetUri()!.ToString().Should().BeEquivalentTo(uri);
             calSerializor.SerializeICalProperty(attachment).Should().Be(value);
+        }
+
+        [TestCase("ATTACH;FMTTYPE=application/postscript:ftp://example.com/pub/reports/r-960812.ps", "application/postscript")]
+        public void Test_Attachment_Uri_Deserialize_FMTTYPE(string value, string type)
+        {
+            ICalSerializor calSerializor = new();
+            ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
+            prop.Should().NotBeNull();
+            CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
+            attachment.Should().NotBeNull();
+            attachment.FMTTYPE.Should().Be(type);
         }
 
         [Test]

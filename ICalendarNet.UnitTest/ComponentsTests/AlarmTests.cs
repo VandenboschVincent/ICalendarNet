@@ -8,8 +8,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         public void Test_Serialize_Alarm()
         {
             ICalSerializor calSerializor = new();
-            var icalvar = @"
-BEGIN:VALARM
+            var icalvar = @"BEGIN:VALARM
 TRIGGER;RELATED=END:-PT30M
 ACTION:DISPLAY
 DESCRIPTION:Breakfast meeting with executive\nteam at 8:30 AM EST.
@@ -21,6 +20,12 @@ END:VALARM";
             calendar.Trigger.Should().Be("-PT30M");
             calendar.Action.Should().Be("DISPLAY");
             calendar.Description.Should().Be("Breakfast meeting with executive\\nteam at 8:30 AM EST.");
+            string serialized = calSerializor.SerializeICalObjec(calendar);
+            serialized.Should().Be(@"BEGIN:VALARM
+TRIGGER;RELATED=END:-PT30M
+ACTION:DISPLAY
+DESCRIPTION:Breakfast meeting with executive\nteam at 8:30 AM EST.
+END:VALARM");
         }
 
         [Test]
@@ -40,7 +45,6 @@ END:VALARM";
                 serializedCalender.Should().NotBeNull();
                 serializedCalender!.GetEvents().Any(t => t.GetAlarms().Any(x => x.Description == calDescr)).Should().BeTrue();
                 serializedCalender.GetEvents().First().GetAlarms().First().Properties.Should().HaveCountGreaterThan(1);
-
             }
         }
     }

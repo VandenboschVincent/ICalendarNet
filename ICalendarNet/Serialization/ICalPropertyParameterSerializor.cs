@@ -7,19 +7,6 @@ namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
-        private ContentLineParameters? GetParameters(CaptureCollection keys, CaptureCollection values)
-        {
-            if (keys.Count == 0)
-                return null;
-            ContentLineParameters keyValuePairs = [];
-            for (int i = 0; i < keys.Count; i++)
-            {
-                keyValuePairs.SetOrAddValue(keys[i].Value, values[i].Value.Split(','));
-            }
-
-            return keyValuePairs;
-        }
-
         private string SerializeProperty(ICalendarProperty parentObject)
         {
             return SerializeProperty(parentObject, new StringBuilder()).ToString();

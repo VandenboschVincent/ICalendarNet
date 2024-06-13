@@ -25,7 +25,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        ///   <see cref="ICalProperty.DESCRIPTION" />
+        ///   <see cref="ICalProperty.SUMMARY" />
         /// </summary>
         public virtual string? Summary
         {
@@ -34,7 +34,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        ///   <see cref="ICalProperty.DESCRIPTION" />
+        ///   <see cref="ICalProperty.ACTION" />
         /// </summary>
         public virtual string? Action
         {
@@ -43,8 +43,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Relative to the DTStart or DTEnd or an absolute datetime of the parent object
-        /// Can be repeated if Duration(delay) and Repeat are present
+        ///   <see cref="ICalProperty.Trigger" />
         /// </summary>
         public virtual string? Trigger
         {
@@ -53,7 +52,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Delay for the next alarm
+        ///   <see cref="ICalProperty.Duration" />
         /// </summary>
         public virtual TimeSpan? Duration
         {
@@ -62,7 +61,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Sets how many times the action will repeat
+        ///   <see cref="ICalProperty.REPEAT" />
         /// </summary>
         public virtual double? Repeat
         {
@@ -71,7 +70,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Sets the receivers when Action is set to Email
+        ///   <see cref="ICalProperty.ATTENDEE" />
         /// </summary>
         public virtual IEnumerable<string>? Attendee
         {
@@ -79,11 +78,17 @@ namespace ICalendarNet.Components
             set => Properties.UpdateLinesProperty(value!.ToList(), ICalProperty.ATTENDEE);
         }
 
+        /// <summary>
+        ///   <see cref="ICalProperty.ATTACH" />
+        /// </summary>
         public IEnumerable<CalendarAttachment> GetAttachments()
         {
             return Properties.GetContentlines(ICalProperty.ATTACH).Cast<CalendarAttachment>();
         }
 
+        /// <summary>
+        ///   <see cref="ICalProperty.ATTACH" />
+        /// </summary>
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);

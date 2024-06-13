@@ -22,9 +22,19 @@ namespace ICalendarNet.Extensions
             return lines.GetContentlinesValue(ICalProperties[(int)key]);
         }
 
+        public static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
+        {
+            return lines.GetContentlinesValue(keys.Select(t => ICalProperties[(int)t]));
+        }
+
         internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, string key)
         {
             return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(','));
+        }
+
+        internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, IEnumerable<string> keys)
+        {
+            return lines.Where(t => keys.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(", "));
         }
 
         public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, ICalProperty key)
@@ -201,9 +211,7 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.TZOFFSETFROM:
                 case ICalProperty.TZOFFSETTO:
                 case ICalProperty.TZURL:
-                case ICalProperty.ATTENDEE:
                 case ICalProperty.CONTACT:
-                case ICalProperty.ORGANIZER:
                 case ICalProperty.RECURRENCE_ID:
                 case ICalProperty.RELATED_TO:
                 case ICalProperty.URL:
@@ -275,7 +283,13 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.CATEGORY:
                     return new CalendarDefaultDataType(ICalProperties[(int)property], value.ToString(), parameters);
 
-                case ICalProperty.ATTACH: return new CalendarAttachment(ICalProperties[(int)property], value.ToString(), parameters);
+                case ICalProperty.ATTACH:
+                    return new CalendarAttachment(ICalProperties[(int)property], value.ToString(), parameters);
+
+                case ICalProperty.ATTENDEE:
+                case ICalProperty.ORGANIZER:
+                    return new CalendarCalAddress(ICalProperties[(int)property], value.ToString(), parameters);
+
                 default:
                     throw new NotSupportedException(property.ToString());
             }

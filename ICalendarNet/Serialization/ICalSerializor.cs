@@ -36,15 +36,15 @@ namespace ICalendarNet.Serialization
 
         public string SerializeCalendar(Calendar calendar)
         {
-            return SerializeComponent(calendar);
+            return SerializeComponent(calendar).Trim();
         }
         public string SerializeICalObjec(ICalendarComponent calendarObject)
         {
-            return SerializeComponent(calendarObject);
+            return SerializeComponent(calendarObject).Trim();
         }
         public string SerializeICalProperty(ICalendarProperty contentLine)
         {
-            return SerializeProperty(contentLine);
+            return SerializeProperty(contentLine).Trim();
         }
 
         // Public implementation of Dispose pattern callable by consumers.

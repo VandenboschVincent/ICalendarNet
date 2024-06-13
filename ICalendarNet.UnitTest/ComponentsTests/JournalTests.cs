@@ -1,5 +1,4 @@
-﻿using ICalendarNet.Extensions;
-using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -24,11 +23,21 @@ END:VJOURNAL";
             calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(859204800));
             calendar.Uid.Should().Be("uid5@host1.com");
             calendar.Description.Should().Be("Project xyz Review Meeting Minutes.");
-            //TODO Add organizer
-            //calendar.Properties.GetContentlineValue(Statics.ICalProperty.ORGANIZER).Should().Be("")
-            calendar.Properties.GetContentlineValue(Statics.ICalProperty.STATUS).Should().Be("FINAL");
-            calendar.Properties.GetContentlineValue(Statics.ICalProperty.CATEGORY).Should().Be("Project Report, XYZ, Weekly Meeting");
-            calendar.Properties.GetContentlineValue(Statics.ICalProperty.SUMMARY).Should().Be("Project xyz Review Meeting");
+            calendar.Organizer.Should().Be("jane_doe@host.com\";CN=JohnSmith");
+            calendar.Status.Should().Be("FINAL");
+            calendar.Categories.Should().BeEquivalentTo(new List<string>() { "Project Report", "XYZ", "Weekly Meeting", });
+            calendar.Summary.Should().Be("Project xyz Review Meeting");
+            string serialized = calSerializor.SerializeICalObjec(calendar);
+            serialized.Should().Be(@"BEGIN:VJOURNAL
+DTSTAMP:19970324T120000Z
+UID:uid5@host1.com
+ORGANIZER;SENT-BY=""MAILTO:jane_doe@host.com"";CN=JohnSmith
+STATUS:FINAL
+CLASS:PRIVATE
+CATEGORY:Project Report, XYZ, Weekly Meeting
+DESCRIPTION:Project xyz Review Meeting Minutes.
+SUMMARY:Project xyz Review Meeting
+END:VJOURNAL");
         }
 
         [Test]
