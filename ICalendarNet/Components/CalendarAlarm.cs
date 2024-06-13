@@ -5,10 +5,19 @@ using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
+    /// <summary>
+    ///   <see cref="ICalComponent.VALARM" />
+    /// </summary>
     public class CalendarAlarm : CalendarObject
     {
+        /// <summary>
+        ///   <see cref="ICalComponent.VALARM" />
+        /// </summary>
         public override ICalComponent ComponentType => ICalComponent.VALARM;
 
+        /// <summary>
+        ///   <see cref="ICalProperty.DESCRIPTION" />
+        /// </summary>
         public virtual string? Description
         {
             get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
@@ -16,7 +25,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Sets the subject of email when trigger is EMAIL
+        ///   <see cref="ICalProperty.DESCRIPTION" />
         /// </summary>
         public virtual string? Summary
         {
@@ -25,10 +34,7 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        /// Can be AUDIO, DISPLAY, EMAIL
-        /// AUDIO: Raises sound found in the Attach property
-        /// DISPLAY: displays text from Description property
-        /// EMAIL: sends email to one or more Attendee properties, Summary as subject, Description as body, Attach as attachments
+        ///   <see cref="ICalProperty.DESCRIPTION" />
         /// </summary>
         public virtual string? Action
         {
@@ -81,13 +87,6 @@ namespace ICalendarNet.Components
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
-        }
-
-        /// <summary>
-        /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.6
-        /// </summary>
-        public CalendarAlarm()
-        {
         }
     }
 }

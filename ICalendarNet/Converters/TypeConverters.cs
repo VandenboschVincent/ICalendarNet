@@ -10,6 +10,7 @@ namespace ICalendarNet.Converters
             if (double.TryParse(value, out double result)) return result;
             return null;
         }
+
         public static TimeSpan? ConvertToTimeSpan(string? value)
         {
             if (string.IsNullOrEmpty(value)) return null;
@@ -23,6 +24,7 @@ namespace ICalendarNet.Converters
                 return ts;
             return null;
         }
+
         public static DateTimeOffset? ConvertToDateTimeOffset(string? value)
         {
             if (string.IsNullOrEmpty(value)) return null;
@@ -44,6 +46,7 @@ namespace ICalendarNet.Converters
                 return offset;
             return null;
         }
+
         public static int? ConvertToInt(string? value)
         {
             if (string.IsNullOrEmpty(value)) return null;
@@ -55,6 +58,7 @@ namespace ICalendarNet.Converters
         {
             return value.ToString();
         }
+
         public static string ConvertFromTimeSpan(TimeSpan value)
         {
             string format = "'PT'";
@@ -72,6 +76,7 @@ namespace ICalendarNet.Converters
             }
             return value.ToString(format);
         }
+
         public static string ConvertFromDateTimeOffset(DateTimeOffset value)
         {
             value = value.ToUniversalTime();
@@ -86,12 +91,11 @@ namespace ICalendarNet.Converters
             }
             return value.ToString(format + "Z");
         }
+
         public static string ConvertFromInt(int value)
         {
             return value.ToString();
         }
-
-
 
         private static TimeSpan? TryParseToTimeSpan(string value, string format)
         {
@@ -99,6 +103,7 @@ namespace ICalendarNet.Converters
                 return ts;
             return null;
         }
+
         private static DateTimeOffset? TryParseToDateTime(string value, string format)
         {
             DateTimeStyles timeStyles = format.EndsWith('Z') ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;

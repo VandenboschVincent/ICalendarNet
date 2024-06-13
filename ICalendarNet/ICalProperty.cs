@@ -1,9 +1,43 @@
-﻿using Microsoft.VisualBasic;
-
-namespace ICalendarNet
+﻿namespace ICalendarNet
 {
     public static class Statics
     {
+        public enum ICalParameter
+        {
+            ALTREP,
+            CN,
+            CUTYPE,
+            DELEGATED_FROM,
+            DELEGATED_TO,
+            DIR,
+            ENCODING,
+            FMTTYPE,
+            FBTYPE,
+            LANGUAGE,
+            MEMBER,
+            PARTSTAT,
+            RANGE,
+            RELATED,
+            RELTYPE,
+            ROLE,
+            RSVP,
+            SENT_BY,
+            TZID,
+            VALUE,
+            X_FILENAME,
+            X_MS_OLK_RESPTIME,
+            X_MICROSOFT_ISLEAPMONTH,
+            DISPLAY,
+            EMAIL,
+            FEATURE,
+            LABEL,
+            ORDER,
+            SCHEMA,
+            DERIVED,
+            GAP,
+            LINKREL
+        }
+
         public static readonly string[] ICalParameters = [
             "ALTREP",
             "CN",
@@ -44,7 +78,7 @@ namespace ICalendarNet
             /// <summary>
             /// 3.7.1 Value Type: TEXT
             /// This property defines the calendar scale used for the calendar information specified in the iCalendar object.
-            /// This property can be specified once in an iCalendar object.  
+            /// This property can be specified once in an iCalendar object.
             /// The default value is "GREGORIAN".
             /// </summary>
             CALSCALE,
@@ -226,7 +260,7 @@ namespace ICalendarNet
 
             /// <summary>
             /// 3.8.3.1 Value Type: TEXT
-            /// This property specifies the text value that uniquely identifies the "VTIMEZONE" 
+            /// This property specifies the text value that uniquely identifies the "VTIMEZONE"
             /// calendar component in the scope of an iCalendar object.
             /// This property MUST be specified in a "VTIMEZONE" calendar component.
             /// </summary>
@@ -255,7 +289,7 @@ namespace ICalendarNet
 
             /// <summary>
             /// 3.8.3.5 Time Zone URL Value Type: UTC-OFFSET
-            /// This property provides a means for a "VTIMEZONE" component to point to a network 
+            /// This property provides a means for a "VTIMEZONE" component to point to a network
             /// location that can be used to retrieve an up-to-date version of itself.
             /// This property can be specified in a "VTIMEZONE" calendar component.
             /// </summary>
@@ -264,10 +298,10 @@ namespace ICalendarNet
             /// <summary>
             /// 3.8.4.1 Value Type: CAL-ADDRESS
             /// This property defines an "Attendee" within a calendar component.
-            /// This property MUST be specified in an iCalendar object that specifies a group-scheduled calendar entity.  
+            /// This property MUST be specified in an iCalendar object that specifies a group-scheduled calendar entity.
             /// This property MUST NOT be specified in an iCalendar object when publishing the calendar information.
-            /// This property is not specified in an iCalendar object that specifies only a time zone definition 
-            /// or that defines calendar components that are not group-scheduled components, 
+            /// This property is not specified in an iCalendar object that specifies only a time zone definition
+            /// or that defines calendar components that are not group-scheduled components,
             /// but are components only on a single user's calendar.
             /// </summary>
             ATTENDEE,
@@ -285,7 +319,7 @@ namespace ICalendarNet
             /// This property defines the organizer for a calendar component.
             /// This property MUST be specified in an iCalendar object that specifies a group-scheduled calendar entity.
             /// This property MUST be specified in an iCalendar object that specifies the publication of a calendar user's busy time.
-            /// This property MUST NOT be specified in an iCalendar object that specifies only a time zone definition or that defines 
+            /// This property MUST NOT be specified in an iCalendar object that specifies only a time zone definition or that defines
             /// calendar components that are not group-scheduled components, but are components only on a single user's calendar.
             /// </summary>
             ORGANIZER,
@@ -323,7 +357,7 @@ namespace ICalendarNet
             /// <summary>
             /// 3.8.5.1 Exception Date-Times Value Type: DATE-TIME
             /// This property defines the list of DATE-TIME exceptions for recurring events, to-dos, journal entries, or time zone definitions.
-            /// This property can be specified in recurring "VEVENT", "VTODO", and "VJOURNAL" calendar components 
+            /// This property can be specified in recurring "VEVENT", "VTODO", and "VJOURNAL" calendar components
             /// as well as in the "STANDARD" and "DAYLIGHT" sub-components of the "VTIMEZONE" calendar component.
             /// </summary>
             EXDATE,
@@ -339,7 +373,7 @@ namespace ICalendarNet
             /// <summary>
             /// 3.8.5.2 Recurrence Rule Value Type: RECUR
             /// This property defines a rule or repeating pattern for recurring events, to-dos, journal entries, or time zone definitions.
-            /// This property can be specified in recurring "VEVENT", "VTODO", and "VJOURNAL" calendar components 
+            /// This property can be specified in recurring "VEVENT", "VTODO", and "VJOURNAL" calendar components
             /// as well as in the "STANDARD" and "DAYLIGHT" sub-components of the "VTIMEZONE" calendar component,
             /// but it SHOULD NOT be specified more than once. The recurrence set generated with multiple "RRULE" properties is undefined.
             /// </summary>
@@ -348,6 +382,10 @@ namespace ICalendarNet
             /// <summary>
             /// 3.8.6.1 Value Type: TEXT
             /// This property defines the action to be invoked when an alarm is triggered.
+            /// Can be AUDIO, DISPLAY, EMAIL
+            /// AUDIO: Raises sound found in the Attach property
+            /// DISPLAY: displays text from Description property
+            /// EMAIL: sends email to one or more Attendee properties, Summary as subject, Description as body, Attach as attachments
             /// This property MUST be specified once in a "VALARM" calendar component.
             /// </summary>
             ACTION,
@@ -368,7 +406,7 @@ namespace ICalendarNet
 
             /// <summary>
             /// 3.8.7.1 Value Type: DATE-TIME
-            /// This property specifies the date and time that the calendar information was created 
+            /// This property specifies the date and time that the calendar information was created
             /// by the calendar user agent in the calendar store.
             /// The property can be specified once in "VEVENT", "VTODO", or "VJOURNAL" calendar components.
             /// The value MUST be specified as a date with UTC time.
@@ -377,9 +415,9 @@ namespace ICalendarNet
 
             /// <summary>
             /// 3.8.7.2 Value Type: DATE-TIME
-            /// In the case of an iCalendar object that specifies a "METHOD" property, 
+            /// In the case of an iCalendar object that specifies a "METHOD" property,
             /// this property specifies the date and time that the instance of the iCalendar object was created.
-            /// In the case of an iCalendar object that doesn't specify a "METHOD" property, 
+            /// In the case of an iCalendar object that doesn't specify a "METHOD" property,
             /// this property specifies the date and time that the information associated with the calendar component was last revised in the calendar store.
             /// This property MUST be included in the "VEVENT", "VTODO", "VJOURNAL", or "VFREEBUSY" calendar components.
             /// </summary>
@@ -461,6 +499,7 @@ namespace ICalendarNet
             ETAG,
             CATEGORY
         };
+
         public static readonly string[] ICalProperties = [
             "CALSCALE",
             "METHOD",

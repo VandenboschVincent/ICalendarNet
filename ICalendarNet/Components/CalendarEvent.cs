@@ -5,34 +5,43 @@ using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
+    /// <summary>
+    /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.1
+    /// </summary>
     public class CalendarEvent : CalendarObject
     {
         public override ICalComponent ComponentType => ICalComponent.VEVENT;
+
         public string? Name
         {
             get => Properties.GetContentlineValue(ICalProperty.NAME);
             set => Properties.UpdateLineProperty(value!, ICalProperty.NAME);
         }
+
         public string? Summary
         {
             get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
             set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
+
         public string? Description
         {
             get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
+
         public string? Uid
         {
             get => Properties.GetContentlineValue(ICalProperty.UID);
             set => Properties.UpdateLineProperty(value!, ICalProperty.UID);
         }
+
         public string? Url
         {
             get => Properties.GetContentlineValue(ICalProperty.URL);
             set => Properties.UpdateLineProperty(value!, ICalProperty.URL);
         }
+
         public string? Location
         {
             get => Properties.GetContentlineValue(ICalProperty.LOCATION);
@@ -53,16 +62,19 @@ namespace ICalendarNet.Components
             get => Properties.GetContentlineDateTime(ICalProperty.DTSTART);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
         }
+
         public DateTimeOffset? DTEND
         {
             get => Properties.GetContentlineDateTime(ICalProperty.DTEND);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTEND);
         }
+
         public DateTimeOffset? DTSTAMP
         {
             get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTAMP);
         }
+
         public DateTimeOffset? Created
         {
             get => Properties.GetContentlineDateTime(ICalProperty.CREATED);
@@ -90,13 +102,6 @@ namespace ICalendarNet.Components
         }
 
         public IEnumerable<CalendarAlarm> GetAlarms() => SubComponents.Where(t => t.ComponentType == ICalComponent.VALARM).Cast<CalendarAlarm>();
-
-        /// <summary>
-        /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.1
-        /// </summary>
-        public CalendarEvent()
-        {
-        }
 
         public override string ToString()
         {
