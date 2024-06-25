@@ -1,28 +1,42 @@
 # This workflow will build a .NET project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
 
-name: .NET
+name: .TestAndPublish
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags:
+    - '*'
 
 jobs:
-  build:
-
+  BuildTestAndPublish:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 8.0.x
+    - name: GitHub Tag Name example
+      run: |
+        echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
+        echo "Tag name from github.ref_name: ${{  github.ref_name }}"
     - name: Restore dependencies
       run: dotnet restore
+    - name: Verify commit exists in origin/master
+      run: |
+        git fetch --no-tags --prune --depth=1 origin +refs/heads/*:refs/remotes/origin/*
+        git branch --remote --contains | grep origin/master
+    - name: Set VERSION variable from tag
+      run: echo "VERSION=${GITHUB_REF/refs\/tags\/v/}" >> $GITHUB_ENV
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --configuration Release /p:Version=${VERSION} --no-restore
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --configuration Release /p:Version=${VERSION} --no-build
+    - name: Pack
+      run: dotnet pack --configuration Release /p:Version=${VERSION} --no-build --output .
+    - name: Push
+      run: dotnet nuget push ICalendarNet.${VERSION}.nupkg --source https://api.nuget.org/v3/index.json --api-key ${NUGET_API_KEY}
+      env:
+        NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
