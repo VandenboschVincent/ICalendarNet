@@ -25,7 +25,7 @@ END:VEVENT";
             CalendarEvent? calendar = calSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
             calendar!.Properties.Should().HaveCount(9);
             calendar.Uid.Should().Be("uuid1153170430406");
-            calendar.Summary.Should().Be($"Test event\r\nNewline Test event\r\nhttps://learn.microsoft.com/en-us/dotnet/api/system.string.join?view=net-8.0");
+            calendar.Summary.Should().Be($"Test event{Environment.NewLine}Newline Test event{Environment.NewLine}https://learn.microsoft.com/en-us/dotnet/api/system.string.join?view=net-8.0");
             calendar.Location.Should().Be("Daywest");
             calendar.Categories.Should().Contain("3");
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.Should().HaveCount(1);
