@@ -1,55 +1,106 @@
 ﻿using ICalendarNet.Base;
+using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
-using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor
     {
-        private Task DeserializePropertiesToICalObject<T>(string source, T parentObject) where T : ICalendarComponent, new()
+        private IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
         {
-            return Task.Run(() => AddContentLines(parentObject.ComponentType, source, parentObject));
-        }
-        private void AddContentLines(ICalComponent calComponent, string source, ICalendarComponent parentObject)
-        {
-            string content = GetComponentContent(source, calComponent);
-            if (content == string.Empty)
-                content = source;
-            string[] lines = content.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            int currentWorkingLine = 0;
-            int linesToWork = 1;
-            for (int x = 0; x < lines.Length; x++)
+            List<ICalendarProperty> calendarProperties = new List<ICalendarProperty>();
+            SpanLineEnumerator lineEnumerator = new SpanLineEnumerator(source);
+            bool needvalue = false;
+            int nextPropertySeparator;
+            while (lineEnumerator.MoveNext())
             {
-                string line = lines[x];
-                if (x == 0) continue;
-                else if (line.IsNewProperty())
+                if (lineEnumerator.Current.Length < 3)
+                    continue;
+                if (calendarProperties.Count == 0 && lineEnumerator.Current.StartsWith("BEGIN", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                if (calendarProperties.Count > 0 && lineEnumerator.Current.StartsWith("END", StringComparison.OrdinalIgnoreCase))
+                    continue;
+                nextPropertySeparator = lineEnumerator.Current.IndexOf(':');
+                ReadOnlySpan<char> toProcess = nextPropertySeparator == 1 ? lineEnumerator.Current.Slice(1, lineEnumerator.Current.Length - 1) : lineEnumerator.Current;
+                if (needvalue)
                 {
-                    ICalendarProperty contentLine = GetProperty(string.Join(Environment.NewLine, lines.Skip(currentWorkingLine).Take(linesToWork)));
-                    currentWorkingLine = x;
-                    linesToWork = 1;
-                    if (string.IsNullOrEmpty(contentLine.Name) ||
-                        (string.IsNullOrEmpty(contentLine.Value) && !contentLine.Parameters.Any()))
-                        continue;
-                    parentObject.contentLines.Enqueue(contentLine);
+                    if (nextPropertySeparator >= 0)
+                    {
+                        calendarProperties[^1].Value = toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1).ToString();
+                    }
+                    else
+                    {
+                        calendarProperties[^1].Value = toProcess.ToString();
+                    }
+                    needvalue = false;
+                    continue;
                 }
-                else linesToWork++;
+                if (ICalendarPropertyExtensions.TryGetNewProperty(toProcess, out Statics.ICalProperty? property))
+                {
+                    if (nextPropertySeparator >= 0)
+                    {
+                        calendarProperties.Add(ToContentLine(
+                            property,
+                            toProcess.Slice(0, nextPropertySeparator),
+                            toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1)));
+                    }
+                    else
+                    {
+                        calendarProperties.Add(ToContentLine(
+                            property,
+                            toProcess,
+                            ReadOnlySpan<char>.Empty));
+                        needvalue = true;
+                    }
+                }
+                else if (calendarProperties.Count > 0)
+                {
+                    calendarProperties[^1].Value += 
+                        (calendarProperties[^1].Value.Length > 0 ? Environment.NewLine : "") + 
+                        toProcess.ToString();
+                }
+                else
+                {
+                }
             }
-            ICalendarProperty finalcontentLine = GetProperty(string.Join(Environment.NewLine, lines.Skip(currentWorkingLine).Take(linesToWork)));
-            if (!string.IsNullOrEmpty(finalcontentLine.Name) &&
-                (!string.IsNullOrEmpty(finalcontentLine.Value) || finalcontentLine.Parameters.Any()))
-                parentObject.contentLines.Enqueue(finalcontentLine);
+
+            return calendarProperties;
         }
-        private ICalendarProperty GetProperty(string source)
+
+        public static ICalendarProperty ToContentLine(Statics.ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
-            Match match = ContentLineRegex().Match(source);
-            return CreateProperty(match.Groups[1].ToString().Trim(),
-                match.Groups[4].ToString().Trim(),
-                match.Groups[2].ToString().Trim()
-                );
+            if (property != null)
+            {
+                return ToInternalContentLine(property.Value,
+                    key,
+                    value);
+            }
+            else
+            {
+                return new CalendarDefaultDataType(key.ToString(),
+                    value.ToString(),
+                    null);
+            }
         }
-        private ICalendarProperty CreateProperty(string key, string name, string param)
+
+        private static ICalendarProperty ToInternalContentLine(Statics.ICalProperty property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
-            return ICalendarPropertyExtensions.GetPropertyType(key).GetContentLine(key, name, GetParameters(param));
+            if (key.Length == Statics.ICalProperties[(int)property].Length)
+                return ICalendarPropertyExtensions.GetContentLine(property,
+                    value,
+                    null);
+            return ICalendarPropertyExtensions.GetContentLine(property,
+                value,
+                key.Slice(Statics.ICalProperties[(int)property].Length, key.Length - Statics.ICalProperties[(int)property].Length)
+                    .ToString()
+                    .Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
+                    {
+                        string[] splitted = x.Split('=');
+                        return new KeyValuePair<string, IEnumerable<string>>(splitted[0], splitted[^1].Split(','));
+                    }).ToDictionary());
         }
     }
 }

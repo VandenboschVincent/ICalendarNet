@@ -4,7 +4,7 @@ namespace ICalendarNet.UnitTest.Base
 {
     public class UnitTestBase
     {
-        internal static List<string> GetIcalStrings(string? fileName = null)
+        public static List<string> GetIcalStrings(string? fileName = null)
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, @"Calendars"));

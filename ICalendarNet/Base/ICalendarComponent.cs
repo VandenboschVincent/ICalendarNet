@@ -1,18 +1,14 @@
-﻿using System.Collections.Concurrent;
+﻿using System.Collections.Generic;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Base
 {
     public interface ICalendarComponent
     {
-        internal ConcurrentQueue<ICalendarProperty> contentLines { get; set; }
-        internal ConcurrentBag<ICalendarComponent> components { get; set; }
-
-
         ICalComponent ComponentType { get; }
         List<ICalendarProperty> Properties { get; }
         List<ICalendarComponent> SubComponents { get; }
-        void AddProperty(string key, string value);
-        void UpdateProperty(string key, string value);
-        void UpdateProperty(string key, IEnumerable<string> value);
+        void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null);
+        void UpdateProperty(ICalProperty key, IEnumerable<string> value, ContentLineParameters? parameters = null);
     }
 }

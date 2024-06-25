@@ -1,30 +1,37 @@
 ﻿using ICalendarNet.Extensions;
-using System.Collections.Concurrent;
+using static ICalendarNet.Statics;
+using System.Collections.Generic;
+using System;
 
 namespace ICalendarNet.Base
 {
-    public abstract class CalendarObject : ICalendarComponent
+    public abstract class CalendarObject : ICalendarComponent, IDisposable
     {
         public abstract ICalComponent ComponentType { get; }
-        ConcurrentQueue<ICalendarProperty> ICalendarComponent.contentLines { get; set; } = [];
-        ConcurrentBag<ICalendarComponent> ICalendarComponent.components { get; set; } = [];
+        public List<ICalendarProperty> Properties { get; } = new List<ICalendarProperty>();
+        public List<ICalendarComponent> SubComponents { get; } = new List<ICalendarComponent>();
 
-        public List<ICalendarProperty> Properties { get; } = [];
-        public List<ICalendarComponent> SubComponents { get; } = [];
-
-        public void AddProperty(string key, string value)
+        public void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null)
         {
-            Properties.UpdateLineProperty(value, key);
+            Properties.UpdateLineProperty(value!, key, parameters);
         }
 
-        public void UpdateProperty(string key, string value)
+        public void UpdateProperty(ICalProperty key, IEnumerable<string> value, ContentLineParameters? parameters = null)
         {
-            Properties.UpdateLineProperty(value, key);
+            Properties.UpdateLinesProperty(value!, key, parameters);
         }
 
-        public void UpdateProperty(string key, IEnumerable<string> value)
+        protected virtual void Dispose(bool disposing)
         {
-            Properties.UpdateLinesProperty(value.ToList(), key);
+            Properties.Clear();
+            SubComponents.Clear();
         }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
     }
 }

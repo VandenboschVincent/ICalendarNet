@@ -1,6 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
-using ICalendarNet.Serialization;
+using System;
 using System.Text;
 
 namespace ICalendarNet.DataTypes
@@ -31,7 +31,7 @@ namespace ICalendarNet.DataTypes
         /// <returns></returns>
         public byte[]? GetData()
         {
-            if ((Value.Length % 4 == 0) && ICalSerializor.Base64Regex().IsMatch(Value))
+            if (!string.IsNullOrWhiteSpace(Value) && Value.IsBase64())
                 return dataEncoding.GetBytes(Value);
             return null;
         }
@@ -63,23 +63,28 @@ namespace ICalendarNet.DataTypes
             set => Parameters.SetOrAddValue("VALUE", value!);
         }
 
+        public CalendarAttachment(Statics.ICalProperty key, string value, ContentLineParameters? param) : base(Statics.ICalProperties[(int)key], value, param)
+        { }
+
         public CalendarAttachment(string key, string value, ContentLineParameters? param) : base(key, value, param)
         { }
+
         public CalendarAttachment(Uri uri, string? fmttype)
             : base("ATTACH", uri.ToString(), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.Add("FMTTYPE", new ContentLineParameter("FMTTYPE", fmttype));
+                Parameters.SetOrAddValue("FMTTYPE", fmttype);
         }
+
         public CalendarAttachment(byte[] data, string? fmttype, string valueType = "BINARY", string encoding = "BASE64")
             : base("ATTACH", dataEncoding.GetString(data), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.Add("FMTTYPE", new ContentLineParameter("FMTTYPE", fmttype));
+                Parameters.SetOrAddValue("FMTTYPE", fmttype);
             if (!string.IsNullOrEmpty(valueType))
-                Parameters.Add("VALUE", new ContentLineParameter("VALUE", valueType));
+                Parameters.SetOrAddValue("VALUE", valueType);
             if (!string.IsNullOrEmpty(encoding))
-                Parameters.Add("ENCODING", new ContentLineParameter("ENCODING", encoding));
+                Parameters.SetOrAddValue("ENCODING", encoding);
         }
     }
 }

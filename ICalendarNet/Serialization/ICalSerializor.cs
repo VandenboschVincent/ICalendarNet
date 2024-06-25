@@ -1,41 +1,73 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor : IDisposable
     {
-        public async Task<Calendar?> DeserializeCalendar(string source)
+        private StringHandler? handler;
+
+        public Calendar? DeserializeCalendar(string source)
         {
-            return (await DeserializeCalendars(source)).FirstOrDefault();
+            return DeserializeICalComponent<Calendar>(source);
         }
-        public async Task<IEnumerable<Calendar>> DeserializeCalendars(string source)
+
+        public IEnumerable<Calendar> DeserializeCalendars(string source)
         {
-            source = ReplaceAllNewLinesRegex().Replace(source, Environment.NewLine);
-            return await Task.WhenAll(
-                GetObjectSources(source, ICalComponent.VCALENDAR)
-                    .Select(t => DeserializeComponentsToICalObject(string.Join(Environment.NewLine, t.Skip(1)), new Calendar())));
+            return DeserializeICalComponents<Calendar>(source);
         }
-        public Task<T> DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
+
+        public T DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
         {
-            return DeserializeComponentsToICalObject(source, new T());
+            return DeserializeICalComponents<T>(source).FirstOrDefault();
         }
-        public ICalendarProperty DeserializeICalProperty(string source)
+
+        public IEnumerable<T> DeserializeICalComponents<T>(string source) where T : ICalendarComponent, new()
         {
-            return GetProperty(source);
+            handler = new StringHandler(source);
+            if (handler.BlocksLeft < 1)
+                throw new ArgumentException("Could not desirialize source");
+
+            return InternalDeserializeComponents<T>(handler);
+        }
+
+        public ICalendarProperty? DeserializeICalProperty(string source)
+        {
+            return InternalDeserializeContentLines(source).FirstOrDefault();
         }
 
         public string SerializeCalendar(Calendar calendar)
         {
-            return SerializeComponent(calendar);
+            return SerializeComponent(calendar).Trim();
         }
+
         public string SerializeICalObjec(ICalendarComponent calendarObject)
         {
-            return SerializeComponent(calendarObject);
+            return SerializeComponent(calendarObject).Trim();
         }
+
         public string SerializeICalProperty(ICalendarProperty contentLine)
         {
-            return SerializeProperty(contentLine);
+            return SerializeProperty(contentLine).Trim();
+        }
+
+        // Public implementation of Dispose pattern callable by consumers.
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        // Protected implementation of Dispose pattern.
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                handler?.Dispose();
+            }
         }
     }
 }

@@ -1,89 +1,100 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
+    /// <summary>
+    ///   <see cref="ICalComponent.VALARM" />
+    /// </summary>
     public class CalendarAlarm : CalendarObject
     {
+        /// <summary>
+        ///   <see cref="ICalComponent.VALARM" />
+        /// </summary>
         public override ICalComponent ComponentType => ICalComponent.VALARM;
 
+        /// <summary>
+        ///   <see cref="ICalProperty.DESCRIPTION" />
+        /// </summary>
         public virtual string? Description
         {
-            get => Properties.GetContentlineProperty("Description");
-            set => UpdateProperty("Description", value!);
+            get => Properties.GetContentlineValue(ICalProperty.DESCRIPTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DESCRIPTION);
         }
 
         /// <summary>
-        /// Sets the subject of email when trigger is EMAIL
+        ///   <see cref="ICalProperty.SUMMARY" />
         /// </summary>
         public virtual string? Summary
         {
-            get => Properties.GetContentlineProperty("SUMMARY");
-            set => UpdateProperty("SUMMARY", value!);
+            get => Properties.GetContentlineValue(ICalProperty.SUMMARY);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.SUMMARY);
         }
 
         /// <summary>
-        /// Can be AUDIO, DISPLAY, EMAIL
-        /// AUDIO: Raises sound found in the Attach property
-        /// DISPLAY: displays text from Description property
-        /// EMAIL: sends email to one or more Attendee properties, Summary as subject, Description as body, Attach as attachments
+        ///   <see cref="ICalProperty.ACTION" />
         /// </summary>
         public virtual string? Action
         {
-            get => Properties.GetContentlineProperty("Action");
-            set => UpdateProperty("Action", value!);
+            get => Properties.GetContentlineValue(ICalProperty.ACTION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.ACTION);
         }
 
         /// <summary>
-        /// Relative to the DTStart of the parent object
-        /// Can be repeated if Duration(delay) and Repeat are present
+        ///   <see cref="ICalProperty.Trigger" />
         /// </summary>
-        public virtual DateTimeOffset? Trigger
+        public virtual string? Trigger
         {
-            get => Properties.GetContentlineDateTime("Trigger");
-            set => Properties.UpdateLineProperty(value!, "Trigger");
+            get => Properties.GetContentlineValue(ICalProperty.TRIGGER);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.TRIGGER);
         }
 
+        /// <summary>
+        ///   <see cref="ICalProperty.Duration" />
+        /// </summary>
         public virtual TimeSpan? Duration
         {
-            get => Properties.GetContentlineTimeSpan("Duration");
-            set => Properties.UpdateLineProperty(value, "DURATION");
+            get => Properties.GetContentlineTimeSpan(ICalProperty.DURATION);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.DURATION);
         }
 
         /// <summary>
-        /// Sets how many times the action will repeat
+        ///   <see cref="ICalProperty.REPEAT" />
         /// </summary>
         public virtual double? Repeat
         {
-            get => Properties.GetContentlineDouble("Repeat");
-            set => UpdateProperty("Repeat", value.ToString()!);
+            get => Properties.GetContentlineDouble(ICalProperty.REPEAT);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.REPEAT);
         }
 
         /// <summary>
-        /// Sets the receivers when Action is set to Email
+        ///   <see cref="ICalProperty.ATTENDEE" />
         /// </summary>
         public virtual IEnumerable<string>? Attendee
         {
-            get => Properties.GetContentlinesProperty("ATTENDEE");
-            set => UpdateProperty("ATTENDEE", value!);
-        }
-
-        public IEnumerable<CalendarAttachment> GetAttachments()
-        {
-            return Properties.GetContentlines("ATTACH").Cast<CalendarAttachment>();
-        }
-
-        public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
-        {
-            Properties.UpdateLineProperty(attachments, "ATTACH");
+            get => Properties.GetContentlinesSeperatedValue(ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesSeperatedProperty(value!.ToList(), ICalProperty.ATTENDEE);
         }
 
         /// <summary>
-        /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.6
+        ///   <see cref="ICalProperty.ATTACH" />
         /// </summary>
-        public CalendarAlarm()
+        public IEnumerable<CalendarAttachment> GetAttachments()
         {
+            return Properties.GetContentlines(ICalProperty.ATTACH).Cast<CalendarAttachment>();
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.ATTACH" />
+        /// </summary>
+        public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
+        {
+            Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
         }
     }
 }
