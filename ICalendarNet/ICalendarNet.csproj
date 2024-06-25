@@ -3,6 +3,22 @@
   <PropertyGroup>
     <TargetFrameworks>net8.0;netstandard2.1;</TargetFrameworks>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>VandenboschVincent</Authors>
+    <Description>For Serializing/Deserializing/Changing ICal Files</Description>
+    <PackageProjectUrl>https://github.com/VandenboschVincent/ICalendarNet</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/VandenboschVincent/ICalendarNet</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
