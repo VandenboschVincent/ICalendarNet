@@ -1,3 +1,5 @@
+## Benchmarking
+
 BenchmarkDotNet v0.13.12, Windows 10 (10.0.19045.4291/22H2/2022Update)
 12th Gen Intel Core i7-1265U, 1 CPU, 12 logical and 10 physical cores
 .NET SDK 8.0.204
@@ -12,9 +14,15 @@ BenchmarkDotNet v0.13.12, Windows 10 (10.0.19045.4291/22H2/2022Update)
 | BenchMark_Load_And_Serialize_Events                 |      3.529 us |     0.4480 us |     1.1803 us |      3.164 us |    0.6523 |    0.0038 |        - |     4.02 KB |
 | BenchMark_Load_And_Serialize_American_Awerness_Days | 38,598.039 us | 1,385.1851 us | 4,040.6501 us | 37,832.762 us | 3769.2308 | 1769.2308 | 615.3846 | 22656.07 KB |
 
+## Available for
+* Net Standart 2.1
+* Net 8.0
+
 How to use:
-`using var httpClient = new HttpClient();
+```csharp
+using var httpClient = new HttpClient();
 string icalvar = await httpClient.GetStringAsync(icalString);
 
 Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
-CalendarEvent calEvent = calendar.GetEvents().First();`
+CalendarEvent calEvent = calendar.GetEvents().First();
+```
