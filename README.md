@@ -21,7 +21,7 @@ BenchmarkDotNet v0.13.12, Windows 10 (10.0.19045.4291/22H2/2022Update)
 How to use:
 ```csharp
 using var httpClient = new HttpClient();
-string icalvar = await httpClient.GetStringAsync(icalString);
+string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
 
 Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
 CalendarEvent calEvent = calendar.GetEvents().First();
