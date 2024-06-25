@@ -19,6 +19,9 @@ BenchmarkDotNet v0.13.12, Windows 10 (10.0.19045.4291/22H2/2022Update)
 * Net 8.0
 
 How to use:
+
+dotnet add packages ICalendarNet
+
 ```csharp
 using var httpClient = new HttpClient();
 string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
