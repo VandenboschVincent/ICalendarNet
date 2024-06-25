@@ -7,7 +7,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Todo()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string icalvar = @"BEGIN:VTODO
 UID:fed50a1c-1e72-11db-a465-aae271be3660
 SUMMARY:Test Todo
@@ -47,7 +47,7 @@ END:VTODO");
         [Test]
         public void Test_ChangeProperty_Todo()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             foreach (var icalvar in GetIcalStrings("Todo*"))
             {

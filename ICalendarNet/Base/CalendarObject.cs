@@ -1,15 +1,15 @@
-﻿
-using ICalendarNet.Extensions;
+﻿using ICalendarNet.Extensions;
 using static ICalendarNet.Statics;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
+using System;
 
 namespace ICalendarNet.Base
 {
     public abstract class CalendarObject : ICalendarComponent, IDisposable
     {
         public abstract ICalComponent ComponentType { get; }
-        public List<ICalendarProperty> Properties { get; } = [];
-        public List<ICalendarComponent> SubComponents { get; } = [];
+        public List<ICalendarProperty> Properties { get; } = new List<ICalendarProperty>();
+        public List<ICalendarComponent> SubComponents { get; } = new List<ICalendarComponent>();
 
         public void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null)
         {

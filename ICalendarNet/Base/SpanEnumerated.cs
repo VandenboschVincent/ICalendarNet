@@ -1,4 +1,6 @@
-﻿namespace ICalendarNet.Base
+﻿using System;
+
+namespace ICalendarNet.Base
 {
     public ref struct SpanEnumerated
     {

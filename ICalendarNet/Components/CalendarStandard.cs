@@ -1,6 +1,8 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using static ICalendarNet.Statics;
+using System.Collections.Generic;
+using System;
 
 namespace ICalendarNet.Components
 {

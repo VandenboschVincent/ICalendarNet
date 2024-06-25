@@ -7,7 +7,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Alarm()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             var icalvar = @"BEGIN:VALARM
 TRIGGER;RELATED=END:-PT30M
 ACTION:DISPLAY
@@ -31,7 +31,7 @@ END:VALARM");
         [Test]
         public void Test_ChangeProperty_Alarm()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             foreach (var icalvar in GetIcalStrings("Alarm*"))
             {

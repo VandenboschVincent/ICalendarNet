@@ -1,16 +1,18 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
-using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor
     {
         private IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
         {
-            List<ICalendarProperty> calendarProperties = [];
-            System.Text.SpanLineEnumerator lineEnumerator = source.EnumerateLines();
+            List<ICalendarProperty> calendarProperties = new List<ICalendarProperty>();
+            SpanLineEnumerator lineEnumerator = new SpanLineEnumerator(source);
             bool needvalue = false;
             int nextPropertySeparator;
             while (lineEnumerator.MoveNext())
@@ -50,7 +52,7 @@ namespace ICalendarNet.Serialization
                         calendarProperties.Add(ToContentLine(
                             property,
                             toProcess,
-                            []));
+                            ReadOnlySpan<char>.Empty));
                         needvalue = true;
                     }
                 }

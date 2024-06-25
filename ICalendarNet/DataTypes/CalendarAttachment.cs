@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
+using System;
 using System.Text;
 
 namespace ICalendarNet.DataTypes

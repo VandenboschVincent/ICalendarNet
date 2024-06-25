@@ -38,7 +38,7 @@
             LINKREL
         }
 
-        public static readonly string[] ICalParameters = [
+        public static readonly string[] ICalParameters = new string[] {
             "ALTREP",
             "CN",
             "CUTYPE",
@@ -71,7 +71,7 @@
             "DERIVED",
             "GAP",
             "LINKREL"
-        ];
+        };
 
         public enum ICalProperty
         {
@@ -500,7 +500,7 @@
             CATEGORY
         };
 
-        public static readonly string[] ICalProperties = [
+        public static readonly string[] ICalProperties = new string[] {
             "CALSCALE",
             "METHOD",
             "PRODID",
@@ -616,6 +616,6 @@
             "SYNCTOKEN",
             "ETAG",
             "CATEGORY"
-        ];
+        };
     }
 }

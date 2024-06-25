@@ -1,7 +1,10 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
+using System;
 using static ICalendarNet.Statics;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Components
 {

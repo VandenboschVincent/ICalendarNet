@@ -1,6 +1,8 @@
-﻿namespace ICalendarNet.Serialization
+﻿using System;
+
+namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor
     {
         public static int GetEndLength(ICalComponent component)
         {
@@ -59,7 +61,7 @@
         internal const string vDaylightBegin = "BEGIN:DAYLIGHT";
         internal const string vAlarmBegin = "BEGIN:VALARM";
 
-        internal static readonly string[] searchBeginKeys = [vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin];
+        internal static readonly string[] searchBeginKeys = new string[] { vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin };
         //internal static readonly string[] searchEndKeys = [vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd]
         //internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys]
 

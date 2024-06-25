@@ -1,11 +1,13 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
+using System;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor
     {
         private string SerializeProperty(ICalendarProperty parentObject)
         {

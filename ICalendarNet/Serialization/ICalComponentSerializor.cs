@@ -1,12 +1,13 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
 using ICalendarNet.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor
+    public partial class CalSerializor
     {
         private ICalendarComponent InternalDesirializeComponents(StringHandler handler, CalCompontentBlock parentBlock)
         {

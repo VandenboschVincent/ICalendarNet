@@ -7,7 +7,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Journal()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string icalvar = @"BEGIN:VJOURNAL
 DTSTAMP:19970324T120000Z
 UID:uid5@host1.com
@@ -43,7 +43,7 @@ END:VJOURNAL");
         [Test]
         public void Test_ChangeProperty_Journal()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             foreach (var icalvar in GetIcalStrings("Journal*"))
             {

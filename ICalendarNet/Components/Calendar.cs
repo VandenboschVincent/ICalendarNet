@@ -1,6 +1,9 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Extensions;
 using ICalendarNet.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
@@ -12,13 +15,13 @@ namespace ICalendarNet.Components
     {
         public static Calendar? LoadCalendar(string source)
         {
-            using ICalSerializor serializor = new();
+            using CalSerializor serializor = new CalSerializor();
             return serializor.DeserializeCalendar(source);
         }
 
         public static IEnumerable<Calendar> LoadCalendars(string source)
         {
-            using ICalSerializor serializor = new();
+            using CalSerializor serializor = new CalSerializor();
             return serializor.DeserializeCalendars(source).ToList();
         }
 

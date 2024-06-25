@@ -1,4 +1,8 @@
-﻿namespace ICalendarNet.Serialization
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ICalendarNet.Serialization
 {
     /// <summary>
     /// Block that contains content and properties
@@ -7,12 +11,20 @@
     /// <param name="componentCount"></param>
     /// <param name="calComponent"></param>
     /// <param name="properties"></param>
-    public ref struct CalCompontentBlock(ReadOnlySpan<char> content, int componentCount, ICalComponent? calComponent, ReadOnlySpan<char> properties)
+    public ref struct CalCompontentBlock
     {
-        public ICalComponent? CalComponent { get; set; } = calComponent;
-        public ReadOnlySpan<char> Content { get; set; } = content;
-        public ReadOnlySpan<char> Properties { get; set; } = properties;
-        public int ComponentCount { get; set; } = componentCount;
+        public CalCompontentBlock(ReadOnlySpan<char> content, int componentCount, ICalComponent? calComponent, ReadOnlySpan<char> properties)
+        {
+            Content = content;
+            ComponentCount = componentCount;
+            CalComponent = calComponent;
+            Properties = properties;
+        }
+
+        public ICalComponent? CalComponent { get; set; }
+        public ReadOnlySpan<char> Content { get; set; }
+        public ReadOnlySpan<char> Properties { get; set; }
+        public int ComponentCount { get; set; }
     }
 
     /// <summary>
@@ -22,7 +34,7 @@
     public class StringHandler : IDisposable
     {
         private string? reader;
-        private readonly List<CalComponentIndex> indexes = [];
+        private readonly List<CalComponentIndex> indexes = new List<CalComponentIndex>();
         private int currentWorkingBlock = 0;
 
         public int BlocksLeft => indexes.Count - currentWorkingBlock;
@@ -38,7 +50,7 @@
             while (i < s.Length)
             {
                 //Find the next BEGIN statement
-                int indexFound = s.IndexOf(ICalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
+                int indexFound = s.IndexOf(CalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
 
                 if (indexes.Count > 0)
                 {
@@ -53,7 +65,7 @@
                 //Move the index to after BEGIN:
                 i = indexFound + 6;
 
-                CalComponentIndex currentWorkingItem = new()
+                CalComponentIndex currentWorkingItem = new CalComponentIndex()
                 {
                     StartIndex = indexFound,
                     CalComponent = GetComponent(i, s)
@@ -64,7 +76,7 @@
 
                 //Sets the End index (including subcomponents) to just after this BEGIN
                 currentWorkingItem.EndIndex =
-                    s.IndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + ICalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
+                    s.IndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + CalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
 
                 indexes.Add(currentWorkingItem);
             }
@@ -168,7 +180,14 @@
         /// <returns></returns>
         private static ICalComponent? TryGetComponent(int startIndex, int length, ReadOnlySpan<char> source)
         {
-            if (Enum.TryParse(source.Slice(startIndex, length), true, out ICalComponent foundComponent))
+
+            if (Enum.TryParse(
+#if NET6_0_OR_GREATER
+                source.Slice(startIndex, length)
+#else
+                source.Slice(startIndex, length).ToString()
+#endif
+                , true, out ICalComponent foundComponent))
             {
                 return foundComponent;
             }

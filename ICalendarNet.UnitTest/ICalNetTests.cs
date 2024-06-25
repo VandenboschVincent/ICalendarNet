@@ -11,7 +11,7 @@ namespace ICalendarNet.UnitTest
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
         public async Task Test_Online_vCalendar_Should_Serialize(string icalString)
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             using var httpClient = new HttpClient();
             string icalvar = await httpClient.GetStringAsync(icalString);
 
@@ -48,7 +48,7 @@ namespace ICalendarNet.UnitTest
         [Test]
         public void Test_Offline_vCalendar_Should_Serialize_Combined()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
             calendars.Should().HaveCount(139);
             foreach (var calendar in calendars)
@@ -76,7 +76,7 @@ namespace ICalendarNet.UnitTest
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
         public async Task Test_Update_Param_Should_Serialize(string icalString)
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             DateTime dt = DateTime.UtcNow;
             DateTime date = new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, DateTimeKind.Utc);
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";

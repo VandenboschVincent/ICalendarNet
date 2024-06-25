@@ -1,4 +1,6 @@
 ﻿using System.Globalization;
+using System;
+using System.Linq;
 
 namespace ICalendarNet.Converters
 {
@@ -28,7 +30,7 @@ namespace ICalendarNet.Converters
         public static DateTimeOffset? ConvertToDateTimeOffset(string? value)
         {
             if (string.IsNullOrEmpty(value)) return null;
-            if (value.Last() == 'Z' && (TryParseToDateTime(value, "yyyyMMddTHHmmssZ") ??
+            if (value[^1] == 'Z' && (TryParseToDateTime(value, "yyyyMMddTHHmmssZ") ??
                 TryParseToDateTime(value, "yyyyMMddTHHmmZ") ??
                 TryParseToDateTime(value, "yyyyMMddTHHZ") ??
                 TryParseToDateTime(value, "yyyyMMddZ") ??

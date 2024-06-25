@@ -1,6 +1,9 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Converters;
 using ICalendarNet.DataTypes;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Extensions

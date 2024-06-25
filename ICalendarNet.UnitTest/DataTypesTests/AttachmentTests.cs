@@ -10,7 +10,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("ATTACH;VALUE=BINARY;ENCODING=BASE64:\r\nVGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==", "VGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==")]
         public void Test_Attachment_Byte_Deserialize(string value, string bytevalue)
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
@@ -26,7 +26,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("ATTACH;FMTTYPE=application/postscript:ftp://example.com/pub/reports/r-960812.ps", "ftp://example.com/pub/reports/r-960812.ps")]
         public void Test_Attachment_Uri_Deserialize(string value, string uri)
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
@@ -39,7 +39,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("ATTACH;FMTTYPE=application/postscript:ftp://example.com/pub/reports/r-960812.ps", "application/postscript")]
         public void Test_Attachment_Uri_Deserialize_FMTTYPE(string value, string type)
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
@@ -50,7 +50,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [Test]
         public void Test_Attachment_FromEvent()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             foreach (var icalvar in GetIcalStrings("Serialization\\Attachment*"))
             {
                 Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);

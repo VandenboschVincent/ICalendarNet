@@ -1,10 +1,12 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Components;
-using System.Runtime.InteropServices;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class ICalSerializor : IDisposable
+    public partial class CalSerializor : IDisposable
     {
         private StringHandler? handler;
 
@@ -12,23 +14,26 @@ namespace ICalendarNet.Serialization
         {
             return DeserializeICalComponent<Calendar>(source);
         }
+
         public IEnumerable<Calendar> DeserializeCalendars(string source)
         {
             return DeserializeICalComponents<Calendar>(source);
         }
-        public T? DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
+
+        public T DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
         {
             return DeserializeICalComponents<T>(source).FirstOrDefault();
         }
 
         public IEnumerable<T> DeserializeICalComponents<T>(string source) where T : ICalendarComponent, new()
         {
-            handler = new(source);
+            handler = new StringHandler(source);
             if (handler.BlocksLeft < 1)
                 throw new ArgumentException("Could not desirialize source");
 
             return InternalDeserializeComponents<T>(handler);
         }
+
         public ICalendarProperty? DeserializeICalProperty(string source)
         {
             return InternalDeserializeContentLines(source).FirstOrDefault();
@@ -38,10 +43,12 @@ namespace ICalendarNet.Serialization
         {
             return SerializeComponent(calendar).Trim();
         }
+
         public string SerializeICalObjec(ICalendarComponent calendarObject)
         {
             return SerializeComponent(calendarObject).Trim();
         }
+
         public string SerializeICalProperty(ICalendarProperty contentLine)
         {
             return SerializeProperty(contentLine).Trim();
@@ -62,6 +69,5 @@ namespace ICalendarNet.Serialization
                 handler?.Dispose();
             }
         }
-
     }
 }

@@ -9,7 +9,7 @@
         {
             Name = name;
             Value = value;
-            Parameters = parameter ?? [];
+            Parameters = parameter ?? new ContentLineParameters();
         }
     }
 }

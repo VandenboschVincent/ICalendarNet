@@ -28,7 +28,7 @@ namespace ICalendarNet.Benchmarking
         {
             var icalvar = GetIcalStrings()[0];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
-            return new ICalSerializor().SerializeCalendar(calendar!);
+            return new CalSerializor().SerializeCalendar(calendar!);
         }
 
         [Benchmark]
@@ -36,13 +36,13 @@ namespace ICalendarNet.Benchmarking
         {
             var icalvar = GetIcalStrings()[^1];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
-            return new ICalSerializor().SerializeCalendar(calendar!);
+            return new CalSerializor().SerializeCalendar(calendar!);
         }
 
         [Benchmark]
         public void BenchMark_Load_And_Serialize_all_Calendars()
         {
-            var serializer = new ICalSerializor();
+            var serializer = new CalSerializor();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
             _ = calendars.Select(serializer.SerializeCalendar);
 
@@ -51,10 +51,10 @@ namespace ICalendarNet.Benchmarking
         [Benchmark]
         public string BenchMark_Load_And_Serialize_Events()
         {
-            var serializer = new ICalSerializor();
+            var serializer = new CalSerializor();
             var icalvar = $"BEGIN:VEVENT\r\nCREATED:20060717T210517Z\r\nLAST-MODIFIED:20060717T210718Z\r\nDTSTAMP:20060717T210718Z\r\nUID:uuid1153170430406\r\nSUMMARY:Test event\r\nDTSTART:20060718T100000\r\nDTEND:20060718T110000\r\nLOCATION:Daywest\r\nEND:VEVENT";
             ICalendarComponent? calendar = serializer.DeserializeICalComponent<CalendarEvent>(icalvar);
-            return new ICalSerializor().SerializeICalObjec(calendar!);
+            return new CalSerializor().SerializeICalObjec(calendar!);
         }
 
         [Benchmark]
@@ -64,7 +64,7 @@ namespace ICalendarNet.Benchmarking
             string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
 
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
-            return new ICalSerializor().SerializeCalendar(calendar!);
+            return new CalSerializor().SerializeCalendar(calendar!);
         }
     }
 }

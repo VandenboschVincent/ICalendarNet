@@ -8,7 +8,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Event()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             var icalvar = @"BEGIN:VEVENT
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
@@ -50,7 +50,7 @@ END:VEVENT");
         [Test]
         public void Test_ChangeProperty_Event()
         {
-            ICalSerializor calSerializor = new();
+            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             foreach (var icalvar in GetIcalStrings("Event*"))
             {
