@@ -9,6 +9,16 @@ namespace ICalendarNet.Benchmarking
     [MemoryDiagnoser]
     public class ICalBenchmarkingTests
     {
+        [GlobalSetup]
+        public async Task Setup()
+        {
+            ICalStrings = GetIcalStrings();
+            using var httpClient = new HttpClient();
+            AmericanAwernessDays = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
+        }
+
+        private string AmericanAwernessDays = "";
+        private List<string> ICalStrings = []; 
         private static List<string> GetIcalStrings()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -26,7 +36,7 @@ namespace ICalendarNet.Benchmarking
         [Benchmark]
         public string BenchMark_Load_And_Serialize_Calendar()
         {
-            var icalvar = GetIcalStrings()[0];
+            var icalvar = ICalStrings[0];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             return new CalSerializor().SerializeCalendar(calendar!);
         }
@@ -34,7 +44,7 @@ namespace ICalendarNet.Benchmarking
         [Benchmark]
         public string BenchMark_Load_And_Serialize_Tiny_Calendar()
         {
-            var icalvar = GetIcalStrings()[^1];
+            var icalvar = ICalStrings[^1];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             return new CalSerializor().SerializeCalendar(calendar!);
         }
@@ -43,7 +53,7 @@ namespace ICalendarNet.Benchmarking
         public void BenchMark_Load_And_Serialize_all_Calendars()
         {
             var serializer = new CalSerializor();
-            var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
+            var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, ICalStrings));
             _ = calendars.Select(serializer.SerializeCalendar);
 
         }
@@ -58,12 +68,9 @@ namespace ICalendarNet.Benchmarking
         }
 
         [Benchmark]
-        public async Task<string> BenchMark_Load_And_Serialize_Online_Calendar_Async()
+        public string BenchMark_Load_And_Serialize_American_Awerness_Days()
         {
-            using var httpClient = new HttpClient();
-            string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
-
-            Calendar? calendar = Calendar.LoadCalendar(icalvar);
+            Calendar? calendar = Calendar.LoadCalendar(AmericanAwernessDays);
             return new CalSerializor().SerializeCalendar(calendar!);
         }
     }
