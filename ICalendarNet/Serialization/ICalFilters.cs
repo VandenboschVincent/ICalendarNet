@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace ICalendarNet.Serialization
+﻿namespace ICalendarNet.Serialization
 {
     public partial class ICalSerializor
     {
@@ -65,10 +63,10 @@ namespace ICalendarNet.Serialization
         //internal static readonly string[] searchEndKeys = [vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd]
         //internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys]
 
-        [GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
-        internal static partial Regex ReplaceAllNewLinesRegex();
+        //[GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
+        //internal static partial Regex ReplaceAllNewLinesRegex()
 
-        [GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline | RegexOptions.Compiled)]
-        internal static partial Regex ContentLineRegex();
+        //[GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline | RegexOptions.Compiled)]
+        //internal static partial Regex ContentLineRegex()
     }
 }

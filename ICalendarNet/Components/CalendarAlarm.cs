@@ -74,8 +74,8 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual IEnumerable<string>? Attendee
         {
-            get => Properties.GetContentlinesValue(ICalProperty.ATTENDEE);
-            set => Properties.UpdateLinesProperty(value!.ToList(), ICalProperty.ATTENDEE);
+            get => Properties.GetContentlinesSeperatedValue(ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesSeperatedProperty(value!.ToList(), ICalProperty.ATTENDEE);
         }
 
         /// <summary>

@@ -22,7 +22,7 @@ END:VJOURNAL";
             calendar!.Properties.Should().HaveCount(8);
             calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(859204800));
             calendar.Uid.Should().Be("uid5@host1.com");
-            calendar.Description.Should().Be("Project xyz Review Meeting Minutes.");
+            calendar.Descriptions.Should().OnlyContain(t => t == "Project xyz Review Meeting Minutes.");
             calendar.Organizer.Should().Be("jane_doe@host.com\";CN=JohnSmith");
             calendar.Status.Should().Be("FINAL");
             calendar.Categories.Should().BeEquivalentTo(new List<string>() { "Project Report", "XYZ", "Weekly Meeting", });
@@ -48,14 +48,16 @@ END:VJOURNAL");
             foreach (var icalvar in GetIcalStrings("Journal*"))
             {
                 Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
-
-                calendar!.GetJournals().First().Description = calDescr;
+                CalendarJournal journal = calendar!.GetJournals().First();
+                List<string> description = journal.Descriptions!.ToList();
+                description.Add(calDescr);
+                journal.Descriptions = description;
 
                 string serializedCalendar = calSerializor.SerializeCalendar(calendar);
 
                 Calendar? serializedCalender = calSerializor.DeserializeCalendar(serializedCalendar);
-
-                serializedCalender!.GetJournals().Any(t => t.Description == calDescr).Should().BeTrue();
+                journal = serializedCalender!.GetJournals().First();
+                journal.Descriptions!.Contains(calDescr).Should().BeTrue();
                 serializedCalender.GetJournals().First().Properties.Should().HaveCountGreaterThan(1);
             }
         }

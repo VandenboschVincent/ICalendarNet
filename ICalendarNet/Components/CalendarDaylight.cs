@@ -13,7 +13,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual string? Comment
         {
-            get => Properties.GetContentlineValue(ICalProperty.COMMENT);
+            get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
             set => Properties.UpdateLineProperty(value!, ICalProperty.COMMENT);
         }
 

@@ -29,10 +29,30 @@ namespace ICalendarNet.Extensions
 
         internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, string key)
         {
-            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(','));
+            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).Select(t => t.Value);
         }
 
         internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, IEnumerable<string> keys)
+        {
+            return lines.Where(t => keys.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).Select(t => t.Value);
+        }
+
+        public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, ICalProperty key)
+        {
+            return lines.GetContentlinesSeperatedValue(ICalProperties[(int)key]);
+        }
+
+        public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
+        {
+            return lines.GetContentlinesSeperatedValue(keys.Select(t => ICalProperties[(int)t]));
+        }
+
+        internal static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, string key)
+        {
+            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(','));
+        }
+
+        internal static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, IEnumerable<string> keys)
         {
             return lines.Where(t => keys.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(", "));
         }
@@ -133,6 +153,12 @@ namespace ICalendarNet.Extensions
         {
             lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
             lines.AddRange(value.Select(t => key.GetContentLine(t, parameters)));
+        }
+
+        public static void UpdateLinesSeperatedProperty(this List<ICalendarProperty> lines, IEnumerable<string> value, ICalProperty key, ContentLineParameters? parameters = null)
+        {
+            lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            lines.Add(key.GetContentLine(string.Join(", ", value), parameters));
         }
 
         public static bool TryGetNewProperty(this ReadOnlySpan<char> line, out ICalProperty? property)

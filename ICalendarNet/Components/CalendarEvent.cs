@@ -71,8 +71,8 @@ namespace ICalendarNet.Components
         /// </summary>
         public IEnumerable<string> Categories
         {
-            get => Properties.GetContentlinesValue(ICalProperty.CATEGORIES);
-            set => Properties.UpdateLinesProperty(value!, ICalProperty.CATEGORIES);
+            get => Properties.GetContentlinesSeperatedValue(ICalProperty.CATEGORIES, ICalProperty.CATEGORY);
+            set => Properties.UpdateLinesSeperatedProperty(value!, ICalProperty.CATEGORIES);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public string? Comment
         {
-            get => Properties.GetContentlineValue(ICalProperty.COMMENT);
+            get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
             set => Properties.UpdateLineProperty(value!, ICalProperty.COMMENT);
         }
 
