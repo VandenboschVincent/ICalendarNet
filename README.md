@@ -13,7 +13,7 @@ Credits goes to https://github.com/rianjs/ical.net for providing a ton of info a
  - [x] Serialization
  - [x] Deserialization
  - [x] RFC 5545 compliancy
- - [ ] Make it easier to create/edit occorency
+ - [ ] Make it easier to create/edit occurency
  - [ ] Make it easier to create/edit alarms
 
 ## How to use:
