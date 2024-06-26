@@ -6,35 +6,33 @@ using System.Linq;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class CalSerializor : IDisposable
+    public partial class CalSerializor
     {
-        private StringHandler? handler;
-
-        public Calendar? DeserializeCalendar(string source)
+        public Calendar? DeserializeCalendar(ReadOnlySpan<char> source)
         {
             return DeserializeICalComponent<Calendar>(source);
         }
 
-        public IEnumerable<Calendar> DeserializeCalendars(string source)
+        public List<Calendar> DeserializeCalendars(ReadOnlySpan<char> source)
         {
             return DeserializeICalComponents<Calendar>(source);
         }
 
-        public T DeserializeICalComponent<T>(string source) where T : ICalendarComponent, new()
+        public T DeserializeICalComponent<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
         {
             return DeserializeICalComponents<T>(source).FirstOrDefault();
         }
 
-        public IEnumerable<T> DeserializeICalComponents<T>(string source) where T : ICalendarComponent, new()
+        public List<T> DeserializeICalComponents<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
         {
-            handler = new StringHandler(source);
+            StringHandler handler = new StringHandler(source);
             if (handler.BlocksLeft < 1)
-                throw new ArgumentException("Could not desirialize source");
+                throw new ArgumentException("Could not deserialize source");
 
-            return InternalDeserializeComponents<T>(handler);
+            return InternalDeserializeComponents<T>(ref handler);
         }
 
-        public ICalendarProperty? DeserializeICalProperty(string source)
+        public ICalendarProperty? DeserializeICalProperty(ReadOnlySpan<char> source)
         {
             return InternalDeserializeContentLines(source).FirstOrDefault();
         }
@@ -52,22 +50,6 @@ namespace ICalendarNet.Serialization
         public string SerializeICalProperty(ICalendarProperty contentLine)
         {
             return SerializeProperty(contentLine).Trim();
-        }
-
-        // Public implementation of Dispose pattern callable by consumers.
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        // Protected implementation of Dispose pattern.
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                handler?.Dispose();
-            }
         }
     }
 }

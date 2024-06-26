@@ -9,5 +9,13 @@ namespace ICalendarNet.Extensions
             Span<byte> buffer = new Span<byte>(new byte[value.Length]);
             return Convert.TryFromBase64String(value, buffer, out int bytesParsed);
         }
+
+        public static int FindIndexOf(this ReadOnlySpan<char> span, ReadOnlySpan<char> search, int index, StringComparison stringComparison)
+        {
+            int found = span[index..].IndexOf(search, stringComparison);
+            if (found != -1)
+                found += index;
+            return found;
+        }
     }
 }

@@ -24,7 +24,7 @@ namespace ICalendarNet.Serialization
                 if (calendarProperties.Count > 0 && lineEnumerator.Current.StartsWith("END", StringComparison.OrdinalIgnoreCase))
                     continue;
                 nextPropertySeparator = lineEnumerator.Current.IndexOf(':');
-                ReadOnlySpan<char> toProcess = nextPropertySeparator == 1 ? lineEnumerator.Current.Slice(1, lineEnumerator.Current.Length - 1) : lineEnumerator.Current;
+                ReadOnlySpan<char> toProcess = nextPropertySeparator == 1 ? lineEnumerator.Current[1..] : lineEnumerator.Current;
                 if (needvalue)
                 {
                     if (nextPropertySeparator >= 0)
@@ -44,7 +44,7 @@ namespace ICalendarNet.Serialization
                     {
                         calendarProperties.Add(ToContentLine(
                             property,
-                            toProcess.Slice(0, nextPropertySeparator),
+                            toProcess[..nextPropertySeparator],
                             toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1)));
                     }
                     else

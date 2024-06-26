@@ -13,16 +13,14 @@ namespace ICalendarNet.Components
     /// </summary>
     public class Calendar : CalendarObject
     {
-        public static Calendar? LoadCalendar(string source)
+        public static Calendar? LoadCalendar(ReadOnlySpan<char> source)
         {
-            using CalSerializor serializor = new CalSerializor();
-            return serializor.DeserializeCalendar(source);
+            return new CalSerializor().DeserializeCalendar(source);
         }
 
-        public static IEnumerable<Calendar> LoadCalendars(string source)
+        public static List<Calendar> LoadCalendars(ReadOnlySpan<char> source)
         {
-            using CalSerializor serializor = new CalSerializor();
-            return serializor.DeserializeCalendars(source).ToList();
+            return new CalSerializor().DeserializeCalendars(source);
         }
 
         /// <summary>

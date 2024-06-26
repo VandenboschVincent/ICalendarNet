@@ -84,11 +84,11 @@ BenchmarkDotNet v0.13.12, Windows 10
 12th Gen Intel Core i7-1265U, 1 CPU, 12 logical and 10 physical cores
 .NET SDK 8.0.204
 
-| SERIALIZATION                                  | Mean          | Error       | StdDev        | Median        | Gen0      | Gen1      | Gen2     | Allocated   |
-|---------------------------------------- |--------------:|------------:|--------------:|--------------:|----------:|----------:|---------:|------------:|
-| DeserializeCalendar                     |     14.024 us |   0.5869 us |     1.6933 us |     13.325 us |    3.4180 |    0.1373 |        - |    20.95 KB |
-| SerializeCalendar                       |      3.917 us |   0.2320 us |     0.6692 us |      3.664 us |    1.9684 |    0.0229 |        - |    12.06 KB |
-| Deserialize_And_Serialize_Tiny_Calendar |      1.959 us |   0.1353 us |     0.3967 us |      1.804 us |    0.6084 |    0.0019 |        - |     3.74 KB |
-| Deserialize_And_Serialize_all_Calendars (150 calendars) |  8,895.427 us | 463.8940 us | 1,367.8020 us |  9,324.708 us |  515.6250 |  421.8750 | 109.3750 |  2996.25 KB |
-| Deserialize_And_Serialize_Event         |      2.245 us |   0.0447 us |     0.1053 us |      2.197 us |    0.6523 |    0.0038 |        - |     4.02 KB |
-| Deserialize_And_Serialize_Big_Calendar (1,078 events)  | 28,687.914 us | 894.9811 us | 2,567.8685 us | 28,108.100 us | 3750.0000 | 1812.5000 | 625.0000 | 22656.47 KB |
+| SERIALIZATION                                  | Mean          | Error       | StdDev      | Median        | Gen0      | Gen1      | Gen2     | Allocated   |
+|---------------------------------------- |--------------:|------------:|------------:|--------------:|----------:|----------:|---------:|------------:|
+| DeserializeCalendar                     |     12.656 us |   0.1432 us |   0.1195 us |     12.675 us |    3.4180 |    0.1221 |        - |    20.94 KB |
+| SerializeCalendar                       |      3.129 us |   0.0623 us |   0.0612 us |      3.125 us |    1.9684 |    0.0267 |        - |    12.06 KB |
+| Deserialize_And_Serialize_Tiny_Calendar |      1.406 us |   0.0280 us |   0.0444 us |      1.382 us |    0.6065 |    0.0019 |        - |     3.73 KB |
+| Deserialize_And_Serialize_all_Calendars (150 calendars) |  6,945.098 us | 136.4880 us | 195.7470 us |  6,970.355 us |  539.0625 |  437.5000 | 125.0000 |  2997.37 KB |
+| Deserialize_And_Serialize_Event         |      2.014 us |   0.0187 us |   0.0165 us |      2.008 us |    0.6523 |         - |        - |     4.01 KB |
+| Deserialize_And_Serialize_Big_Calendar (1,078 events) | 30,689.179 us | 274.9266 us | 243.7153 us | 30,682.292 us | 4062.5000 | 2156.2500 | 906.2500 | 22656.61 KB |

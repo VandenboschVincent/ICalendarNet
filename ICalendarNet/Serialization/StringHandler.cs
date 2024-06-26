@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICalendarNet.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,26 +32,28 @@ namespace ICalendarNet.Serialization
     /// This class implements a text reader that reads from a string.
     /// Will output that string in blocks that start with BEGIN: and END:
     /// </summary>
-    public class StringHandler : IDisposable
+    public ref struct StringHandler
     {
-        private string? reader;
-        private readonly List<CalComponentIndex> indexes = new List<CalComponentIndex>();
-        private int currentWorkingBlock = 0;
+        private ReadOnlySpan<char> reader;
+        private readonly List<CalComponentIndex> indexes;
+        private int currentWorkingBlock;
 
-        public int BlocksLeft => indexes.Count - currentWorkingBlock;
+        public readonly int BlocksLeft => indexes.Count - currentWorkingBlock;
 
         /// <summary>
         /// Initializes and parses a string in ical format
         /// </summary>
         /// <param name="s"></param>
-        public StringHandler(string s)
+        public StringHandler(ReadOnlySpan<char> s)
         {
             reader = s;
+            indexes = new List<CalComponentIndex>();
+            currentWorkingBlock = 0;
             int i = 0;
             while (i < s.Length)
             {
                 //Find the next BEGIN statement
-                int indexFound = s.IndexOf(CalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
+                int indexFound = s.FindIndexOf(CalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
 
                 if (indexes.Count > 0)
                 {
@@ -76,7 +79,7 @@ namespace ICalendarNet.Serialization
 
                 //Sets the End index (including subcomponents) to just after this BEGIN
                 currentWorkingItem.EndIndex =
-                    s.IndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + CalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
+                    s.FindIndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + CalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
 
                 indexes.Add(currentWorkingItem);
             }
@@ -100,13 +103,13 @@ namespace ICalendarNet.Serialization
             //Reads the next block
             return new CalCompontentBlock(
                 //Content (including subcomponents)
-                reader.AsSpan().Slice(nextBlock.StartIndex, nextBlock.EndIndex - nextBlock.StartIndex),
+                reader[nextBlock.StartIndex..nextBlock.EndIndex],
                 //Gets the count of al subcomponents
                 indexes.Where(FilterSubComponents(nextBlock.CalComponent!.Value)).Count(t => t.StartIndex > nextBlock.StartIndex && t.EndIndex < nextBlock.EndIndex),
                 //Type of the component
                 nextBlock.CalComponent.Value,
                 //The Content (not including subcomponents)
-                reader.AsSpan().Slice(nextBlock.StartIndex, nextBlock.EndContentIndex - nextBlock.StartIndex));
+                reader[nextBlock.StartIndex..nextBlock.EndContentIndex]);
         }
 
         /// <summary>
@@ -188,26 +191,8 @@ namespace ICalendarNet.Serialization
                 source.Slice(startIndex, length).ToString()
 #endif
                 , true, out ICalComponent foundComponent))
-            {
                 return foundComponent;
-            }
             return null;
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                indexes.Clear();
-                reader = null;
-                currentWorkingBlock = 0;
-            }
         }
 
         private sealed class CalComponentIndex
