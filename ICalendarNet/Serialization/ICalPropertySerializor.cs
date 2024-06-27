@@ -94,7 +94,7 @@ namespace ICalendarNet.Serialization
                     null);
             return ICalendarPropertyExtensions.GetContentLine(property,
                 value,
-                key.Slice(Statics.ICalProperties[(int)property].Length, key.Length - Statics.ICalProperties[(int)property].Length)
+                key[Statics.ICalProperties[(int)property].Length..]
                     .ToString()
                     .Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
                     {
