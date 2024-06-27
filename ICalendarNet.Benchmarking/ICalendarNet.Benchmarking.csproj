@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BenchmarkDotNet" Version="0.13.12" />
+    <PackageReference Include="Ical.Net" Version="4.2.0" />
   </ItemGroup>
 
   <ItemGroup>

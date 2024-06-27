@@ -4,6 +4,9 @@ using ICalendarNet.Benchmarking;
 
 Console.WriteLine("Hello, World!");
 
-var summary = BenchmarkRunner.Run<ICalSerializationTests>();
-Console.WriteLine("LogFilePath: {0}", summary.LogFilePath);
-Console.WriteLine("ResultsDirectoryPath: {0}", summary.ResultsDirectoryPath);
+var summary = BenchmarkRunner.Run(typeof(Program).Assembly);
+foreach (var item in summary)
+{
+    Console.WriteLine("LogFilePath: {0}", item.LogFilePath);
+    Console.WriteLine("ResultsDirectoryPath: {0}", item.ResultsDirectoryPath);
+}
