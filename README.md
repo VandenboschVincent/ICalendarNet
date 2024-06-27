@@ -2,7 +2,7 @@
 
 ## ICalendarNet
 ICalendarNet is an iCalendar (RFC 5545) class library for .NET aimed at providing RFC 5545 compliance, while providing full compatibility with popular calendaring applications and libraries.
-Credits go to [rianjs] (https://github.com/rianjs/ical.net) for providing a ton of info and the baseline of this project.
+Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton of info and the baseline of this project.
 
 
 ## Available for
