@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System;
 using System.Linq;
+using System.Text;
 
 namespace ICalendarNet.Converters
 {
@@ -15,16 +16,47 @@ namespace ICalendarNet.Converters
 
         public static TimeSpan? ConvertToTimeSpan(string? value)
         {
-            if (string.IsNullOrEmpty(value)) return null;
-            if ((TryParseToTimeSpan(value, "'PT'%h'H'%m'M'%s'S'") ??
-                TryParseToTimeSpan(value, "'PT'%h'H'%m'M'") ??
-                TryParseToTimeSpan(value, "'PT'%h'H'") ??
-                TryParseToTimeSpan(value, "'PT'%h'H'%s'S'") ??
-                TryParseToTimeSpan(value, "'PT'%m'M'%s'S'") ??
-                TryParseToTimeSpan(value, "'PT'%m'M'"))
-                is TimeSpan ts)
-                return ts;
-            return null;
+            if (string.IsNullOrEmpty(value) || 
+                !value![..2].Contains('P') ||
+                !value!.Any(char.IsDigit)) return null;
+            bool isNegative = string.Equals(value[..2], "-P", StringComparison.OrdinalIgnoreCase);
+            var enumerator = value.GetEnumerator();
+            StringBuilder currentNumber = new StringBuilder();
+            TimeSpan result = TimeSpan.Zero;
+            while (enumerator.MoveNext()) 
+            {
+                var current = enumerator.Current;
+                if (char.IsNumber(current))
+                {
+                    currentNumber.Append(current);
+                }
+                else if (int.TryParse(currentNumber.ToString(), out int numberFound))
+                {
+                    switch (current)
+                    {
+                        case 'D':
+                            result += TimeSpan.FromDays(numberFound);
+                            break;
+                        case 'H':
+                            result += TimeSpan.FromHours(numberFound);
+                            break;
+                        case 'M':
+                            result += TimeSpan.FromMinutes(numberFound);
+                            break;
+                        case 'S':
+                            result += TimeSpan.FromSeconds(numberFound);
+                            break;
+                        case 'W':
+                            result += TimeSpan.FromDays(numberFound * 7);
+                            break;
+                        default:
+                            break;
+                    }
+                    currentNumber.Clear();
+                }
+            }
+            if (isNegative) result = result.Negate();
+            return result;
         }
 
         public static DateTimeOffset? ConvertToDateTimeOffset(string? value)
@@ -63,20 +95,42 @@ namespace ICalendarNet.Converters
 
         public static string ConvertFromTimeSpan(TimeSpan value)
         {
-            string format = "'PT'";
-            if (value.Hours > 0)
+            string format = "P";
+            if (value < TimeSpan.Zero)
             {
-                format += "%h'H'";
+                format = "-P";
+                value = value.Negate();
             }
-            if (value.Minutes > 0 || value.Seconds > 0)
+            if (value.Days != 0)
             {
-                format += "%m'M'";
+                if (value.Days % 7 == 0)
+                {
+                    format += string.Format("{0}W", value.Days / 7);
+                }
+                else
+                    format += string.Format("{0}D", value.Days);
             }
-            if (value.Seconds > 0)
+#if NET7_0_OR_GREATER
+            if (!double.IsInteger(value.TotalDays))
+#else
+            if (Math.Abs(value.TotalDays % 1) >= double.Epsilon)
+#endif
             {
-                format += "%s'S'";
+                format += "T";
+                if (value.Hours != 0)
+                {
+                    format += string.Format("{0}H", value.Hours);
+                }
+                if (value.Minutes != 0 || value.Seconds != 0)
+                {
+                    format += string.Format("{0}M", value.Minutes);
+                }
+                if (value.Seconds != 0)
+                {
+                    format += string.Format("{0}S", value.Seconds);
+                }
             }
-            return value.ToString(format);
+            return format;
         }
 
         public static string ConvertFromDateTimeOffset(DateTimeOffset value)

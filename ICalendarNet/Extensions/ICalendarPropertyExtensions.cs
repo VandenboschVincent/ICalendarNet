@@ -250,7 +250,6 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.RRULE:
                 case ICalProperty.ACTION:
                 case ICalProperty.REPEAT:
-                case ICalProperty.TRIGGER:
                 case ICalProperty.CREATED:
                 case ICalProperty.DTSTAMP:
                 case ICalProperty.LAST_MODIFIED:
@@ -318,6 +317,9 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.ATTENDEE:
                 case ICalProperty.ORGANIZER:
                     return new CalendarCalAddress(ICalProperties[(int)property], value.ToString(), parameters);
+
+                case ICalProperty.TRIGGER:
+                    return new CalendarTrigger(ICalProperties[(int)property], value.ToString(), parameters);
 
                 default:
                     throw new NotSupportedException(property.ToString());

@@ -109,7 +109,15 @@ END:VCALENDAR
             calendar.SubComponents.Add(
                 new CalendarAlarm()
                 {
-                    Trigger = "-PT1080M",
+                    Trigger = new CalendarTrigger(TimeSpan.FromMinutes(-108)),
+                    Action = "DISPLAY",
+                    Description = "Reminder"
+                });
+            calendar.SubComponents.Add(
+                new CalendarAlarm()
+                {
+                    //As time value
+                    Trigger = new CalendarTrigger(DateTime.Now.AddYears(1)),
                     Action = "DISPLAY",
                     Description = "Reminder"
                 });

@@ -4,6 +4,7 @@ using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
@@ -48,10 +49,10 @@ namespace ICalendarNet.Components
         /// <summary>
         ///   <see cref="ICalProperty.Trigger" />
         /// </summary>
-        public virtual string? Trigger
+        public virtual CalendarTrigger? Trigger
         {
-            get => Properties.GetContentlineValue(ICalProperty.TRIGGER);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.TRIGGER);
+            get => Properties.GetContentlines(ICalProperty.TRIGGER).Cast<CalendarTrigger>().FirstOrDefault();
+            set => Properties.UpdateLineProperty(value!.Value, ICalProperty.TRIGGER);
         }
 
         /// <summary>

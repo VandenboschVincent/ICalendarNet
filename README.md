@@ -53,13 +53,21 @@ private static string SimpleCalendar()
     });
     calendar.SubComponents.Add(calendarEvent);
     //Add an alarm
-    calendar.SubComponents.Add(
-        new CalendarAlarm()
-        {
-            Trigger = "-PT1080M",
-            Action = "DISPLAY",
-            Description = "Reminder"
-        });
+	calendar.SubComponents.Add(
+		new CalendarAlarm()
+		{
+			Trigger = new CalendarTrigger(TimeSpan.FromMinutes(-108)),
+			Action = "DISPLAY",
+			Description = "Reminder"
+		});
+	calendar.SubComponents.Add(
+		new CalendarAlarm()
+		{
+			//As time value
+			Trigger = new CalendarTrigger(DateTime.Now.AddYears(1)),
+			Action = "DISPLAY",
+			Description = "Reminder"
+		});
     //Add a t_odo
     calendar.SubComponents.Add(
         new CalendarTodo()
