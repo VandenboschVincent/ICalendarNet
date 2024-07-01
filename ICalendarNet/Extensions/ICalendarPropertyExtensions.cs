@@ -180,20 +180,6 @@ namespace ICalendarNet.Extensions
             return false;
         }
 
-        internal static ICalProperty? GetPropertyType(ReadOnlySpan<char> key)
-        {
-            if (TryGetNewProperty(key, out ICalProperty? property))
-                return property;
-            return null;
-        }
-
-        internal static ICalendarProperty GetContentLine(this ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value, ContentLineParameters? parameters)
-        {
-            if (property == null)
-                return new CalendarDefaultDataType(key.ToString(), value.ToString(), parameters);
-            return property.Value.GetContentLine(value, parameters);
-        }
-
         internal static ICalendarProperty GetContentLine(this ICalProperty property, ReadOnlySpan<char> value, ContentLineParameters? parameters)
         {
             switch (property)
