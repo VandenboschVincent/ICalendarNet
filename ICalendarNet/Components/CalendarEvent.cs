@@ -223,6 +223,15 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
+        ///   <see cref="ICalProperty.ORGANIZER" />
+        /// </summary>
+        public string? Organizer
+        {
+            get => Properties.GetContentlineValue(ICalProperty.ORGANIZER);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.ORGANIZER);
+        }
+
+        /// <summary>
         ///   <see cref="ICalProperty.ATTACH" />
         /// </summary>
         public IEnumerable<CalendarAttachment> GetAttachments()

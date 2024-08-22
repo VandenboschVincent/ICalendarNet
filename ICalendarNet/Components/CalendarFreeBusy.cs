@@ -1,6 +1,9 @@
 ﻿using ICalendarNet.Base;
+using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
@@ -82,6 +85,22 @@ namespace ICalendarNet.Components
         {
             get => Properties.GetContentlineValue(ICalProperty.REQUEST_STATUS);
             set => Properties.UpdateLineProperty(value!, ICalProperty.REQUEST_STATUS);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.FREEBUSY" />
+        /// </summary>
+        public IEnumerable<CalendarPeriod> GetFreeBusy()
+        {
+            return Properties.GetContentlines(ICalProperty.FREEBUSY).Cast<CalendarPeriods>().SelectMany(t => t.GetPeriods());
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.FREEBUSY" />
+        /// </summary>
+        public void SetFreeBusy(IEnumerable<CalendarPeriod> freebusy)
+        {
+            Properties.UpdateLineProperty(new List<CalendarPeriods>() { new CalendarPeriods(ICalProperty.FREEBUSY, freebusy) }, ICalProperty.FREEBUSY);
         }
     }
 }

@@ -17,14 +17,15 @@ namespace ICalendarNet.Serialization
             int nextPropertySeparator;
             while (lineEnumerator.MoveNext())
             {
-                if (lineEnumerator.Current.Length < 3)
+                ReadOnlySpan<char> preProcess = lineEnumerator.Current.TrimStart();
+                if (preProcess.Length < 3)
                     continue;
-                if (calendarProperties.Count == 0 && lineEnumerator.Current.StartsWith("BEGIN", StringComparison.OrdinalIgnoreCase))
+                if (calendarProperties.Count == 0 && preProcess.StartsWith("BEGIN", StringComparison.OrdinalIgnoreCase))
                     continue;
-                if (calendarProperties.Count > 0 && lineEnumerator.Current.StartsWith("END", StringComparison.OrdinalIgnoreCase))
+                if (calendarProperties.Count > 0 && preProcess.StartsWith("END", StringComparison.OrdinalIgnoreCase))
                     continue;
-                nextPropertySeparator = lineEnumerator.Current.IndexOf(':');
-                ReadOnlySpan<char> toProcess = nextPropertySeparator == 1 ? lineEnumerator.Current[1..] : lineEnumerator.Current;
+                nextPropertySeparator = preProcess.IndexOf(':');
+                ReadOnlySpan<char> toProcess = nextPropertySeparator == 1 ? preProcess[1..] : preProcess;
                 if (needvalue)
                 {
                     if (nextPropertySeparator >= 0)

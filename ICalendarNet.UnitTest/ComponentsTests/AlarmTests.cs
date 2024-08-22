@@ -1,4 +1,5 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.DataTypes;
+using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -17,7 +18,7 @@ END:VALARM";
             calendar.Should().NotBeNull();
             calendar!.Properties.Should().HaveCount(3);
             calendar.Trigger!.TimeValue.Should().Be(TimeSpan.FromMinutes(-30));
-            calendar.Action.Should().Be("DISPLAY");
+            calendar.Action.Should().Be(AlarmAction.DISPLAY);
             calendar.Description.Should().Be("Breakfast meeting with executive\\nteam at 8:30 AM EST.");
             string serialized = calSerializor.SerializeICalObjec(calendar);
             serialized.Should().Be(@"BEGIN:VALARM

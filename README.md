@@ -1,5 +1,6 @@
 
 
+
 ## ICalendarNet
 ICalendarNet is an iCalendar (RFC 5545) class library for .NET aimed at providing RFC 5545 compliance, while providing full compatibility with popular calendaring applications and libraries.
 Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton of info and the baseline of this project.
@@ -53,21 +54,21 @@ private static string SimpleCalendar()
     });
     calendar.SubComponents.Add(calendarEvent);
     //Add an alarm
-	calendar.SubComponents.Add(
-		new CalendarAlarm()
-		{
-			Trigger = new CalendarTrigger(TimeSpan.FromMinutes(-108)),
-			Action = "DISPLAY",
-			Description = "Reminder"
-		});
-	calendar.SubComponents.Add(
-		new CalendarAlarm()
-		{
-			//As time value
-			Trigger = new CalendarTrigger(DateTime.Now.AddYears(1)),
-			Action = "DISPLAY",
-			Description = "Reminder"
-		});
+    calendar.SubComponents.Add(
+       //Display info when triggered
+       new CalendarAlarm(trigger: new CalendarTrigger(TimeSpan.FromMinutes(-108)),
+           notification: "Reminder water plants"));
+   calendar.SubComponents.Add(
+       //Send an email when triggered
+       new CalendarAlarm(trigger: new CalendarTrigger(DateTime.Now.AddYears(1)),
+           emailAdresses: ["test@gmail.com"],
+           subject: "Test email subject",
+           body: @"Dear John,
+
+				   Please water the plants.
+
+				   Regards
+				   Mr Smith"));
     //Add a t_odo
     calendar.SubComponents.Add(
         new CalendarTodo()

@@ -10,6 +10,10 @@ namespace ICalendarNet.Extensions
 {
     public static class ICalendarPropertyExtensions
     {
+        public static TEnum GetContentlineValue<TEnum>(this List<ICalendarProperty> lines, ICalProperty key, string defaultEnum) where TEnum : struct, Enum
+        {
+            return Enum.Parse<TEnum>(lines.GetContentlineValue(ICalProperties[(int)key]) ?? defaultEnum, true);
+        }
         public static string? GetContentlineValue(this List<ICalendarProperty> lines, ICalProperty key)
         {
             return lines.GetContentlineValue(ICalProperties[(int)key]);
@@ -93,6 +97,11 @@ namespace ICalendarNet.Extensions
         public static IEnumerable<DateTimeOffset>? GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key)
         {
             return lines.GetContentlines(ICalProperties[(int)key]).Select(t => TypeConverters.ConvertToDateTimeOffset(t.Value)!.Value);
+        }
+
+        public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
+        {
+            lines.UpdateLineProperty(value.ToString()!, key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, string value, ICalProperty key, ContentLineParameters? parameters = null)
@@ -219,7 +228,6 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.DUE:
                 case ICalProperty.DTSTART:
                 case ICalProperty.DURATION:
-                case ICalProperty.FREEBUSY:
                 case ICalProperty.TRANSP:
                 case ICalProperty.TZID:
                 case ICalProperty.TZNAME:
@@ -296,17 +304,15 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.ETAG:
                 case ICalProperty.CATEGORY:
                     return new CalendarDefaultDataType(ICalProperties[(int)property], value.ToString(), parameters);
-
                 case ICalProperty.ATTACH:
                     return new CalendarAttachment(ICalProperties[(int)property], value.ToString(), parameters);
-
                 case ICalProperty.ATTENDEE:
                 case ICalProperty.ORGANIZER:
                     return new CalendarCalAddress(ICalProperties[(int)property], value.ToString(), parameters);
-
                 case ICalProperty.TRIGGER:
                     return new CalendarTrigger(ICalProperties[(int)property], value.ToString(), parameters);
-
+                case ICalProperty.FREEBUSY:
+                    return new CalendarPeriods(ICalProperties[(int)property], value.ToString(), parameters);
                 default:
                     throw new NotSupportedException(property.ToString());
             }

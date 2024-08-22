@@ -40,9 +40,9 @@ namespace ICalendarNet.Components
         /// <summary>
         ///   <see cref="ICalProperty.ACTION" />
         /// </summary>
-        public virtual string? Action
+        public virtual AlarmAction Action
         {
-            get => Properties.GetContentlineValue(ICalProperty.ACTION);
+            get => Properties.GetContentlineValue<AlarmAction>(ICalProperty.ACTION, AlarmAction.DISPLAY.ToString());
             set => Properties.UpdateLineProperty(value!, ICalProperty.ACTION);
         }
 
@@ -96,6 +96,36 @@ namespace ICalendarNet.Components
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
+        }
+
+        public CalendarAlarm() { }
+
+        /// <summary>
+        /// Add the Alarm as an email
+        /// </summary>
+        /// <param name="trigger"></param>
+        /// <param name="emailAdresses"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        public CalendarAlarm(CalendarTrigger trigger, IEnumerable<string> emailAdresses, string subject, string body)
+        {
+            Trigger = trigger;
+            Action = AlarmAction.EMAIL;
+            Description = body;
+            Attendee = emailAdresses;
+            Summary = subject;
+        }
+
+        /// <summary>
+        /// Add the alarm as a notification
+        /// </summary>
+        /// <param name="trigger"></param>
+        /// <param name="notification"></param>
+        public CalendarAlarm(CalendarTrigger trigger, string notification)
+        {
+            Trigger = trigger;
+            Action = AlarmAction.DISPLAY;
+            Description = notification;
         }
     }
 }

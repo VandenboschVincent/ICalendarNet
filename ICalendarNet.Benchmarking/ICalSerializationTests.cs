@@ -88,9 +88,9 @@ END:VCALENDAR
 ";
         private static Calendar SimpleCalendar()
         {
-            Calendar calendar = new Calendar();
+            Calendar calendar = new();
             //Add an event
-            CalendarEvent calendarEvent = new CalendarEvent()
+            CalendarEvent calendarEvent = new()
             {
                 DTSTART = DateTimeOffset.UtcNow,
                 DTEND = DateTimeOffset.UtcNow.AddHours(1),
@@ -107,20 +107,21 @@ END:VCALENDAR
             calendar.SubComponents.Add(calendarEvent);
             //Add an alarm
             calendar.SubComponents.Add(
-                new CalendarAlarm()
-                {
-                    Trigger = new CalendarTrigger(TimeSpan.FromMinutes(-108)),
-                    Action = "DISPLAY",
-                    Description = "Reminder"
-                });
+                //Display info when triggered
+                new CalendarAlarm(trigger: new CalendarTrigger(TimeSpan.FromMinutes(-108)),
+                    notification: "Reminder water plants"));
             calendar.SubComponents.Add(
-                new CalendarAlarm()
-                {
-                    //As time value
-                    Trigger = new CalendarTrigger(DateTime.Now.AddYears(1)),
-                    Action = "DISPLAY",
-                    Description = "Reminder"
-                });
+                //Send an email when triggered
+                new CalendarAlarm(trigger: new CalendarTrigger(DateTime.Now.AddYears(1)),
+                    emailAdresses: ["test@gmail.com"],
+                    subject: "Test email subject",
+                    body: @"
+Dear John,
+
+Please water the plants.
+
+Regards
+Mr Smith"));
             //Add a t_odo
             calendar.SubComponents.Add(
                 new CalendarTodo()
