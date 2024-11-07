@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.DataTypes;
 using ICalendarNet.UnitTest.Base;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -40,7 +41,6 @@ COMMENT:This iCalendar file contains busy time information for the next three mo
 END:VFREEBUSY");
         }
 
-
         [Test]
         public void Test_ChangeProperty_Period()
         {
@@ -66,6 +66,15 @@ END:VFREEBUSY");
             CalendarFreeBusy? serializedCalender = calSerializor.DeserializeICalComponent<CalendarFreeBusy>(serializedCalendar);
             serializedCalender.Should().NotBeNull();
             serializedCalender!.GetFreeBusy().Should().HaveCount(2);
+        }
+
+        [TestCase("20180219T000000Z/PT6H", 6, 0, 0)]
+        [TestCase("20180219T000000Z/20180219T061005Z", 6, 10, 5)]
+        [TestCase("20180219T010000Z/20180219T071005Z", 6, 10, 5)]
+        public void Test_PeriodTime_ShouldBeCorrect(string value, int hours, int minutes, int seconds)
+        {
+            CalendarPeriod period = new(ICalProperty.FREEBUSY, value, null);
+            period.Duration.Should().Be(TimeSpan.FromHours(hours).Add(TimeSpan.FromMinutes(minutes)).Add(TimeSpan.FromSeconds(seconds)));
         }
     }
 }

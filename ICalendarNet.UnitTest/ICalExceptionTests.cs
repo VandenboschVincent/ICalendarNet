@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ICalendarNet.UnitTest
+﻿namespace ICalendarNet.UnitTest
 {
     public class ICalExceptionTests
     {
@@ -35,7 +29,11 @@ END:VEVENT";
             CalSerializor calSerializor = new();
             CalendarEvent? calendar = calSerializor.DeserializeICalComponent<CalendarEvent>(ical);
             calendar!.Properties.Should().NotBeEmpty();
-            calendar.Organizer.Should().Be("mailto:c_4eb66b106265305aa178a912be02479cb3c4a71159c9db935e8b515afff2f88f@group.calendar.google.com");
+            calendar.Organizer!.Value.Should().Be("mailto:c_4eb66b106265305aa178a912be02479cb3c4a71159c9db935e8b515afff2f88f@group.calendar.google.com");
+            calendar.Organizer.Parameters.Should().HaveCount(2);
+            calendar.Organizer.Parameters.First().Key.Should().Be("CN");
+            calendar.Organizer.Parameters.First().Value.First().Should().Be("Sber500 &amp");
+            calendar.Organizer.Parameters.Skip(1).First().Key.Should().Be(" 2080 Acceleration Program");
         }
     }
 }

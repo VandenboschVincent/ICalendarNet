@@ -47,6 +47,7 @@ namespace ICalendarNet.Serialization
                             property,
                             toProcess[..nextPropertySeparator],
                             toProcess.Slice(nextPropertySeparator + 1, toProcess.Length - nextPropertySeparator - 1)));
+                        needvalue = nextPropertySeparator == toProcess.Length - 1;
                     }
                     else
                     {
@@ -59,8 +60,8 @@ namespace ICalendarNet.Serialization
                 }
                 else if (calendarProperties.Count > 0)
                 {
-                    calendarProperties[^1].Value += 
-                        (calendarProperties[^1].Value.Length > 0 ? Environment.NewLine : "") + 
+                    calendarProperties[^1].Value +=
+                        (calendarProperties[^1].Value.Length > 0 ? Environment.NewLine : "") +
                         toProcess.ToString();
                 }
                 else
@@ -100,7 +101,7 @@ namespace ICalendarNet.Serialization
                     .Split(';', StringSplitOptions.RemoveEmptyEntries).Select(x =>
                     {
                         string[] splitted = x.Split('=');
-                        return new KeyValuePair<string, IEnumerable<string>>(splitted[0], splitted[^1].Split(','));
+                        return new KeyValuePair<string, IEnumerable<string>>(splitted[0], splitted.Length == 1 ? Array.Empty<string>() : splitted[^1].Split(','));
                     }).ToDictionary());
         }
     }

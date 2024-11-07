@@ -14,6 +14,7 @@ namespace ICalendarNet.Extensions
         {
             return Enum.Parse<TEnum>(lines.GetContentlineValue(ICalProperties[(int)key]) ?? defaultEnum, true);
         }
+
         public static string? GetContentlineValue(this List<ICalendarProperty> lines, ICalProperty key)
         {
             return lines.GetContentlineValue(ICalProperties[(int)key]);
@@ -178,7 +179,7 @@ namespace ICalendarNet.Extensions
             property = null;
             for (int i = 0; i < ICalProperties.Length; i++)
             {
-                if (line.StartsWith(ICalProperties[i]))
+                if (line.StartsWith(ICalProperties[i], StringComparison.OrdinalIgnoreCase))
                 {
                     property = (ICalProperty)i;
                     return true;
@@ -302,17 +303,23 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.REFID:
                 case ICalProperty.SYNCTOKEN:
                 case ICalProperty.ETAG:
+                case ICalProperty.X_APPLE_STRUCTURED_LOCATION:
                 case ICalProperty.CATEGORY:
                     return new CalendarDefaultDataType(ICalProperties[(int)property], value.ToString(), parameters);
+
                 case ICalProperty.ATTACH:
                     return new CalendarAttachment(ICalProperties[(int)property], value.ToString(), parameters);
+
                 case ICalProperty.ATTENDEE:
                 case ICalProperty.ORGANIZER:
                     return new CalendarCalAddress(ICalProperties[(int)property], value.ToString(), parameters);
+
                 case ICalProperty.TRIGGER:
                     return new CalendarTrigger(ICalProperties[(int)property], value.ToString(), parameters);
+
                 case ICalProperty.FREEBUSY:
                     return new CalendarPeriods(ICalProperties[(int)property], value.ToString(), parameters);
+
                 default:
                     throw new NotSupportedException(property.ToString());
             }

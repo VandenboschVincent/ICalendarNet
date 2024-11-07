@@ -13,6 +13,7 @@ namespace ICalendarNet.Serialization
         {
             return SerializeProperty(parentObject, new StringBuilder()).ToString();
         }
+
         private StringBuilder SerializeProperty(ICalendarProperty component, StringBuilder builder)
         {
             if (component.Parameters.Any())
@@ -27,9 +28,10 @@ namespace ICalendarNet.Serialization
                 builder.Append($"{component.Name}:{component.Value}");
             return builder;
         }
+
         private void SerializeParameters(ContentLineParameters parameters, StringBuilder builder)
         {
-            builder.Append(string.Join(";", parameters.Select(t => $"{t.Key}={string.Join(",", t.Value)}")));
+            builder.Append(string.Join(";", parameters.Select(t => $"{t.Key}{(t.Value.Any() ? "=" : "")}{string.Join(",", t.Value)}")));
         }
     }
 }

@@ -16,14 +16,14 @@ namespace ICalendarNet.Converters
 
         public static TimeSpan? ConvertToTimeSpan(string? value)
         {
-            if (string.IsNullOrEmpty(value) || 
+            if (string.IsNullOrEmpty(value) ||
                 !value![..2].Contains('P') ||
                 !value!.Any(char.IsDigit)) return null;
             bool isNegative = string.Equals(value[..2], "-P", StringComparison.OrdinalIgnoreCase);
             var enumerator = value.GetEnumerator();
             StringBuilder currentNumber = new StringBuilder();
             TimeSpan result = TimeSpan.Zero;
-            while (enumerator.MoveNext()) 
+            while (enumerator.MoveNext())
             {
                 var current = enumerator.Current;
                 if (char.IsNumber(current))
@@ -37,18 +37,23 @@ namespace ICalendarNet.Converters
                         case 'D':
                             result += TimeSpan.FromDays(numberFound);
                             break;
+
                         case 'H':
                             result += TimeSpan.FromHours(numberFound);
                             break;
+
                         case 'M':
                             result += TimeSpan.FromMinutes(numberFound);
                             break;
+
                         case 'S':
                             result += TimeSpan.FromSeconds(numberFound);
                             break;
+
                         case 'W':
                             result += TimeSpan.FromDays(numberFound * 7);
                             break;
+
                         default:
                             break;
                     }
@@ -151,13 +156,6 @@ namespace ICalendarNet.Converters
         public static string ConvertFromInt(int value)
         {
             return value.ToString();
-        }
-
-        private static TimeSpan? TryParseToTimeSpan(string value, string format)
-        {
-            if (TimeSpan.TryParseExact(value, format, new CultureInfo("en-US"), out TimeSpan ts))
-                return ts;
-            return null;
         }
 
         private static DateTimeOffset? TryParseToDateTime(string value, string format)

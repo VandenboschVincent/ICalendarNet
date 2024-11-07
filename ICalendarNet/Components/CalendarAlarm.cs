@@ -51,8 +51,8 @@ namespace ICalendarNet.Components
         /// </summary>
         public virtual CalendarTrigger? Trigger
         {
-            get => Properties.GetContentlines(ICalProperty.TRIGGER).Cast<CalendarTrigger>().FirstOrDefault();
-            set => Properties.UpdateLineProperty(value!.Value, ICalProperty.TRIGGER);
+            get => (CalendarTrigger?)Properties.GetContentlines(ICalProperty.TRIGGER).FirstOrDefault();
+            set => Properties.UpdateLineProperty(value!.Value, ICalProperty.TRIGGER, value!.Parameters);
         }
 
         /// <summary>
@@ -98,7 +98,8 @@ namespace ICalendarNet.Components
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
         }
 
-        public CalendarAlarm() { }
+        public CalendarAlarm()
+        { }
 
         /// <summary>
         /// Add the Alarm as an email

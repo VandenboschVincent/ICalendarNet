@@ -39,6 +39,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("PT", null, false)]
         [TestCase("T15M", null, false)]
         [TestCase("46qsd54f9q4df63a64dsfq", null, false)]
+        [TestCase("00001231T000000Z", null, false)]
         public void Test_GetContentlineDateTime_ShouldReturnDateTime(string value, string? time, bool utc)
         {
             List<ICalendarProperty> lines = [new CalendarDefaultDataType(Statics.ICalProperty.DTEND, value, null)];
@@ -56,7 +57,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             }
             else
             {
-                lines.GetContentlineTimeSpan(Statics.ICalProperty.DTEND).Should().BeNull();
+                lines.GetContentlineDateTime(Statics.ICalProperty.DTEND).Should().BeNull();
             }
         }
     }

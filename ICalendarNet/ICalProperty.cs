@@ -497,7 +497,8 @@
             REFID,
             SYNCTOKEN,
             ETAG,
-            CATEGORY
+            CATEGORY,
+            X_APPLE_STRUCTURED_LOCATION
         };
 
         public static readonly string[] ICalProperties = new string[] {

@@ -225,10 +225,10 @@ namespace ICalendarNet.Components
         /// <summary>
         ///   <see cref="ICalProperty.ORGANIZER" />
         /// </summary>
-        public string? Organizer
+        public CalendarCalAddress? Organizer
         {
-            get => Properties.GetContentlineValue(ICalProperty.ORGANIZER);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.ORGANIZER);
+            get => (CalendarCalAddress?)Properties.GetContentlines(ICalProperty.ORGANIZER).FirstOrDefault();
+            set => Properties.UpdateLineProperty(value!.Value, ICalProperty.ORGANIZER, value!.Parameters);
         }
 
         /// <summary>
