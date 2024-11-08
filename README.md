@@ -95,7 +95,7 @@ BenchmarkDotNet v0.14.0, Windows 10 (10.0.19045.5011/22H2/2022Update)
 .NET SDK 9.0.100-rc.1.24452.12
 
 ```
-| SERIALIZATION                                  | Mean          | Error       | StdDev      | Median        | Gen0      | Gen1      | Gen2     | Allocated   |
+| SERIALIZATION                           | Mean          | Error       | StdDev      | Median        | Gen0      | Gen1      | Gen2     | Allocated   |
 |---------------------------------------- |--------------:|------------:|------------:|--------------:|----------:|----------:|---------:|------------:|
 | DeserializeCalendar                     |     13.668 μs |   0.2459 μs |   0.4797 μs |     13.491 μs |    3.3875 |    0.1221 |        - |    20.89 KB |
 | SerializeCalendar                       |      5.697 μs |   0.1136 μs |   0.2849 μs |      5.666 μs |    2.8381 |    0.0534 |        - |    17.39 KB |
@@ -105,7 +105,7 @@ BenchmarkDotNet v0.14.0, Windows 10 (10.0.19045.5011/22H2/2022Update)
 ```
 When using ICal.Net
 ```
-| SERIALIZATION                                           | Mean          | Error        | StdDev       | Gen0       | Gen1      | Gen2      | Allocated    |
+| SERIALIZATION                                    | Mean          | Error        | StdDev       | Gen0       | Gen1      | Gen2      | Allocated    |
 |------------------------------------------------- |--------------:|-------------:|-------------:|-----------:|----------:|----------:|-------------:|
 | ICal_Net_DeserializeCalendar                     |      79.87 μs |     0.707 μs |     0.626 μs |    30.7617 |    5.3711 |         - |    191.42 KB |
 | ICal_Net_SerializeCalendar                       |      22.93 μs |     0.428 μs |     0.783 μs |     9.2773 |    0.7324 |         - |      57.4 KB |
