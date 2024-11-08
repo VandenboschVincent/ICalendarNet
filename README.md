@@ -99,8 +99,8 @@ BenchmarkDotNet v0.14.0, Windows 10 (10.0.19045.5011/22H2/2022Update)
 |---------------------------------------- |--------------:|------------:|------------:|--------------:|----------:|----------:|---------:|------------:|
 | DeserializeCalendar                     |     13.668 μs |   0.2459 μs |   0.4797 μs |     13.491 μs |    3.3875 |    0.1221 |        - |    20.89 KB |
 | SerializeCalendar                       |      5.697 μs |   0.1136 μs |   0.2849 μs |      5.666 μs |    2.8381 |    0.0534 |        - |    17.39 KB |
-| Deserialize_And_Serialize_all_Calendars |  7,384.326 μs | 143.6299 μs | 176.3904 μs |  7,337.092 μs |  531.2500 |  429.6875 | 125.0000 |  2986.76 KB |
-| Deserialize_And_Serialize_Big_Calendar  | 24,471.842 μs | 488.4794 μs | 986.7525 μs | 24,261.273 μs | 3406.2500 | 1656.2500 | 562.5000 | 20489.48 KB |
+| Deser_And_Ser_allotof_Calendars         |  7,384.326 μs | 143.6299 μs | 176.3904 μs |  7,337.092 μs |  531.2500 |  429.6875 | 125.0000 |  2986.76 KB |
+| Deser_And_Ser_verybig_Calendar          | 24,471.842 μs | 488.4794 μs | 986.7525 μs | 24,261.273 μs | 3406.2500 | 1656.2500 | 562.5000 | 20489.48 KB |
 
 ```
 When using ICal.Net
@@ -109,12 +109,14 @@ When using ICal.Net
 |------------------------------------------------- |--------------:|-------------:|-------------:|-----------:|----------:|----------:|-------------:|
 | ICal_Net_DeserializeCalendar                     |      79.87 μs |     0.707 μs |     0.626 μs |    30.7617 |    5.3711 |         - |    191.42 KB |
 | ICal_Net_SerializeCalendar                       |      22.93 μs |     0.428 μs |     0.783 μs |     9.2773 |    0.7324 |         - |      57.4 KB |
-| ICal_Net_Deserialize_And_Serialize_all_Calendars |            NA |           NA |           NA |         NA |        NA |        NA |           NA |
-| ICal_Net_Deserialize_And_Serialize_Big_Calendar  | 174,481.37 μs | 3,461.040 μs | 6,831.756 μs | 20500.0000 | 6500.0000 | 1500.0000 | 121901.07 KB |
+| Deser_And_Ser_allotof_Calendars                  |            NA |           NA |           NA |         NA |        NA |        NA |           NA |
+| Deser_And_Ser_verybig_Calendar                   | 174,481.37 μs | 3,461.040 μs | 6,831.756 μs | 20500.0000 | 6500.0000 | 1500.0000 | 121901.07 KB |
 
 Benchmarks with issues:
   OtherToolsTests.ICal_Net_Deserialize_And_Serialize_all_Calendars: DefaultJob
 ```
+We can see in .net9 ICalendarNet is +- 4 times faster and uses 4-6 times fewer allocated memory.
+
 ## How it works:
 
 I replaced Regex functions, and started using [ReadonlySpan\<char>](https://learn.microsoft.com/en-us/dotnet/api/system.readonlyspan-1?view=net-8.0) instead of strings when possible.
