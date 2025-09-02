@@ -1,5 +1,5 @@
-﻿using System.Globalization;
-using System;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -144,11 +144,7 @@ namespace ICalendarNet.Converters
             string format = "yyyyMMdd";
             if (value.Hour > 0 || value.Minute > 0 || value.Second > 0)
             {
-                format += "THHmm";
-            }
-            if (value.Second > 0)
-            {
-                format += "ss";
+                format += "THHmmss";
             }
             return value.ToString(format + "Z");
         }
