@@ -36,7 +36,7 @@ Hot to create a new calendar and serialize
 private static string SimpleCalendar()
 {
     Calendar calendar = new Calendar();
-    using CalSerializor serializor = new CalSerializor()
+    CalSerializor serializor = new CalSerializor();
     //Add an event
     CalendarEvent calendarEvent = new CalendarEvent()
     {
