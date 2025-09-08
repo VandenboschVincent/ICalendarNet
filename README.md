@@ -90,29 +90,32 @@ private static string SimpleCalendar()
 
 ## Benchmarking
 
-BenchmarkDotNet v0.14.0, Windows 10 (10.0.19045.5011/22H2/2022Update)
+BenchmarkDotNet v0.14.0, Windows 11 (10.0.22631.5768/23H2/2023Update/SunValley3)
 12th Gen Intel Core i7-1265U, 1 CPU, 12 logical and 10 physical cores
-.NET SDK 9.0.100-rc.1.24452.12
+.NET SDK 9.0.304
 
 ```
-| SERIALIZATION                                  | Mean          | Error       | StdDev      | Median        | Gen0      | Gen1      | Gen2     | Allocated   |
-|---------------------------------------- |--------------:|------------:|------------:|--------------:|----------:|----------:|---------:|------------:|
-| DeserializeCalendar                     |     13.668 μs |   0.2459 μs |   0.4797 μs |     13.491 μs |    3.3875 |    0.1221 |        - |    20.89 KB |
-| SerializeCalendar                       |      5.697 μs |   0.1136 μs |   0.2849 μs |      5.666 μs |    2.8381 |    0.0534 |        - |    17.39 KB |
-| Deserialize_And_Serialize_Tiny_Calendar |      1.639 μs |   0.0299 μs |   0.0378 μs |      1.631 μs |    0.6065 |    0.0019 |        - |     3.73 KB |
-| Deserialize_And_Serialize_all_Calendars (150 calendars) |  7,384.326 μs | 143.6299 μs | 176.3904 μs |  7,337.092 μs |  531.2500 |  429.6875 | 125.0000 |  2986.76 KB |
-| Deserialize_And_Serialize_Event         |      2.305 μs |   0.0450 μs |   0.0701 μs |      2.266 μs |    0.6523 |    0.0038 |        - |     4.01 KB |
-| Deserialize_And_Serialize_Big_Calendar (1,078 events) | 24,471.842 μs | 488.4794 μs | 986.7525 μs | 24,261.273 μs | 3406.2500 | 1656.2500 | 562.5000 | 20489.48 KB |
+| SERIALIZATION                                  | Mean         | Error       | StdDev      | Median       | Gen0      | Gen1      | Gen2     | Allocated  |
+|---------------------------------------- |-------------:|------------:|------------:|-------------:|----------:|----------:|---------:|-----------:|
+| DeserializeCalendar                     |    14.718 μs |   0.2912 μs |   0.5176 μs |    14.590 μs |    3.4027 |    0.1221 |        - |   20.89 KB |
+| SerializeCalendar                       |     5.971 μs |   0.1762 μs |   0.5111 μs |     5.850 μs |    2.7847 |    0.0534 |        - |   17.07 KB |
+| Deserialize_And_Serialize_Tiny_Calendar |     1.851 μs |   0.0408 μs |   0.1182 μs |     1.828 μs |    0.6065 |         - |        - |    3.73 KB |
+| Deserialize_And_Serialize_all_Calendars (150 calendars) | 7,926.388 μs | 154.5271 μs | 407.0861 μs | 7,829.672 μs |  531.2500 |  421.8750 | 125.0000 | 2986.98 KB |
+| Deserialize_And_Serialize_Event         |     2.619 μs |   0.0789 μs |   0.2251 μs |     2.549 μs |    0.6523 |         - |        - |    4.01 KB |
+| Deserialize_And_Serialize_Big_Calendar (1,078 events)  | 9,718.046 μs | 188.8740 μs | 325.7984 μs | 9,713.112 μs | 1578.1250 | 1421.8750 | 437.5000 | 8781.35 KB |
+
 
 ```
 When using ICal.Net
 ```
-| SERIALIZATION                                           | Mean          | Error        | StdDev       | Gen0       | Gen1      | Gen2      | Allocated    |
-|------------------------------------------------- |--------------:|-------------:|-------------:|-----------:|----------:|----------:|-------------:|
-| ICal_Net_DeserializeCalendar                     |      79.87 μs |     0.707 μs |     0.626 μs |    30.7617 |    5.3711 |         - |    191.42 KB |
-| ICal_Net_SerializeCalendar                       |      22.93 μs |     0.428 μs |     0.783 μs |     9.2773 |    0.7324 |         - |      57.4 KB |
-| ICal_Net_Deserialize_And_Serialize_all_Calendars |            NA |           NA |           NA |         NA |        NA |        NA |           NA |
-| ICal_Net_Deserialize_And_Serialize_Big_Calendar  | 174,481.37 μs | 3,461.040 μs | 6,831.756 μs | 20500.0000 | 6500.0000 | 1500.0000 | 121901.07 KB |
+| SERIALIZATION                                           | Mean         | Error      | StdDev     | Median       | Gen0      | Gen1      | Gen2     | Allocated   |
+|------------------------------------------------- |-------------:|-----------:|-----------:|-------------:|----------:|----------:|---------:|------------:|
+| ICal_Net_DeserializeCalendar                     |     85.40 μs |   2.965 μs |   8.603 μs |     82.64 μs |   26.6113 |    3.5400 |        - |    163.3 KB |
+| ICal_Net_SerializeCalendar                       |     20.56 μs |   0.540 μs |   1.559 μs |     20.53 μs |    7.0801 |    0.2441 |        - |    43.44 KB |
+| ICal_Net_Deserialize_And_Serialize_all_Calendars |           NA |         NA |         NA |           NA |        NA |        NA |       NA |          NA |
+| ICal_Net_Deserialize_And_Serialize_Big_Calendar  | 57,538.05 μs | 856.205 μs | 759.004 μs | 57,759.25 μs | 9500.0000 | 2000.0000 | 750.0000 | 56450.86 KB |
+
+
 
 Benchmarks with issues:
   OtherToolsTests.ICal_Net_Deserialize_And_Serialize_all_Calendars: DefaultJob
