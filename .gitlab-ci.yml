@@ -22,12 +22,12 @@ build:
 test:
   stage: test
   script:
-    - dotnet test $PROJECT_PATH --no-restore --verbosity normal
+    - dotnet test $PROJECT_PATH --verbosity normal
 
 publish:
   stage: publish
   script:
-    - dotnet publish $PROJECT_PATH --configuration Release --output $PUBLISH_DIR --no-restore
+    - dotnet publish $PROJECT_PATH --configuration Release --output $PUBLISH_DIR
 
 deploy:
   stage: deploy
