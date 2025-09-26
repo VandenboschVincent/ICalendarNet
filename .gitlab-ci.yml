@@ -1,5 +1,4 @@
 stages:
-  - restore
   - build
   - test
   - publish
@@ -15,15 +14,10 @@ image: mcr.microsoft.com/dotnet/sdk:8.0
 before_script:
   - dotnet --version
 
-restore:
-  stage: restore
-  script:
-    - dotnet restore $PROJECT_PATH
-
 build:
   stage: build
   script:
-    - dotnet build $PROJECT_PATH --configuration Release --no-restore
+    - dotnet build $PROJECT_PATH --configuration Release
 
 test:
   stage: test
