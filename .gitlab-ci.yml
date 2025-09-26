@@ -1,22 +1,44 @@
-image: mcr.microsoft.com/dotnet/sdk:8.0
-
 stages:
-    - build
-    - test
+  - restore
+  - build
+  - test
+  - publish
+  - deploy
 
 variables:
-    test: "ICalendarNet.UnitTest"
+  PROJECT_PATH: "ICalendarNet/ICalendarNet.csproj"
+  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
+  PUBLISH_DIR: "publish"
+
+image: mcr.microsoft.com/dotnet/sdk:8.0
 
 before_script:
-    - "dotnet restore"
+  - dotnet --version
+
+restore:
+  stage: restore
+  script:
+    - dotnet restore $PROJECT_PATH
 
 build:
-    stage: build
-    script:
-        - "dotnet build"
+  stage: build
+  script:
+    - dotnet build $PROJECT_PATH --configuration Release --no-restore
 
 test:
-    stage: test
-    script: 
-        - "cd $test"
-        - "dotnet test"
+  stage: test
+  script:
+    - dotnet test $PROJECT_PATH --no-restore --verbosity normal
+
+publish:
+  stage: publish
+  script:
+    - dotnet publish $PROJECT_PATH --configuration Release --output $PUBLISH_DIR --no-restore
+
+deploy:
+  stage: deploy
+  only:
+    - develop
+  script:
+    - echo "Deploying to server..."
+    - TODO!!
