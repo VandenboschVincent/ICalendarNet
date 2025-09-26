@@ -27,7 +27,7 @@ test:
 publish:
   stage: publish
   script:
-    - dotnet publish $PROJECT_PATH --configuration Release --output $PUBLISH_DIR
+    - dotnet publish $PROJECT_PATH -f net8.0 --configuration Release --output $PUBLISH_DIR
 
 deploy:
   stage: deploy
