@@ -4,7 +4,6 @@ using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components

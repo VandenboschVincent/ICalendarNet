@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.DataTypes
@@ -20,6 +18,5 @@ namespace ICalendarNet.DataTypes
 
         public CalendarPeriods(ICalProperty key, IEnumerable<CalendarPeriod> calendarPeriods) : base(ICalProperties[(int)key], string.Join(',', calendarPeriods.Select(t => t.Value)), null)
         { }
-
     }
 }

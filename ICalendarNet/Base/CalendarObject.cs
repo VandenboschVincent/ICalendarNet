@@ -1,6 +1,6 @@
 ﻿using ICalendarNet.Extensions;
-using static ICalendarNet.Statics;
 using System.Collections.Generic;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Base
 {
@@ -19,6 +19,5 @@ namespace ICalendarNet.Base
         {
             Properties.UpdateLinesProperty(value!, key, parameters);
         }
-
     }
 }

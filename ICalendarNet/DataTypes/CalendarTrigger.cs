@@ -4,25 +4,27 @@ using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.DataTypes
 {
     public class CalendarTrigger : ContentLine
     {
-        public TimeSpan? TimeValue { 
-            get { 
-                return TypeConverters.ConvertToTimeSpan(Value); 
-            } 
-            set 
-            { 
+        public TimeSpan? TimeValue
+        {
+            get
+            {
+                return TypeConverters.ConvertToTimeSpan(Value);
+            }
+            set
+            {
                 if (value == null) return;
                 Value = TypeConverters.ConvertFromTimeSpan(value.Value);
             }
         }
-        public DateTimeOffset? DateValue { 
+
+        public DateTimeOffset? DateValue
+        {
             get { return TypeConverters.ConvertToDateTimeOffset(Value); }
             set
             {
@@ -34,6 +36,7 @@ namespace ICalendarNet.DataTypes
         public CalendarTrigger(string name, string value, ContentLineParameters? parameter) : base(name, value, parameter)
         {
         }
+
         public CalendarTrigger(DateTimeOffset dateTime)
             : base(ICalProperties[(int)ICalProperty.TRIGGER],
                   TypeConverters.ConvertFromDateTimeOffset(dateTime),
@@ -56,6 +59,7 @@ namespace ICalendarNet.DataTypes
             }.ToDictionary();
         }
     }
+
     public enum TriggerStartEnd
     {
         START,

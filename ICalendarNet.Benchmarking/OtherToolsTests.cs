@@ -3,12 +3,7 @@ using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Ical.Net.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICalendarNet.Benchmarking
 {
@@ -25,6 +20,7 @@ namespace ICalendarNet.Benchmarking
 
         private string AmericanAwernessDays = "";
         private List<string> ICalStrings = [];
+
         private static List<string> GetIcalStrings()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -38,6 +34,7 @@ namespace ICalendarNet.Benchmarking
 ,
             ];
         }
+
         private const string _sampleEvent = @"BEGIN:VCALENDAR
 PRODID:-//Microsoft Corporation//Outlook 12.0 MIMEDIR//EN
 VERSION:2.0
@@ -89,7 +86,9 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 ";
+
         private const string _aTzid = "America/New_York";
+
         private static Calendar SimpleCalendar()
         {
             //Add an event
@@ -120,14 +119,12 @@ END:VCALENDAR
         [Benchmark]
         public void ICal_Net_SerializeCalendar() => new CalendarSerializer().SerializeToString(SimpleCalendar());
 
-
         [Benchmark]
         public void ICal_Net_Deserialize_And_Serialize_all_Calendars()
         {
             var serializer = new CalendarSerializer();
             var calendars = CalendarCollection.Load(string.Join(Environment.NewLine, ICalStrings));
             _ = calendars.Select(t => serializer.SerializeToString(t));
-
         }
 
         [Benchmark]

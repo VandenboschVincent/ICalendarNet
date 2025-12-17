@@ -16,6 +16,7 @@ namespace ICalendarNet.Extensions
         {
             parameters.SetOrAddValue(key, new List<string>() { value });
         }
+
         public static void SetOrAddValue(this ContentLineParameters parameters, string key, IEnumerable<string> value)
         {
             parameters[key] = value;
@@ -27,9 +28,9 @@ namespace ICalendarNet.Extensions
         public static ContentLineParameters ToDictionary(this IEnumerable<KeyValuePair<string, IEnumerable<string>>> source, IEqualityComparer<string>? comparer) =>
 #if NET8_0_OR_GREATER
             new(source.DistinctBy(t => t.Key), comparer);
+
 #else
             new ContentLineParameters(source.GroupBy(t => t.Key).Select(g => g.First()), comparer);
 #endif
-
     }
 }

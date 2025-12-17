@@ -3,7 +3,6 @@ using ICalendarNet.Base;
 using ICalendarNet.Components;
 using ICalendarNet.DataTypes;
 using ICalendarNet.Serialization;
-using System.Data.SqlTypes;
 using System.Reflection;
 using System.Text;
 
@@ -21,7 +20,8 @@ namespace ICalendarNet.Benchmarking
         }
 
         private string AmericanAwernessDays = "";
-        private List<string> ICalStrings = []; 
+        private List<string> ICalStrings = [];
+
         private static List<string> GetIcalStrings()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
@@ -35,6 +35,7 @@ namespace ICalendarNet.Benchmarking
 ,
             ];
         }
+
         private const string _sampleEvent = @"BEGIN:VCALENDAR
 PRODID:-//Microsoft Corporation//Outlook 12.0 MIMEDIR//EN
 VERSION:2.0
@@ -86,6 +87,7 @@ END:VALARM
 END:VEVENT
 END:VCALENDAR
 ";
+
         private static Calendar SimpleCalendar()
         {
             Calendar calendar = new();
@@ -146,7 +148,6 @@ Mr Smith"));
         [Benchmark]
         public void SerializeCalendar() => new CalSerializor().SerializeCalendar(SimpleCalendar());
 
-
         [Benchmark]
         public string Deserialize_And_Serialize_Tiny_Calendar()
         {
@@ -161,7 +162,6 @@ Mr Smith"));
             var serializer = new CalSerializor();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, ICalStrings));
             _ = calendars.Select(serializer.SerializeCalendar);
-
         }
 
         [Benchmark]

@@ -2,9 +2,9 @@
 using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
 using System;
-using static ICalendarNet.Statics;
 using System.Collections.Generic;
 using System.Linq;
+using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {

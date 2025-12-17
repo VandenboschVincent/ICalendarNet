@@ -7,6 +7,7 @@ namespace ICalendarNet.DataTypes
         public CalendarDefaultDataType(Statics.ICalProperty key, string value, ContentLineParameters? param) : base(Statics.ICalProperties[(int)key], value, param)
         {
         }
+
         public CalendarDefaultDataType(string key, string value, ContentLineParameters? param) : base(key, value, param)
         {
         }

@@ -6,6 +6,7 @@
         {
             return $"BEGIN:{component}".ToUpper();
         }
+
         public static string ToEnd(this ICalComponent component)
         {
             return $"END:{component}".ToUpper();

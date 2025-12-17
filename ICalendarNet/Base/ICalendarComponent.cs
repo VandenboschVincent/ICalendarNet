@@ -8,7 +8,9 @@ namespace ICalendarNet.Base
         ICalComponent ComponentType { get; }
         List<ICalendarProperty> Properties { get; }
         List<ICalendarComponent> SubComponents { get; }
+
         void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null);
+
         void UpdateProperty(ICalProperty key, IEnumerable<string> value, ContentLineParameters? parameters = null);
     }
 }

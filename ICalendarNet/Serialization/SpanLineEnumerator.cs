@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Buffers;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ICalendarNet.Serialization
 {
@@ -12,7 +9,7 @@ namespace ICalendarNet.Serialization
     /// <remarks>
     /// To get an instance of this type, use <see cref="MemoryExtensions.EnumerateLines(ReadOnlySpan{char})"/>.
     /// </remarks>
-    public ref struct SpanLineEnumerator
+    public struct SpanLineEnumerator
     {
 #if NET8_0_OR_GREATER
         private static readonly SearchValues<char> NewLineSearchValues = SearchValues.Create(NewLineChars);

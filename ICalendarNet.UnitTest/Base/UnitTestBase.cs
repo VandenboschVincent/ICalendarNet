@@ -17,6 +17,5 @@ namespace ICalendarNet.UnitTest.Base
 ,
             ];
         }
-
     }
 }

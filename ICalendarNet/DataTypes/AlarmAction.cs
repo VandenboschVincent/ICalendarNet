@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ICalendarNet.DataTypes
+﻿namespace ICalendarNet.DataTypes
 {
     public enum AlarmAction
     {
-        AUDIO, 
-        DISPLAY, 
+        AUDIO,
+        DISPLAY,
         EMAIL
     }
 }

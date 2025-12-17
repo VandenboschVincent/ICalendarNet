@@ -1,10 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Converters;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.DataTypes
@@ -13,13 +10,13 @@ namespace ICalendarNet.DataTypes
     {
         public DateTimeOffset DateStart
         {
-            get 
+            get
             {
                 return TypeConverters.ConvertToDateTimeOffset(Value.Split('/').FirstOrDefault()) ??
-                    throw new ArgumentException($"Could not parse {Value} to period"); 
+                    throw new ArgumentException($"Could not parse {Value} to period");
             }
-            set 
-            { 
+            set
+            {
                 Value = TypeConverters.ConvertFromDateTimeOffset(value) + "/" + Value.Split('/')[^1];
             }
         }
@@ -50,14 +47,12 @@ namespace ICalendarNet.DataTypes
                     return TypeConverters.ConvertToTimeSpan(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period");
                 return (TypeConverters.ConvertToDateTimeOffset(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period"))
                     .Subtract(DateStart);
-
             }
             set
             {
                 Value = Value.Split('/')[0] + "/" + TypeConverters.ConvertFromTimeSpan(value);
             }
         }
-
 
         public CalendarPeriod(ICalProperty key, string value, ContentLineParameters? param) : base(ICalProperties[(int)key], value, param)
         { }
@@ -69,10 +64,10 @@ namespace ICalendarNet.DataTypes
         {
             Value = TypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + TypeConverters.ConvertFromDateTimeOffset(dateEnd);
         }
+
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(ICalProperties[(int)key], string.Empty, null)
         {
             Value = TypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + TypeConverters.ConvertFromTimeSpan(duration);
         }
     }
-
 }

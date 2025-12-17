@@ -1,10 +1,5 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
