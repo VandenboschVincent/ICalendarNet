@@ -12,7 +12,7 @@ namespace ICalendarNet.Serialization
     /// <param name="componentCount"></param>
     /// <param name="calComponent"></param>
     /// <param name="properties"></param>
-    public struct CalCompontentBlock
+    public ref struct CalCompontentBlock
     {
         public CalCompontentBlock(ReadOnlySpan<char> content, int componentCount, ICalComponent? calComponent, ReadOnlySpan<char> properties)
         {
@@ -32,9 +32,9 @@ namespace ICalendarNet.Serialization
     /// This class implements a text reader that reads from a string.
     /// Will output that string in blocks that start with BEGIN: and END:
     /// </summary>
-    public struct StringHandler
+    public ref struct StringHandler
     {
-        private ReadOnlySpan<char> reader;
+        private readonly ReadOnlySpan<char> reader;
         private readonly List<CalComponentIndex> indexes;
         private int currentWorkingBlock;
 

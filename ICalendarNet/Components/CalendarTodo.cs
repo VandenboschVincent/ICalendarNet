@@ -11,7 +11,7 @@ namespace ICalendarNet.Components
     /// <summary>
     /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.2
     /// </summary>
-    public class CalendarTodo : CalendarObject
+    public class CalendarTodo : CalendarRecurrableObject
     {
         public override ICalComponent ComponentType => ICalComponent.VTODO;
 
@@ -103,24 +103,6 @@ namespace ICalendarNet.Components
         {
             get => Properties.GetContentlineValue(ICalProperty.CLASS);
             set => Properties.UpdateLineProperty(value!, ICalProperty.CLASS);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.DTSTART" />
-        /// </summary>
-        public DateTimeOffset? DTSTART
-        {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.RRULE" />
-        /// </summary>
-        public string? RRULE
-        {
-            get => Properties.GetContentlineValue(ICalProperty.RRULE);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.RRULE);
         }
 
         /// <summary>
@@ -220,6 +202,15 @@ namespace ICalendarNet.Components
         {
             get => Properties.GetContentlineValue(ICalProperty.REQUEST_STATUS);
             set => Properties.UpdateLineProperty(value!, ICalProperty.REQUEST_STATUS);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.ATTENDEE" />
+        /// </summary>
+        public virtual IEnumerable<string>? Attendee
+        {
+            get => Properties.GetContentlinesSeperatedValue(ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesSeperatedProperty(value!.ToList(), ICalProperty.ATTENDEE);
         }
 
         /// <summary>

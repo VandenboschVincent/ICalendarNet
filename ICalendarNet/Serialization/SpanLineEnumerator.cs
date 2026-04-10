@@ -9,7 +9,7 @@ namespace ICalendarNet.Serialization
     /// <remarks>
     /// To get an instance of this type, use <see cref="MemoryExtensions.EnumerateLines(ReadOnlySpan{char})"/>.
     /// </remarks>
-    public struct SpanLineEnumerator
+    public ref struct SpanLineEnumerator
     {
 #if NET8_0_OR_GREATER
         private static readonly SearchValues<char> NewLineSearchValues = SearchValues.Create(NewLineChars);
@@ -29,12 +29,12 @@ namespace ICalendarNet.Serialization
         /// <summary>
         /// Gets the line at the current position of the enumerator.
         /// </summary>
-        public ReadOnlySpan<char> Current => _current;
+        public readonly ReadOnlySpan<char> Current => _current;
 
         /// <summary>
         /// Returns this instance as an enumerator.
         /// </summary>
-        public SpanLineEnumerator GetEnumerator() => this;
+        public readonly SpanLineEnumerator GetEnumerator() => this;
 
         /// <summary>
         /// Advances the enumerator to the next line of the span.

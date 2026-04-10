@@ -2,7 +2,7 @@
 
 namespace ICalendarNet.Base
 {
-    public struct SpanEnumerated
+    public readonly ref struct SpanEnumerated
     {
         public readonly Span<string> Span;
         public readonly int Index;
