@@ -240,8 +240,17 @@ namespace ICalendarNet.DataTypes.Recurrence
                         // manually clamping the day.
                         var monthDelta = originalDate.Month - intervalRefTime.Month;
                         var adjusted = intervalRefTime.AddMonths(monthDelta);
+                        var day = adjusted.Day;
+                        if (pattern.ByDay.Count == 0
+                            && pattern.ByMonthDay.Count == 0
+                            && pattern.ByYearDay.Count == 0
+                            && adjusted.Month == originalDate.Month)
+                        {
+                            //No other BY* rules that could cause the earliest candidate to be before the original date, so we can clamp to the original day in month.
+                            day = originalDate.Day;
+                        }
 
-                        return new DateTimeOffset(adjusted.Year, adjusted.Month, adjusted.Day, adjusted.Hour, adjusted.Minute, adjusted.Second, intervalRefTime.Offset);
+                        return new DateTimeOffset(adjusted.Year, adjusted.Month, day, adjusted.Hour, adjusted.Minute, adjusted.Second, intervalRefTime.Offset);
                     }
 
                 case { Frequency: FrequencyType.Yearly, ByMonth.Count: > 0, ByWeekNo.Count: 0 }:

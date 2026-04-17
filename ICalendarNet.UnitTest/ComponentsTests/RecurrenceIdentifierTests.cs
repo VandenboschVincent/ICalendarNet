@@ -1,7 +1,6 @@
 ﻿using ICalendarNet.Converters;
 using ICalendarNet.DataTypes;
 using ICalendarNet.DataTypes.Recurrence;
-using ICalendarNet.Extensions;
 using ICalendarNet.UnitTest.Base;
 using System.Reflection;
 
