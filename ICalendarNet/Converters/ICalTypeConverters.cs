@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICalendarNet.Converters
 {
-    internal static class TypeConverters
+    public static class ICalTypeConverters
     {
         public static double? ConvertToDouble(string? value)
         {
@@ -157,7 +157,7 @@ namespace ICalendarNet.Converters
         private static DateTimeOffset? TryParseToDateTime(string value, string format)
         {
             DateTimeStyles timeStyles = format.EndsWith('Z') ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;
-            if (DateTime.TryParseExact(value, format, CultureInfo.InvariantCulture, timeStyles, out DateTime UtcTime))
+            if (DateTimeOffset.TryParseExact(value, format, CultureInfo.InvariantCulture, timeStyles, out DateTimeOffset UtcTime))
                 return UtcTime;
             return null;
         }

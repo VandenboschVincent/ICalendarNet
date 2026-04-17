@@ -17,7 +17,7 @@ namespace ICalendarNet.Serialization
             if (component.Parameters.Any())
             {
                 builder.Append(component.Name);
-                builder.Append(string.Equals(component.Name, "RRULE", StringComparison.OrdinalIgnoreCase) ? ":" : ";");
+                builder.Append(';');
                 SerializeParameters(component.Parameters, builder);
                 builder.Append(string.IsNullOrEmpty(component.Value) ? "" : ":");
                 builder.Append(component.Value);

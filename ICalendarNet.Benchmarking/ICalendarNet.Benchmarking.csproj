@@ -95,9 +95,6 @@
 		<None Update="Calendars\Recurrence\DailyUntil1.ics">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="Calendars\Recurrence\Empty1.ics">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="Calendars\Recurrence\Hourly1.ics">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

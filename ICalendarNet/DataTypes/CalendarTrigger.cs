@@ -14,22 +14,22 @@ namespace ICalendarNet.DataTypes
         {
             get
             {
-                return TypeConverters.ConvertToTimeSpan(Value);
+                return ICalTypeConverters.ConvertToTimeSpan(Value);
             }
             set
             {
                 if (value == null) return;
-                Value = TypeConverters.ConvertFromTimeSpan(value.Value);
+                Value = ICalTypeConverters.ConvertFromTimeSpan(value.Value);
             }
         }
 
         public DateTimeOffset? DateValue
         {
-            get { return TypeConverters.ConvertToDateTimeOffset(Value); }
+            get { return ICalTypeConverters.ConvertToDateTimeOffset(Value); }
             set
             {
                 if (value == null) return;
-                Value = TypeConverters.ConvertFromDateTimeOffset(value.Value);
+                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value.Value);
             }
         }
 
@@ -39,7 +39,7 @@ namespace ICalendarNet.DataTypes
 
         public CalendarTrigger(DateTimeOffset dateTime)
             : base(ICalProperties[(int)ICalProperty.TRIGGER],
-                  TypeConverters.ConvertFromDateTimeOffset(dateTime),
+                  ICalTypeConverters.ConvertFromDateTimeOffset(dateTime),
                   null)
         {
             Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
@@ -50,7 +50,7 @@ namespace ICalendarNet.DataTypes
 
         public CalendarTrigger(TimeSpan timeSpan, TriggerStartEnd triggerStartEnd = TriggerStartEnd.START)
             : base(ICalProperties[(int)ICalProperty.TRIGGER],
-                  TypeConverters.ConvertFromTimeSpan(timeSpan),
+                  ICalTypeConverters.ConvertFromTimeSpan(timeSpan),
                   null)
         {
             Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
