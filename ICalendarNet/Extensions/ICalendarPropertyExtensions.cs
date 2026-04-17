@@ -77,27 +77,28 @@ namespace ICalendarNet.Extensions
 
         public static int? GetContentlineInt(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return TypeConverters.ConvertToInt(lines.GetContentlineValue(ICalProperties[(int)key]));
+            return ICalTypeConverters.ConvertToInt(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
         public static double? GetContentlineDouble(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return TypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
+            return ICalTypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
         public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return TypeConverters.ConvertToDateTimeOffset(lines.GetContentlineValue(ICalProperties[(int)key]));
+            return ICalTypeConverters.ConvertToDateTimeOffset(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
         public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return TypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(ICalProperties[(int)key]));
+            return ICalTypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
         public static IEnumerable<DateTimeOffset>? GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return lines.GetContentlines(ICalProperties[(int)key]).Select(t => TypeConverters.ConvertToDateTimeOffset(t.Value)!.Value);
+            var dateLines = lines.GetContentlines(ICalProperties[(int)key]).Select(t => ICalTypeConverters.ConvertToDateTimeOffset(t.Value));
+            return dateLines.Where(t => t.HasValue).Select(t => t!.Value);
         }
 
         public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
@@ -122,33 +123,33 @@ namespace ICalendarNet.Extensions
         {
             if (!value.HasValue)
                 return;
-            lines.UpdateLineProperty(TypeConverters.ConvertFromTimeSpan(value.Value), key, parameters);
+            lines.UpdateLineProperty(ICalTypeConverters.ConvertFromTimeSpan(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, int? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             if (!value.HasValue)
                 return;
-            lines.UpdateLineProperty(TypeConverters.ConvertFromInt(value.Value), key, parameters);
+            lines.UpdateLineProperty(ICalTypeConverters.ConvertFromInt(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, double? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             if (!value.HasValue)
                 return;
-            lines.UpdateLineProperty(TypeConverters.ConvertFromDouble(value.Value), key, parameters);
+            lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDouble(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, DateTimeOffset? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             if (!value.HasValue)
                 return;
-            lines.UpdateLineProperty(TypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
+            lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<DateTimeOffset> value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            lines.UpdateLineProperty(string.Join(",", value.Select(TypeConverters.ConvertFromDateTimeOffset)), key, parameters);
+            lines.UpdateLineProperty(string.Join(",", value.Select(ICalTypeConverters.ConvertFromDateTimeOffset)), key, parameters);
         }
 
         internal static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)
@@ -241,8 +242,6 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.URL:
                 case ICalProperty.UID:
                 case ICalProperty.EXDATE:
-                case ICalProperty.RDATE:
-                case ICalProperty.RRULE:
                 case ICalProperty.ACTION:
                 case ICalProperty.REPEAT:
                 case ICalProperty.CREATED:
@@ -304,6 +303,7 @@ namespace ICalendarNet.Extensions
                 case ICalProperty.SYNCTOKEN:
                 case ICalProperty.ETAG:
                 case ICalProperty.X_APPLE_STRUCTURED_LOCATION:
+                case ICalProperty.EXRULE:
                 case ICalProperty.CATEGORY:
                     return new CalendarDefaultDataType(ICalProperties[(int)property], value.ToString(), parameters);
 
@@ -318,7 +318,11 @@ namespace ICalendarNet.Extensions
                     return new CalendarTrigger(ICalProperties[(int)property], value.ToString(), parameters);
 
                 case ICalProperty.FREEBUSY:
+                case ICalProperty.RDATE:
                     return new CalendarPeriods(ICalProperties[(int)property], value.ToString(), parameters);
+
+                case ICalProperty.RRULE:
+                    return new CalendarRecurrenceRule(ICalProperties[(int)property], value.ToString(), parameters);
 
                 default:
                     throw new NotSupportedException(property.ToString());

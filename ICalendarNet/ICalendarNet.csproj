@@ -12,6 +12,7 @@
     <RepositoryType>git</RepositoryType>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+	  <LangVersion>12.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
