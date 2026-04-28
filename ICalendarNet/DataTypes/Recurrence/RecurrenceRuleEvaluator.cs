@@ -434,7 +434,7 @@ namespace ICalendarNet.DataTypes.Recurrence
             Debug.Assert(expand.Value);
 
             // Expand behavior
-            var weekNoDates = GetWeekNoVariantsExpanded(dates, pattern);
+            var weekNoDates = GetWeekNoVariantsExpanded(dates, pattern).ToList();
 
             // subsequent parts should only limit, not expand
             expandContext.IsCandidateSetFullyExpanded = true;
@@ -897,13 +897,21 @@ namespace ICalendarNet.DataTypes.Recurrence
         /// where the <see cref="DateTimeOffset.HasTime"/> is taken into account.
         /// when initializing the new period with a new <see cref="DateTimeOffset"/>.
         /// </summary>
-        private static CalendarPeriod CreatePeriod(DateTimeOffset dateTime, DateTimeOffset referenceDate)
+        private static CalendarPeriod CreatePeriod(DateTimeOffset dateTime)
         {
             // Turn each resulting date/time into an DateTimeOffset and associate it
             // with the reference date.
             var newDt = new CalendarPeriod(ICalProperty.FREEBUSY, dateTime, dateTime);
             // Create a period from the new date/time.
             return newDt;
+        }
+
+        private static DateTimeOffset GetMaxYear(DateTimeOffset periodStart)
+        {
+            if (periodStart > new DateTimeOffset(9800, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                return DateTimeOffset.MaxValue;
+            return periodStart > DateTimeOffset.UtcNow
+                    ? periodStart.AddYears(100) : DateTimeOffset.UtcNow.AddYears(100);
         }
 
         /// <summary>
@@ -915,10 +923,13 @@ namespace ICalendarNet.DataTypes.Recurrence
         /// <returns></returns>
         public override IEnumerable<CalendarPeriod> Evaluate(DateTimeOffset referenceDate, DateTimeOffset? periodStart, EvaluationOptions? options)
         {
+            options ??= new();
+            options.MaxDateTime ??= GetMaxYear(periodStart ?? referenceDate);
             if (Pattern.Frequency < FrequencyType.Daily && !referenceDate.HasTime())
             {
                 // This case is not defined by RFC 5545. We handle it by evaluating the rule
-                // as if referenceDate had a time (i.e. set to midnight).
+                // as if referenceDate had a time (
+                // i.e. set to midnight).
                 referenceDate = new DateTimeOffset(referenceDate.Date, referenceDate.Offset);
             }
 
@@ -926,12 +937,17 @@ namespace ICalendarNet.DataTypes.Recurrence
             var pattern = ProcessRecurrencePattern(referenceDate);
 
             var periodQuery = GetDates(referenceDate, periodStart, pattern, options)
-                .Select(dt => CreatePeriod(dt, referenceDate));
+                .Select(dt => CreatePeriod(dt))
+                .TakeWhile((p,x) => p.DateStart <= (pattern.Until ?? options.MaxDateTime) && x < options.MaxOccurrencesLimit)
+                .ToList();
 
-            if (pattern.Until is not null)
-                periodQuery = periodQuery.TakeWhile(p => p.DateStart <= pattern.Until);
 
-            return periodQuery;
+            if (options.AddStartDate && !periodQuery.Any(t => t.DateStart.Equals(referenceDate)))
+                periodQuery.Add(CreatePeriod(referenceDate));
+            else if (options?.AddStartDate == false)
+                periodQuery.RemoveAll(p => p.DateStart.Equals(referenceDate));
+
+            return periodQuery.OrderBy(t => t.DateStart);
         }
     }
 }

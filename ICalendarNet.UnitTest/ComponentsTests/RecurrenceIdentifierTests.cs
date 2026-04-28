@@ -52,8 +52,9 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             {
                 try
                 {
-                    var recurrence = calEvent.GetRecurrence(1);
+                    var recurrence = calEvent.GetRecurrence(10);
                     recurrence.Should().NotBeEmpty(icalvar);
+                    recurrence.Should().HaveCountGreaterThan(1, icalvar);
                 }
                 catch (Exception ex)
                 {
@@ -141,7 +142,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                     }
                     else if (trimmed.StartsWith("DTSTART:"))
                     {
-                        test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset(trimmed.Substring("DTSTART:".Length) + "Z")?.DateTime;
+                        test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset((trimmed.Substring("DTSTART:".Length) + "Z")
+                            .Replace("ZZ","Z"))?.DateTime;
                     }
                     else if (trimmed.StartsWith("INSTANCES:"))
                     {
