@@ -9,7 +9,7 @@ variables:
   TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
   PUBLISH_DIR: "publish"
 
-image: mcr.microsoft.com/dotnet/sdk:8.0
+image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
@@ -27,7 +27,7 @@ test:
 publish:
   stage: publish
   script:
-    - dotnet publish $PROJECT_PATH -f net8.0 --configuration Release --output $PUBLISH_DIR
+    - dotnet publish $PROJECT_PATH -f net10.0 --configuration Release --output $PUBLISH_DIR
 
 deploy:
   stage: deploy
