@@ -444,6 +444,11 @@
             /// </summary>
             REQUEST_STATUS,
 
+            /// <summary>
+            /// Deprecated: The "EXRULE" property can no longer be specified in a component.
+            /// </summary>
+            EXRULE,
+
             X_ALT_DESC,
             X_MICROSOFT_CDO_ALLDAYEVENT,
             X_MICROSOFT_CDO_APPT_SEQUENCE,
@@ -563,6 +568,7 @@
             "LAST-MODIFIED",
             "SEQUENCE",
             "REQUEST-STATUS",
+            "EXRULE",
             "X-ALT-DESC",
             "X-MICROSOFT-CDO-ALLDAYEVENT",
             "X-MICROSOFT-CDO-APPT-SEQUENCE",

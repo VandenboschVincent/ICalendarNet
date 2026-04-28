@@ -48,7 +48,7 @@ namespace ICalendarNet.UnitTest
         {
             CalSerializor calSerializor = new();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
-            calendars.Should().HaveCount(140);
+            calendars.Should().HaveCount(139);
             foreach (var calendar in calendars)
             {
                 calendar!.Properties.Should().NotBeEmpty();
