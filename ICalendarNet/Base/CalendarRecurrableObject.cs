@@ -55,39 +55,25 @@ namespace ICalendarNet.Base
         /// <summary>
         ///   <see cref="ICalProperty.RDATE" />
         /// </summary>
-        public IEnumerable<DateTimeOffset>? GetRecurrence(int skip = 0, int amount = 1)
+        public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1)
         {
             var rrule = GetRecurrenceRule();
             if (rrule != null && DTSTART != null)
-                return GetRecurrenceDates(rrule, skip, amount);
+                return GetRecurrenceDates(rrule, amount);
             return Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
-                .SelectMany(t => t.GetPeriods())
-                .Select(t => t.DateStart);
+                .SelectMany(t => t.GetPeriods());
         }
 
-        private IEnumerable<DateTimeOffset> GetRecurrenceDates(CalendarRecurrenceRule rrule, int skip = 0, int amount = 1)
+        private IEnumerable<CalendarPeriod> GetRecurrenceDates(CalendarRecurrenceRule rrule, int amount = 1)
         {
             DateTimeOffset? dtstart = DTSTART;
             List<DateTimeOffset> exdates = ExceptionDateTimes?.ToList() ?? new List<DateTimeOffset>();
             if (dtstart is null)
-                yield break;
+                return Enumerable.Empty<CalendarPeriod>();
 
             var evaluator = new RecurrenceRuleEvaluator(rrule);
-            var dates = evaluator.Evaluate(dtstart.Value, null, new());
-            int i = -1;
-            int total = 0;
-            foreach (var date in dates)
-            {
-                i++;
-                if (i < skip)
-                    continue;
-                if (exdates.Contains(date.DateStart))
-                    continue;
-                total++;
-                if (total > amount)
-                    break;
-                yield return date.DateStart;
-            }
+            return evaluator.Evaluate(dtstart.Value, null, new() { MaxOccurrencesLimit = amount})
+                .Where(t => !exdates.Contains(t.DateStart));
         }
     }
 }

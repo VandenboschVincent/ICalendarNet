@@ -154,7 +154,7 @@ namespace ICalendarNet.DataTypes
 
         public DayOfWeek FirstDayOfWeek
         {
-            get => dayMap.GetValueOrDefault(valueParameters.GetValue("WKST") ?? string.Empty);
+            get => dayMap.GetValueOrDefault(valueParameters.GetValue("WKST") ?? "MO");
             set => valueParameters.SetOrAddValue("WKST", dayMap.First(t => t.Value == value).Key);
         }
 
