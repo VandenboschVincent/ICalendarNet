@@ -18,7 +18,7 @@ namespace ICalendarNet.Serialization
             return DeserializeICalComponents<Calendar>(source);
         }
 
-        public T DeserializeICalComponent<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
+        public T? DeserializeICalComponent<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
         {
             return DeserializeICalComponents<T>(source).FirstOrDefault();
         }

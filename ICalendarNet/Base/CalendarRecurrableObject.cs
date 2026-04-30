@@ -15,7 +15,7 @@ namespace ICalendarNet.Base
         /// </summary>
         public DateTimeOffset? DTSTART
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART);
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
         }
 
@@ -55,25 +55,39 @@ namespace ICalendarNet.Base
         /// <summary>
         ///   <see cref="ICalProperty.RDATE" />
         /// </summary>
+        public IEnumerable<CalendarPeriod>? RecurrenceDates
+        {
+            get => Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
+                .SelectMany(t => t.GetPeriods());
+            set => Properties.UpdateLineProperty(value!, ICalProperty.RDATE);
+        }
+
         public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1)
         {
-            var rrule = GetRecurrenceRule();
-            if (rrule != null && DTSTART != null)
-                return GetRecurrenceDates(rrule, amount);
-            return Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
+            return GetRecurrenceDates(amount) ?? 
+                Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
                 .SelectMany(t => t.GetPeriods());
         }
 
-        private IEnumerable<CalendarPeriod> GetRecurrenceDates(CalendarRecurrenceRule rrule, int amount = 1)
+        internal IEnumerable<CalendarPeriod>? GetRecurrenceDates(
+            int amount = 1
+            , DateTimeOffset? periodStart = null
+            , bool addStartDate = true
+            , DateTimeOffset? maxDate = null)
         {
-            DateTimeOffset? dtstart = DTSTART;
-            List<DateTimeOffset> exdates = ExceptionDateTimes?.ToList() ?? new List<DateTimeOffset>();
-            if (dtstart is null)
-                return Enumerable.Empty<CalendarPeriod>();
+            var rrule = GetRecurrenceRule();
+            var dtstart = DTSTART;
+            if (rrule is null || dtstart is null)
+                return null;
 
+            List<DateTimeOffset> exdates = ExceptionDateTimes?.ToList() ?? new List<DateTimeOffset>();
             var evaluator = new RecurrenceRuleEvaluator(rrule);
-            return evaluator.Evaluate(dtstart.Value, null, new() { MaxOccurrencesLimit = amount})
-                .Where(t => !exdates.Contains(t.DateStart));
+            return evaluator.Evaluate(dtstart.Value, periodStart, new() 
+            { 
+                MaxOccurrencesLimit = amount,
+                AddStartDate = addStartDate,
+                MaxDateTime = maxDate
+            }).Where(t => !exdates.Contains(t.DateStart));
         }
     }
 }

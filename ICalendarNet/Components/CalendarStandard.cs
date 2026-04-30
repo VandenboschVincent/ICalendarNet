@@ -6,28 +6,10 @@ using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Components
 {
-    public class CalendarStandard : CalendarObject
+    public class CalendarStandard : CalendarRecurrableObject
     {
         public override ICalComponent ComponentType => ICalComponent.STANDARD;
-
-        /// <summary>
-        ///   <see cref="ICalProperty.COMMENT" />
-        /// </summary>
-        public virtual string? Comment
-        {
-            get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
-            set => Properties.UpdateLineProperty(value!, ICalProperty.COMMENT);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.TZNAME" />
-        /// </summary>
-        public virtual string? TimezoneName
-        {
-            get => Properties.GetContentlineValue(ICalProperty.TZNAME);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.TZNAME);
-        }
-
+        
         /// <summary>
         ///   <see cref="ICalProperty.TZOFFSETFROM" />
         /// </summary>
@@ -47,12 +29,22 @@ namespace ICalendarNet.Components
         }
 
         /// <summary>
-        ///   <see cref="ICalProperty.EXDATE" />
+        ///   <see cref="ICalProperty.COMMENT" />
         /// </summary>
-        public virtual IEnumerable<DateTimeOffset>? ExceptionDateTimes
+        public virtual string? Comment
         {
-            get => Properties.GetContentlineDateTimes(ICalProperty.EXDATE);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.EXDATE);
+            get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
+            set => Properties.UpdateLineProperty(value!, ICalProperty.COMMENT);
         }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.TZNAME" />
+        /// </summary>
+        public virtual string? TimezoneName
+        {
+            get => Properties.GetContentlineValue(ICalProperty.TZNAME);
+            set => Properties.UpdateLineProperty(value!, ICalProperty.TZNAME);
+        }
+
     }
 }

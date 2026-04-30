@@ -24,10 +24,12 @@ namespace ICalendarNet.DataTypes
             }
         }
 
-        public DateTimeOffset DateEnd
+        public DateTimeOffset? DateEnd
         {
             get
             {
+                if (!Value.Contains('/'))
+                    return null;
                 string endValue = ValueParts.LastOrDefault()
                     ?? throw new ArgumentException($"Could not parse {Value} to period");
                 if (endValue.StartsWith('P'))
@@ -36,7 +38,7 @@ namespace ICalendarNet.DataTypes
             }
             set
             {
-                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value);
+                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value);
             }
         }
 
@@ -71,6 +73,13 @@ namespace ICalendarNet.DataTypes
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(ICalProperties[(int)key], string.Empty, null)
         {
             Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + ICalTypeConverters.ConvertFromTimeSpan(duration);
+        }
+
+        public override string ToString()
+        {
+            if (DateEnd is null)
+                return DateStart.ToString("o");
+            return DateStart.ToString("o") + "/" + DateEnd.Value.ToString("o");
         }
     }
 }

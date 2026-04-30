@@ -132,7 +132,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public DateTimeOffset? Created
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.CREATED);
+            get => Properties.GetContentlineDateTime(ICalProperty.CREATED, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.CREATED);
         }
 

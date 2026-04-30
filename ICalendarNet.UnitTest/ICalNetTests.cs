@@ -4,6 +4,8 @@ namespace ICalendarNet.UnitTest
 {
     public class ICalNetTests : UnitTestBase
     {
+        static IEnumerable<string> IcalFiles => GetIcalFiles();
+
         [TestCase("https://www.officeholidays.com/ics-all/belgium")]
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10")]
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
@@ -25,21 +27,19 @@ namespace ICalendarNet.UnitTest
             calendarAfterSerialize.SubComponents.Select(t => t.Properties.Count).Sum().Should().Be(calendar.SubComponents.Select(t => t.Properties.Count).Sum());
         }
 
-        [Test]
-        public void Test_Offline_vCalendar_Should_Serialize()
+        [TestCaseSource(nameof(IcalFiles))]
+        public void Test_Offline_vCalendar_Should_Serialize(string file)
         {
-            foreach (var icalvar in GetIcalStrings())
+            string icalvar = File.ReadAllText(file);
+            try
             {
-                try
-                {
-                    var calendar = Calendar.LoadCalendar(icalvar);
-                    calendar!.Properties.Should().NotBeEmpty(icalvar);
-                    calendar!.SubComponents.Should().NotBeEmpty(icalvar);
-                }
-                catch (Exception ex)
-                {
-                    Assert.Fail(ex.Message + Environment.NewLine + icalvar);
-                }
+                var calendar = Calendar.LoadCalendar(icalvar);
+                calendar!.Properties.Should().NotBeEmpty(icalvar);
+                calendar!.SubComponents.Should().NotBeEmpty(icalvar);
+            }
+            catch (Exception ex)
+            {
+                Assert.Fail(ex.Message + Environment.NewLine + icalvar);
             }
         }
 

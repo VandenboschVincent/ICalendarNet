@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Converters;
 using ICalendarNet.DataTypes;
+using ICalendarNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,9 +86,15 @@ namespace ICalendarNet.Extensions
             return ICalTypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
-        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key)
+        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
         {
-            return ICalTypeConverters.ConvertToDateTimeOffset(lines.GetContentlineValue(ICalProperties[(int)key]));
+            var line = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (line?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid)
+            {
+                var timezone = metadata.GetTimeZone(tzid);
+                return ICalTypeConverters.ConvertToDateTimeOffset(line?.Value, timezone);
+            }
+            return ICalTypeConverters.ConvertToDateTimeOffset(line?.Value);
         }
 
         public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)

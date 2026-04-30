@@ -31,7 +31,10 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var evaluator = new RecurrenceRuleEvaluator(rrule);
             var startdate = new DateTimeOffset(exampleCase.DtStart!.Value, TimeSpan.Zero);
             var refDate = new DateTimeOffset(exampleCase.DtStart!.Value, TimeSpan.Zero);
-            var datesFound = evaluator.Evaluate(startdate, refDate, new()).Select(t => t.DateStart.DateTime).ToList();
+            var datesFound = evaluator.Evaluate(startdate, refDate, new() 
+            { 
+                MaxOccurrencesLimit = 10 
+            }).Select(t => t.DateStart.DateTime).ToList();
             if (exampleCase.Instances.Count > 0)
             {
                 datesFound.Should().Equal(exampleCase.Instances);
@@ -143,7 +146,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                     else if (trimmed.StartsWith("DTSTART:"))
                     {
                         test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset((trimmed.Substring("DTSTART:".Length) + "Z")
-                            .Replace("ZZ","Z"))?.DateTime;
+                            .Replace("ZZ","Z"), null)?.DateTime;
                     }
                     else if (trimmed.StartsWith("INSTANCES:"))
                     {
@@ -151,7 +154,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                             .Split(',', StringSplitOptions.RemoveEmptyEntries);
 
                         test.Instances = values
-                            .Select(v => ICalTypeConverters.ConvertToDateTimeOffset(v + "Z"))
+                            .Select(v => ICalTypeConverters.ConvertToDateTimeOffset(v + "Z", null))
                             .Where(d => d.HasValue)
                             .Select(d => d.Value.DateTime)
                             .ToList();

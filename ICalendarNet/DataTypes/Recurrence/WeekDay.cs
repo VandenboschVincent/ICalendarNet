@@ -26,14 +26,13 @@ namespace ICalendarNet.DataTypes.Recurrence
         public WeekDay(string value)
         {
             var partWithoutNumber = value;
-            var number = new string(value.TakeWhile(char.IsDigit).ToArray());
+            var number = new string(value.TakeWhile(t => char.IsDigit(t) || t == '-' || t == '+').ToArray());
             if (!string.IsNullOrEmpty(number))
             {
-                var negative = value.StartsWith('-');
-                partWithoutNumber = value[(negative ? 1 + number.Length : number.Length)..];
+                partWithoutNumber = value[number.Length..];
                 if (int.TryParse(number, out var intValue))
                 {
-                    Offset = negative ? -intValue : intValue;
+                    Offset = intValue;
                 }
             }
             if (CalendarRecurrenceRule.dayMap.TryGetValue(partWithoutNumber, out var dow))
