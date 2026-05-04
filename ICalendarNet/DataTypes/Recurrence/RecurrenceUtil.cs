@@ -1,7 +1,30 @@
-﻿namespace ICalendarNet.DataTypes.Recurrence
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace ICalendarNet.DataTypes.Recurrence
 {
     internal static class RecurrenceUtil
     {
+
+        internal static IEnumerable<CalendarPeriod>? GetRecurrenceDates(
+            CalendarRecurrenceRule rrule
+            , DateTimeOffset dtstart
+            , int amount = 1
+            , DateTimeOffset? periodStart = null
+            , bool addStartDate = true
+            , DateTimeOffset? maxDate = null
+            , IEnumerable<DateTimeOffset>? exceptionDates = null)
+        {
+            List<DateTimeOffset> exdates = exceptionDates?.ToList() ?? new List<DateTimeOffset>();
+            var evaluator = new RecurrenceRuleEvaluator(rrule);
+            return evaluator.Evaluate(dtstart, periodStart, new()
+            {
+                MaxOccurrencesLimit = amount,
+                AddStartDate = addStartDate,
+                MaxDateTime = maxDate
+            }).Where(t => !exdates.Contains(t.DateStart));
+        }
         public static bool?[] GetExpandBehaviorList(CalendarRecurrenceRule p)
         {
             // See the table in RFC 5545 Section 3.3.10 (Page 43).

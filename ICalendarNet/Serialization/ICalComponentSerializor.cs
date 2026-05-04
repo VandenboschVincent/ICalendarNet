@@ -3,12 +3,20 @@ using ICalendarNet.Components;
 using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace ICalendarNet.Serialization
 {
     public partial class CalSerializor
     {
+        private List<CalendarTimeZone> TimeZones { get; set; } = [];
+        private CalendarTimeZone InternalDeserializeTimeZone<T>(ref StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
+        {
+            var block = InternalDeserializeComponentsBlock(ref handler, new CalendarTimeZone(), parentBlock);
+            TimeZones.Add(block);
+            return block;
+        }
         private ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalCompontentBlock parentBlock)
         {
             return parentBlock.CalComponent!.Value switch
@@ -18,7 +26,7 @@ namespace ICalendarNet.Serialization
                 ICalComponent.VTODO => InternalDeserializeComponentsBlock(ref handler, new CalendarTodo(), parentBlock),
                 ICalComponent.VJOURNAL => InternalDeserializeComponentsBlock(ref handler, new CalendarJournal(), parentBlock),
                 ICalComponent.VFREEBUSY => InternalDeserializeComponentsBlock(ref handler, new CalendarFreeBusy(), parentBlock),
-                ICalComponent.VTIMEZONE => InternalDeserializeComponentsBlock(ref handler, new CalendarTimeZone(), parentBlock),
+                ICalComponent.VTIMEZONE => InternalDeserializeTimeZone(ref handler, new CalendarTimeZone(), parentBlock),
                 ICalComponent.STANDARD => InternalDeserializeComponentsBlock(ref handler, new CalendarStandard(), parentBlock),
                 ICalComponent.DAYLIGHT => InternalDeserializeComponentsBlock(ref handler, new CalendarDaylight(), parentBlock),
                 ICalComponent.VALARM => InternalDeserializeComponentsBlock(ref handler, new CalendarAlarm(), parentBlock),
@@ -33,7 +41,31 @@ namespace ICalendarNet.Serialization
             {
                 result.Add(InternalDeserializeComponentsBlock(ref handler, new T()));
             }
+            if (TimeZones.Count > 0)
+            {
+                for (int i = 0; i < result.Count; i++)
+                {
+                    SetMetaData(result[i]);
+                }
+            }
             return result;
+        }
+
+        private void SetMetaData(ICalendarComponent component)
+        {
+            if (component.ComponentType == ICalComponent.VTIMEZONE)
+                return;
+            for (int x = 0; x < component.Properties.Count; x++)
+            {
+                if (component.ComponentType == ICalComponent.VTIMEZONE)
+                    break;
+                component.Properties[x].Metadata.SetTimeZones(TimeZones);
+            }
+            component.Metadata.SetTimeZones(TimeZones);
+            for (int i = 0; i < component.SubComponents.Count; i++)
+            {
+                SetMetaData(component.SubComponents[i]);
+            }
         }
 
         private T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent) where T : ICalendarComponent, new()

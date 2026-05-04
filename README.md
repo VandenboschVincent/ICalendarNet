@@ -8,15 +8,16 @@ Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton o
 
 ## Available for
 * Net Standard 2.1
-* Net 8.0
+* Net 8.0/9.0/10.0
 
 ## Roadmap:
 
  - [x] Serialization
  - [x] Deserialization
  - [x] RFC 5545 compliancy
- - [ ] Make it easier to create/edit occurency
- - [ ] Make it easier to create/edit alarms
+ - [x] Make it easier to create/edit occurency
+ - [x] Make it easier to create/edit alarms
+ - [ ] Timezones fully implemented
 
 ## How to use:
 
@@ -27,11 +28,11 @@ How to deserialize an get events
 using var httpClient = new HttpClient();
 string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
 
-Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+Calendar? calendar = Calendar.LoadCalendar(icalvar);
 CalendarEvent calEvent = calendar.GetEvents().First();
 ```
 
-Hot to create a new calendar and serialize
+How to create a new calendar and serialize
 ```csharp
 private static string SimpleCalendar()
 {
@@ -85,6 +86,15 @@ private static string SimpleCalendar()
             DTEND = DateTimeOffset.UtcNow.AddHours(1),
         });
     return serializor.SerializeCalendar(calendar);
+}
+```
+
+How to get the upcomming recurring events
+```csharp
+Calendar? calendar = Calendar.LoadCalendar(icalvar);
+foreach (var calEvent in calendar.GetEvents())
+{
+    var recurrence = calEvent.GetRecurrence(10, DateTimeOffset.UtcNow); //Get the upcomming 10 events
 }
 ```
 

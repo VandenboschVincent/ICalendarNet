@@ -5,6 +5,9 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class EventTests : UnitTestBase
     {
+        static IEnumerable<string> IcalFiles => GetIcalFiles("Event*");
+        static IEnumerable<string> ICalOccerenceIcalFiles => GetIcalFiles("ICalOccerence");
+
         [Test]
         public void Test_Serialize_Event()
         {
@@ -51,41 +54,37 @@ LOCATION:Daywest
 END:VEVENT");
         }
 
-        [Test]
-        public void Test_ChangeProperty_Event()
+        [TestCaseSource(nameof(IcalFiles))]
+        public void Test_ChangeProperty_Event(string file)
         {
+            string icalvar = File.ReadAllText(file);
             CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
-            foreach (var icalvar in GetIcalStrings("Event*"))
-            {
-                Calendar? calendar = Calendar.LoadCalendar(icalvar);
-                calendar.Should().NotBeNull();
-                calendar!.GetEvents().First().Description = calDescr;
+            Calendar? calendar = Calendar.LoadCalendar(icalvar);
+            calendar.Should().NotBeNull();
+            calendar!.GetEvents().First().Description = calDescr;
 
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
 
-                Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
-                serializedCalender.Should().NotBeNull();
-                serializedCalender!.GetEvents().Any(t => t.Description == calDescr).Should().BeTrue();
-                serializedCalender.GetEvents().First().Properties.Should().HaveCountGreaterThan(1);
-            }
+            Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
+            serializedCalender.Should().NotBeNull();
+            serializedCalender!.GetEvents().Any(t => t.Description == calDescr).Should().BeTrue();
+            serializedCalender.GetEvents().First().Properties.Should().HaveCountGreaterThan(1);
         }
 
-        [Test]
-        public void Test_GetAppleStrucured_Location()
+        [TestCaseSource(nameof(ICalOccerenceIcalFiles))]
+        public void Test_GetAppleStrucured_Location(string file)
         {
+            string icalvar = File.ReadAllText(file);
             CalSerializor calSerializor = new();
-            foreach (var icalvar in GetIcalStrings("ICalOccerence"))
-            {
-                Calendar? calendar = Calendar.LoadCalendar(icalvar);
-                calendar.Should().NotBeNull();
+            Calendar? calendar = Calendar.LoadCalendar(icalvar);
+            calendar.Should().NotBeNull();
 
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar!);
+            string serializedCalendar = calSerializor.SerializeCalendar(calendar!);
 
-                Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
-                serializedCalender.Should().NotBeNull();
-                serializedCalender!.GetEvents().First().Properties.Should().HaveCountGreaterThan(1);
-            }
+            Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
+            serializedCalender.Should().NotBeNull();
+            serializedCalender!.GetEvents().First().Properties.Should().HaveCountGreaterThan(1);
         }
     }
 }

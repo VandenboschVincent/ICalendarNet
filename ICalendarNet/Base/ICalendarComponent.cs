@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ICalendarNet.Models;
+using System.Collections.Generic;
 using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Base
@@ -8,6 +9,7 @@ namespace ICalendarNet.Base
         ICalComponent ComponentType { get; }
         List<ICalendarProperty> Properties { get; }
         List<ICalendarComponent> SubComponents { get; }
+        MetadataContainer Metadata { get; }
 
         void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null);
 
