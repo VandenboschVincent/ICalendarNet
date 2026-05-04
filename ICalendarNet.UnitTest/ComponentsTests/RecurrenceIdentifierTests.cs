@@ -17,13 +17,6 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var file = File.ReadAllText(Path.Combine(topLevelIcsPath, "RecurrenceTestCases.txt"));
             return RecurrenceParser.Parse(file);
         }
-        static IEnumerable<RecurrenceTest> FaultyRecurrenceTestCases()
-        {
-            string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
-            string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, "Calendars", "Recurrence"));
-            var file = File.ReadAllText(Path.Combine(topLevelIcsPath, "FaultyTestCases.txt"));
-            return RecurrenceParser.Parse(file);
-        }
 
         private void TestCase(RecurrenceTest exampleCase)
         {
@@ -68,23 +61,6 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 
         [TestCaseSource(nameof(RecurrenceTestCases))]
         public void TestCases(RecurrenceTest exampleCase)
-        {
-            try
-            {
-                TestCase(exampleCase);
-            }
-            catch (Exception ex)
-            {
-                if (string.IsNullOrEmpty(exampleCase.Exception))
-                {
-                    Assert.Fail($"Unexpected exception for case: {exampleCase.Comment}{Environment.NewLine}RRule: {exampleCase.RRule}{Environment.NewLine}DTSTART: {exampleCase.DtStart}{Environment.NewLine}Expected Instances: {string.Join(", ", exampleCase.Instances)}{Environment.NewLine}Exception: {ex}");
-                }
-            }
-        }
-
-        [Ignore("These currently do not work")]
-        [TestCaseSource(nameof(FaultyRecurrenceTestCases))]
-        public void FaultyTestCases(RecurrenceTest exampleCase)
         {
             try
             {
