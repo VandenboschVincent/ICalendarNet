@@ -8,15 +8,16 @@ Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton o
 
 ## Available for
 * Net Standard 2.1
-* Net 8.0
+* Net 8.0/9.0/10.0
 
 ## Roadmap:
 
  - [x] Serialization
  - [x] Deserialization
  - [x] RFC 5545 compliancy
- - [ ] Make it easier to create/edit occurency
- - [ ] Make it easier to create/edit alarms
+ - [x] Make it easier to create/edit occurency
+ - [x] Make it easier to create/edit alarms
+ - [ ] Timezones fully implemented
 
 ## How to use:
 
