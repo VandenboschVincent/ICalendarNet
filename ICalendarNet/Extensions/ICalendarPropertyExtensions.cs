@@ -157,12 +157,26 @@ namespace ICalendarNet.Extensions
         {
             if (!value.HasValue)
                 return;
+            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine?.Metadata is not null)
+            {
+                var timezone = foundLine.Metadata.GetTimeZone(tzid);
+                lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value, timezone), key, parameters);
+                return;
+            }
             lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<DateTimeOffset> value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            lines.UpdateLineProperty(string.Join(",", value.Select(ICalTypeConverters.ConvertFromDateTimeOffset)), key, parameters);
+            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine?.Metadata is not null)
+            {
+                var timezone = foundLine.Metadata.GetTimeZone(tzid);
+                lines.UpdateLineProperty(string.Join(",", value.Select(t => ICalTypeConverters.ConvertFromDateTimeOffset(t, timezone))), key, parameters);
+                return;
+            }
+            lines.UpdateLineProperty(string.Join(",", value.Select(t => ICalTypeConverters.ConvertFromDateTimeOffset(t))), key, parameters);
         }
 
         internal static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)

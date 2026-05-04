@@ -45,7 +45,7 @@ namespace ICalendarNet.DataTypes
         public DateTimeOffset? Until
         {
             get => ICalTypeConverters.ConvertToDateTimeOffset(valueParameters.GetValue("UNTIL"), GetTimeZone());
-            set => valueParameters.SetOrAddValue("UNTIL", ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value));
+            set => valueParameters.SetOrAddValue("UNTIL", ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value, GetTimeZone()));
         }
 
         /// <summary>

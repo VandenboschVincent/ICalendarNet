@@ -62,14 +62,14 @@ namespace ICalendarNet.Base
             set => Properties.UpdateLineProperty(value!, ICalProperty.RDATE);
         }
 
-        public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1)
+        public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1, DateTimeOffset? start = null, bool addStartDay = true, DateTimeOffset? end = null)
         {
             var rrule = GetRecurrenceRule();
             var dtstart = DTSTART;
             if (rrule is null || dtstart is null)
                 return null;
             var exdates = ExceptionDateTimes;
-            return RecurrenceUtil.GetRecurrenceDates(rrule, dtstart.Value, amount, exceptionDates: exdates) ?? 
+            return RecurrenceUtil.GetRecurrenceDates(rrule, dtstart.Value, amount, start, addStartDay, end, exceptionDates: exdates) ?? 
                 Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
                 .SelectMany(t => t.GetPeriods());
         }

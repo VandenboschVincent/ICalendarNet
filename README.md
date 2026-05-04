@@ -27,11 +27,11 @@ How to deserialize an get events
 using var httpClient = new HttpClient();
 string icalvar = await httpClient.GetStringAsync("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10");
 
-Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+Calendar? calendar = Calendar.LoadCalendar(icalvar);
 CalendarEvent calEvent = calendar.GetEvents().First();
 ```
 
-Hot to create a new calendar and serialize
+How to create a new calendar and serialize
 ```csharp
 private static string SimpleCalendar()
 {
@@ -85,6 +85,15 @@ private static string SimpleCalendar()
             DTEND = DateTimeOffset.UtcNow.AddHours(1),
         });
     return serializor.SerializeCalendar(calendar);
+}
+```
+
+How to get the upcomming recurring events
+```csharp
+Calendar? calendar = Calendar.LoadCalendar(icalvar);
+foreach (var calEvent in calendar.GetEvents())
+{
+    var recurrence = calEvent.GetRecurrence(10, DateTimeOffset.UtcNow); //Get the upcomming 10 events
 }
 ```
 

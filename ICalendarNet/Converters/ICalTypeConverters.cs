@@ -139,15 +139,25 @@ namespace ICalendarNet.Converters
             return format;
         }
 
-        public static string ConvertFromDateTimeOffset(DateTimeOffset value)
+        public static string ConvertFromDateTimeOffset(DateTimeOffset value, CalendarTimeZone? tzone = null)
         {
-            value = value.ToUniversalTime();
             string format = "yyyyMMdd";
+            if (tzone == null || value.Offset == TimeSpan.Zero)
+            {
+                value = value.ToUniversalTime();
+                if (value.Hour > 0 || value.Minute > 0 || value.Second > 0)
+                {
+                    format += "THHmmss";
+                }
+                return value.ToString(format + "Z");
+            }
+            int offset = tzone.GetOffsetInMinutes(value);
+            value = value.ToOffset(TimeSpan.FromMinutes(offset));
             if (value.Hour > 0 || value.Minute > 0 || value.Second > 0)
             {
                 format += "THHmmss";
             }
-            return value.ToString(format + "Z");
+            return value.ToString(format);
         }
 
         public static string ConvertFromInt(int value)

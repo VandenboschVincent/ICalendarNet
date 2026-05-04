@@ -29,7 +29,7 @@ namespace ICalendarNet.DataTypes
             set
             {
                 if (value == null) return;
-                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value.Value);
+                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value.Value, GetTimeZone());
             }
         }
 

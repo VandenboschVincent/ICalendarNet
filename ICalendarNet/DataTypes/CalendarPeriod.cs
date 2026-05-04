@@ -20,7 +20,7 @@ namespace ICalendarNet.DataTypes
             }
             set
             {
-                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value) + "/" + Value.Split('/')[^1];
+                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value, GetTimeZone()) + "/" + Value.Split('/')[^1];
             }
         }
 
@@ -38,7 +38,7 @@ namespace ICalendarNet.DataTypes
             }
             set
             {
-                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value);
+                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value, GetTimeZone());
             }
         }
 
@@ -67,12 +67,12 @@ namespace ICalendarNet.DataTypes
 
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, DateTimeOffset dateEnd) : base(ICalProperties[(int)key], string.Empty, null)
         {
-            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(dateEnd);
+            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(dateEnd, GetTimeZone());
         }
 
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(ICalProperties[(int)key], string.Empty, null)
         {
-            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + ICalTypeConverters.ConvertFromTimeSpan(duration);
+            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + ICalTypeConverters.ConvertFromTimeSpan(duration);
         }
 
         public override string ToString()
