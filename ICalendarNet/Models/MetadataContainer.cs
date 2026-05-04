@@ -1,21 +1,31 @@
 ﻿using ICalendarNet.Components;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Models
 {
     public class MetadataContainer
     {
-        private readonly Dictionary<string, CalendarTimeZone> _TimeZonedata = [];
+        private readonly List<CalendarTimeZone> _TimeZonedata = [];
 
-        public void SetTimeZone(string? key, CalendarTimeZone value)
+        public void SetTimeZone(CalendarTimeZone value)
         {
-            if (key == null) return;
-            _TimeZonedata[key] = value;
+            _TimeZonedata.Add(value);
+        }
+
+        public void SetTimeZones(List<CalendarTimeZone> values)
+        {
+            _TimeZonedata.AddRange(values);
         }
 
         public CalendarTimeZone? GetTimeZone(string key)
         {
-            return _TimeZonedata.GetValueOrDefault(key);
+            return _TimeZonedata.Find(t => t.TimeZoneId == key);
+        }
+
+        public IEnumerable<string?> GetTimeZones()
+        {             
+            return _TimeZonedata.Select(t => t.TimeZoneId);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.DataTypes;
+using ICalendarNet.DataTypes.Recurrence;
 using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
@@ -57,37 +58,53 @@ namespace ICalendarNet.Components
             dateTime ??= DateTimeOffset.UtcNow;
             List<DateTimeAndOffset> periods = new();
             var components = SubComponents.Where(t => t.ComponentType == ICalComponent.STANDARD || t.ComponentType == ICalComponent.DAYLIGHT).Cast<CalendarStandard>();
+            var assumeOffset = dateTime.Value.Offset.TotalMinutes;
             foreach (var standard in components)
             {
-                var start = standard.DTSTART;
                 var timezoneOffsetTo = standard.TimezoneOffsetTo;
-                if (start is null || start > dateTime || timezoneOffsetTo is null)
+                if (timezoneOffsetTo is null || timezoneOffsetTo.Length < 4 || timezoneOffsetTo.Length > 5)
                     continue;
-                if (timezoneOffsetTo.Length < 4 || timezoneOffsetTo.Length > 5)
+                var start = ConvertToOffset(standard.DTSTART, assumeOffset);
+                if (start is null || start > dateTime)
                     continue;
-                if (standard.GetRecurrenceRule()?.Until is DateTimeOffset until && until < dateTime)
-                    continue;
-                DateTimeOffset startCalculalte = dateTime.Value.AddYears(-1);
-                startCalculalte = start.Value > startCalculalte ? start.Value : startCalculalte;
-                var foundDates = standard.GetRecurrenceDates(10, startCalculalte, false, dateTime);
-                if (foundDates is not null)
-                    periods.AddRange(foundDates.Select(t => new DateTimeAndOffset(timezoneOffsetTo, t.DateStart)));
-                else
+                var offset = ConvertToOffsetInMinutes(timezoneOffsetTo);
+                var rrule = standard.GetRecurrenceRule();
+                if (rrule is not null)
                 {
-                    var savedProperties = standard.RecurrenceDates?
-                        .Where(t => t.DateEnd is null || t.DateEnd >= dateTime);
-                    if (savedProperties is not null && savedProperties.Any())
-                        periods.AddRange(savedProperties.Select(t => new DateTimeAndOffset(timezoneOffsetTo, t.DateStart)));
-                    else if (components.Count() == 1)
-                        periods.Add(new DateTimeAndOffset(timezoneOffsetTo, start.Value));
+                    var until = ConvertToOffset(rrule.Until, assumeOffset);
+                    if (until is not null && until < dateTime)
+                        continue;
+                    var exDates = standard.ExceptionDateTimes?.Select(t => ConvertToOffset(t, assumeOffset));
+                    DateTimeOffset startCalculalte = dateTime.Value.AddYears(-1);
+                    startCalculalte = start.Value > startCalculalte ? start.Value : startCalculalte;
+                    var foundDates = RecurrenceUtil.GetRecurrenceDates(rrule, start.Value, 10, startCalculalte, false, dateTime, exDates);
+                    if (foundDates is not null)
+                        periods.AddRange(foundDates.Select(t => new DateTimeAndOffset(offset, t.DateStart)));
                 }
+                var savedProperties = standard.RecurrenceDates?
+                    .Where(t => t.DateEnd is null || t.DateEnd > dateTime);
+                if (savedProperties is not null && savedProperties.Any())
+                    periods.AddRange(savedProperties.Select(t => new DateTimeAndOffset(offset, t.DateStart)));
+                else if (components.Count() == 1)
+                    periods.Add(new DateTimeAndOffset(offset, start.Value));
             }
 
-            var currentPeriod = periods.OrderByDescending(t => t.date).FirstOrDefault(t => t.date <= dateTime);
-            return currentPeriod is null ? 0 : ConvertToOffsetInMinutes(currentPeriod.offset);
+            var currentPeriod = periods.OrderByDescending(t => t.date).FirstOrDefault(t => t.date <= dateTime.Value);
+            return currentPeriod is null ? 0 : currentPeriod.offset;
         }
 
-        private int ConvertToOffsetInMinutes(ReadOnlySpan<char> offset)
+        private static DateTimeOffset? ConvertToOffset(DateTimeOffset? dateTime, double offsetInMinutes)
+        {
+            if (dateTime is null)
+                return null;
+            return ConvertToOffset(dateTime.Value, offsetInMinutes);
+        }
+        private static DateTimeOffset ConvertToOffset(DateTimeOffset dateTime, double offsetInMinutes)
+        {
+            return new DateTimeOffset(dateTime.DateTime, TimeSpan.FromMinutes(offsetInMinutes));
+        }
+
+        private static int ConvertToOffsetInMinutes(ReadOnlySpan<char> offset)
         {
             var sign = offset.StartsWith("-") ? -1 : 1;
             var hourParts = offset.TrimStart("+-").Slice(0, 2);
@@ -99,14 +116,19 @@ namespace ICalendarNet.Components
 
         private class DateTimeAndOffset
         {
-            public DateTimeAndOffset(string offset, DateTimeOffset date)
+            public DateTimeAndOffset(int offset, DateTimeOffset date)
             {
                 this.offset = offset;
                 this.date = date;
             }
 
-            public string offset { get; set; }
+            public int offset { get; set; }
             public DateTimeOffset date { get; set; }
+
+            public override string ToString()
+            {
+                return date.ToString("o");
+            }
         }
     }
 }

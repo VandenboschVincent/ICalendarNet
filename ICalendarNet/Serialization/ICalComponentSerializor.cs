@@ -53,10 +53,15 @@ namespace ICalendarNet.Serialization
 
         private void SetMetaData(ICalendarComponent component)
         {
-            for (int i = 0; i < TimeZones.Count; i++)
+            if (component.ComponentType == ICalComponent.VTIMEZONE)
+                return;
+            for (int x = 0; x < component.Properties.Count; x++)
             {
-                component.Metadata.SetTimeZone(TimeZones[i].TimeZoneId, TimeZones[i]);
+                if (component.ComponentType == ICalComponent.VTIMEZONE)
+                    break;
+                component.Properties[x].Metadata.SetTimeZones(TimeZones);
             }
+            component.Metadata.SetTimeZones(TimeZones);
             for (int i = 0; i < component.SubComponents.Count; i++)
             {
                 SetMetaData(component.SubComponents[i]);

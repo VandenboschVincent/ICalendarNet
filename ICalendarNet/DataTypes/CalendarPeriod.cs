@@ -15,7 +15,7 @@ namespace ICalendarNet.DataTypes
         {
             get
             {
-                return ICalTypeConverters.ConvertToDateTimeOffset(Value.Split('/').FirstOrDefault()) ??
+                return ICalTypeConverters.ConvertToDateTimeOffset(Value.Split('/').FirstOrDefault(), GetTimeZone()) ??
                     throw new ArgumentException($"Could not parse {Value} to period");
             }
             set
@@ -34,7 +34,7 @@ namespace ICalendarNet.DataTypes
                     ?? throw new ArgumentException($"Could not parse {Value} to period");
                 if (endValue.StartsWith('P'))
                     return DateStart.Add(ICalTypeConverters.ConvertToTimeSpan(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period"));
-                return ICalTypeConverters.ConvertToDateTimeOffset(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period");
+                return ICalTypeConverters.ConvertToDateTimeOffset(endValue, GetTimeZone()) ?? throw new ArgumentException($"Could not parse {Value} to period");
             }
             set
             {
@@ -50,7 +50,7 @@ namespace ICalendarNet.DataTypes
                     ?? throw new ArgumentException($"Could not parse {Value} to period");
                 if (endValue.StartsWith('P'))
                     return ICalTypeConverters.ConvertToTimeSpan(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period");
-                return (ICalTypeConverters.ConvertToDateTimeOffset(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period"))
+                return (ICalTypeConverters.ConvertToDateTimeOffset(endValue, GetTimeZone()) ?? throw new ArgumentException($"Could not parse {Value} to period"))
                     .Subtract(DateStart);
             }
             set

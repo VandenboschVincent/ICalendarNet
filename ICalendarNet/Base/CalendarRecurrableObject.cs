@@ -13,7 +13,7 @@ namespace ICalendarNet.Base
         /// <summary>
         ///   <see cref="ICalProperty.DTSTART" />
         /// </summary>
-        public DateTimeOffset? DTSTART
+        public virtual DateTimeOffset? DTSTART
         {
             get => Properties.GetContentlineDateTime(ICalProperty.DTSTART, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
@@ -24,7 +24,7 @@ namespace ICalendarNet.Base
         /// </summary>
         public virtual IEnumerable<DateTimeOffset>? ExceptionDateTimes
         {
-            get => Properties.GetContentlineDateTimes(ICalProperty.EXDATE);
+            get => Properties.GetContentlineDateTimes(ICalProperty.EXDATE, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.EXDATE);
         }
 
@@ -64,30 +64,14 @@ namespace ICalendarNet.Base
 
         public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1)
         {
-            return GetRecurrenceDates(amount) ?? 
-                Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
-                .SelectMany(t => t.GetPeriods());
-        }
-
-        internal IEnumerable<CalendarPeriod>? GetRecurrenceDates(
-            int amount = 1
-            , DateTimeOffset? periodStart = null
-            , bool addStartDate = true
-            , DateTimeOffset? maxDate = null)
-        {
             var rrule = GetRecurrenceRule();
             var dtstart = DTSTART;
             if (rrule is null || dtstart is null)
                 return null;
-
-            List<DateTimeOffset> exdates = ExceptionDateTimes?.ToList() ?? new List<DateTimeOffset>();
-            var evaluator = new RecurrenceRuleEvaluator(rrule);
-            return evaluator.Evaluate(dtstart.Value, periodStart, new() 
-            { 
-                MaxOccurrencesLimit = amount,
-                AddStartDate = addStartDate,
-                MaxDateTime = maxDate
-            }).Where(t => !exdates.Contains(t.DateStart));
+            var exdates = ExceptionDateTimes;
+            return RecurrenceUtil.GetRecurrenceDates(rrule, dtstart.Value, amount, exceptionDates: exdates) ?? 
+                Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
+                .SelectMany(t => t.GetPeriods());
         }
     }
 }
