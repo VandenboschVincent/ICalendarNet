@@ -18,7 +18,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             return RecurrenceParser.Parse(file);
         }
 
-        private void TestCase(RecurrenceTest exampleCase)
+        private void TestCase(RecurrenceTest exampleCase, int limit = 10, bool addstart = true)
         {
             var rrule = new CalendarRecurrenceRule(exampleCase.RRule);
             var evaluator = new RecurrenceRuleEvaluator(rrule);
@@ -26,7 +26,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var refDate = new DateTimeOffset(exampleCase.DtStart!.Value, TimeSpan.Zero);
             var datesFound = evaluator.Evaluate(startdate, refDate, new() 
             { 
-                MaxOccurrencesLimit = 10 
+                MaxOccurrencesLimit = limit,
+                AddStartDate = addstart
             }).Select(t => t.DateStart.DateTime).ToList();
             if (exampleCase.Instances.Count > 0)
             {
@@ -71,6 +72,99 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                 if (string.IsNullOrEmpty(exampleCase.Exception))
                 {
                     Assert.Fail($"Unexpected exception for case: {exampleCase.Comment}{Environment.NewLine}RRule: {exampleCase.RRule}{Environment.NewLine}DTSTART: {exampleCase.DtStart}{Environment.NewLine}Expected Instances: {string.Join(", ", exampleCase.Instances)}{Environment.NewLine}Exception: {ex}");
+                }
+            }
+        }
+
+        [TestCase("FREQ=YEARLY;BYMONTH=4;BYDAY=SU;BYSETPOS=3", "20270418", "20280416")]
+        [TestCase("FREQ=YEARLY;BYMONTH=10;BYDAY=MO;BYSETPOS=1,2", "20261005", "20261012", "20271004", "20271011")]
+        [TestCase("FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=29", "20260529", "20260729", "20260929", "20261129", "20270129", "20270329")]
+        [TestCase("FREQ=MONTHLY;INTERVAL=2;BYMONTHDAY=31", "20260531", "20260731", "20270131", "20270331")]
+        [TestCase("FREQ=MONTHLY;BYDAY=MO,TU,WE,TH,FR;BYSETPOS=-1", "20260529", "20260630", "20260731")]
+        [TestCase("FREQ=MONTHLY;INTERVAL=3;BYDAY=SU;BYSETPOS=4", "20260524", "20260823", "20261122", "20270228")]
+        [TestCase("FREQ=YEARLY;BYMONTH=2;BYDAY=-1TH", "20270225", "20280224", "20290222")]
+        [TestCase("FREQ=YEARLY;BYDAY=TH;BYMONTH=6,7", "20260604", "20260611", "20260618", "20260625", "20260702", "20260709", "20260716", "20260723", "20260730", "20270603")]
+        [TestCase("FREQ=MONTHLY;BYDAY=SA;BYMONTHDAY=7,8,9,10,11,12,13", "20260509", "20260613", "20260711")]
+        public void IndividualDateRecurrenceTests(string rrule, params string[] date)
+        {
+            var test = new RecurrenceTest()
+            {
+                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                DtStart = new DateTime(2026,5,5),
+                Comment = rrule,
+                RRule = rrule
+            };
+            try
+            {
+                TestCase(test, date.Length, false);
+            }
+            catch (Exception ex)
+            {
+                if (string.IsNullOrEmpty(test.Exception))
+                {
+                    Assert.Fail($"Unexpected exception for case: {test.Comment}{Environment.NewLine}RRule: {test.RRule}{Environment.NewLine}DTSTART: {test.DtStart}{Environment.NewLine}Expected Instances: {string.Join(", ", test.Instances)}{Environment.NewLine}Exception: {ex}");
+                }
+            }
+        }
+
+        [TestCase("FREQ=HOURLY;INTERVAL=2;UNTIL=20260508T210000Z", "20260508T170000", "20260508T190000", "20260508T210000")]
+        [TestCase("FREQ=MINUTELY;INTERVAL=15;UNTIL=20260508T160000Z", "20260508T151500", "20260508T153000", "20260508T154500", "20260508T160000")]
+        [TestCase("FREQ=SECONDLY;INTERVAL=30;UNTIL=20260508T150200Z", "20260508T150030", "20260508T150100", "20260508T150130", "20260508T150200")]
+        [TestCase("FREQ=HOURLY;INTERVAL=2;BYHOUR=16,17;UNTIL=20260508T210000Z", "20260508T170000")]
+        public void IndividualDateTimeRecurrenceTests(string rrule, params string[] date)
+        {
+            var test = new RecurrenceTest()
+            {
+                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                DtStart = new DateTime(2026, 5, 8, 15, 0, 0),
+                Comment = rrule,
+                RRule = rrule
+            };
+            try
+            {
+                TestCase(test, 10, false);
+            }
+            catch (Exception ex)
+            {
+                if (string.IsNullOrEmpty(test.Exception))
+                {
+                    Assert.Fail($"Unexpected exception for case: {test.Comment}{Environment.NewLine}RRule: {test.RRule}{Environment.NewLine}DTSTART: {test.DtStart}{Environment.NewLine}Expected Instances: {string.Join(", ", test.Instances)}{Environment.NewLine}Exception: {ex}");
+                }
+            }
+        }
+
+        [TestCase("FREQ=DAILY;UNTIL=20260511", "20260509", "20260510")]
+        [TestCase("FREQ=YEARLY;UNTIL=20280509", "20270508", "20280508")]
+        [TestCase("FREQ=WEEKLY;UNTIL=20260608", "20260515", "20260522", "20260529", "20260605")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260608", "20260522", "20260605")]
+        [TestCase("FREQ=WEEKLY;UNTIL=20260520;WKST=SU;BYDAY=TU,TH", "20260512", "20260514", "20260519")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260530;WKST=SU;BYDAY=MO,WE,FR", "20260518", "20260520", "20260522")]
+        [TestCase("FREQ=DAILY;COUNT=3", "20260509", "20260510")]
+        [TestCase("FREQ=YEARLY;COUNT=3", "20270508", "20280508")]
+        [TestCase("FREQ=WEEKLY;COUNT=3", "20260515", "20260522")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;COUNT=3", "20260522", "20260605")]
+        [TestCase("FREQ=WEEKLY;WKST=SU;BYDAY=TU,TH;COUNT=3", "20260512", "20260514", "20260519")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;WKST=SU;BYDAY=MO,WE,FR;COUNT=3", "20260518", "20260520")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=MO", "20260510", "20260519", "20260524", "20260602")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;COUNT=4;BYDAY=TU,SU;WKST=SU", "20260517", "20260519", "20260531", "20260602")]
+        public void IndividualDateLimitRecurrenceTests(string rrule, params string[] date)
+        {
+            var test = new RecurrenceTest()
+            {
+                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                DtStart = new DateTime(2026, 5, 8),
+                Comment = rrule,
+                RRule = rrule
+            };
+            try
+            {
+                TestCase(test, 10, false);
+            }
+            catch (Exception ex)
+            {
+                if (string.IsNullOrEmpty(test.Exception))
+                {
+                    Assert.Fail($"Unexpected exception for case: {test.Comment}{Environment.NewLine}RRule: {test.RRule}{Environment.NewLine}DTSTART: {test.DtStart}{Environment.NewLine}Expected Instances: {string.Join(", ", test.Instances)}{Environment.NewLine}Exception: {ex}");
                 }
             }
         }

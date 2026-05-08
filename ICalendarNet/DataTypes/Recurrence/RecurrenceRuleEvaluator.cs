@@ -310,6 +310,13 @@ namespace ICalendarNet.DataTypes.Recurrence
                         return GetFirstDayOfWeekDate(intervalRefTime, pattern.FirstDayOfWeek);
                     }
 
+                case { Frequency: FrequencyType.Weekly, ByMonth.Count: 0, ByWeekNo.Count: 0, ByDay.Count: 0, ByMonthDay.Count: 0, ByYearDay.Count: 0 }:
+                    {
+                        // Return intervalRefTime but use the weekday from the original DTSTART.
+                        var adjusted = GetFirstDayOfWeekDate(intervalRefTime.AddDays(6), originalDate.DayOfWeek);
+                        return adjusted;
+                    }
+
                 default:
                     {
                         return intervalRefTime;
