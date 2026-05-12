@@ -10,8 +10,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("ATTACH;VALUE=BINARY;ENCODING=BASE64:\r\nVGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==", "VGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==")]
         public void Test_Attachment_Byte_Deserialize(string value, string bytevalue)
         {
-            CalSerializor calSerializor = new();
-            ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
+            ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
             attachment.Should().NotBeNull();
@@ -26,21 +25,19 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("ATTACH;FMTTYPE=application/postscript:ftp://example.com/pub/reports/r-960812.ps", "ftp://example.com/pub/reports/r-960812.ps")]
         public void Test_Attachment_Uri_Deserialize(string value, string uri)
         {
-            CalSerializor calSerializor = new();
-            ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
+            ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
             attachment.Should().NotBeNull();
             attachment.GetUri().Should().NotBeNull();
             attachment.GetUri()!.ToString().Should().BeEquivalentTo(uri);
-            calSerializor.SerializeICalProperty(attachment).Should().Be(value);
+            CalSerializor.SerializeICalProperty(attachment).Should().Be(value);
         }
 
         [TestCase("ATTACH;FMTTYPE=application/postscript:ftp://example.com/pub/reports/r-960812.ps", "application/postscript")]
         public void Test_Attachment_Uri_Deserialize_FMTTYPE(string value, string type)
         {
-            CalSerializor calSerializor = new();
-            ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
+            ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
             attachment.Should().NotBeNull();

@@ -102,11 +102,6 @@ namespace ICalendarNet.Extensions
             return dateLines.Where(t => t.HasValue).Select(t => t!.Value);
         }
 
-        public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
-        {
-            lines.UpdateLineProperty(value.ToString()!, key, parameters);
-        }
-
         private static DateTimeOffset? GetDateTime(ICalendarProperty? line, MetadataContainer? metadata)
         {
             if (line is null)
@@ -117,6 +112,11 @@ namespace ICalendarNet.Extensions
                 return ICalTypeConverters.ConvertToDateTimeOffset(line.Value, timezone);
             }
             return ICalTypeConverters.ConvertToDateTimeOffset(line.Value);
+        }
+
+        public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
+        {
+            lines.UpdateLineProperty(value.ToString()!, key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, string value, ICalProperty key, ContentLineParameters? parameters = null)
@@ -158,7 +158,7 @@ namespace ICalendarNet.Extensions
             if (!value.HasValue)
                 return;
             var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine?.Metadata is not null)
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
             {
                 var timezone = foundLine.Metadata.GetTimeZone(tzid);
                 lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value, timezone), key, parameters);
@@ -170,7 +170,7 @@ namespace ICalendarNet.Extensions
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<DateTimeOffset> value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine?.Metadata is not null)
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
             {
                 var timezone = foundLine.Metadata.GetTimeZone(tzid);
                 lines.UpdateLineProperty(string.Join(",", value.Select(t => ICalTypeConverters.ConvertFromDateTimeOffset(t, timezone))), key, parameters);

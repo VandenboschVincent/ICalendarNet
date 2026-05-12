@@ -210,7 +210,7 @@ namespace ICalendarNet.Components
         public virtual IEnumerable<string>? Attendee
         {
             get => Properties.GetContentlinesSeperatedValue(ICalProperty.ATTENDEE);
-            set => Properties.UpdateLinesSeperatedProperty(value!.ToList(), ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesSeperatedProperty([.. value!], ICalProperty.ATTENDEE);
         }
 
         /// <summary>

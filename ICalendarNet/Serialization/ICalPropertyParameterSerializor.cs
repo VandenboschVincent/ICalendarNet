@@ -1,5 +1,4 @@
 ﻿using ICalendarNet.Base;
-using System;
 using System.Linq;
 using System.Text;
 
@@ -7,12 +6,12 @@ namespace ICalendarNet.Serialization
 {
     public partial class CalSerializor
     {
-        private string SerializeProperty(ICalendarProperty parentObject)
+        private static string SerializeProperty(ICalendarProperty parentObject)
         {
             return SerializeProperty(parentObject, new StringBuilder()).ToString();
         }
 
-        private StringBuilder SerializeProperty(ICalendarProperty component, StringBuilder builder)
+        private static StringBuilder SerializeProperty(ICalendarProperty component, StringBuilder builder)
         {
             if (component.Parameters.Any())
             {
@@ -27,7 +26,7 @@ namespace ICalendarNet.Serialization
             return builder;
         }
 
-        private void SerializeParameters(ContentLineParameters parameters, StringBuilder builder)
+        private static void SerializeParameters(ContentLineParameters parameters, StringBuilder builder)
         {
             builder.Append(string.Join(";", parameters.Select(t => $"{t.Key}{(t.Value.Any() ? "=" : "")}{string.Join(",", t.Value)}")));
         }

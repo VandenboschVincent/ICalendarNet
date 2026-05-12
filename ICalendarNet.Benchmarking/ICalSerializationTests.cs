@@ -99,13 +99,13 @@ END:VCALENDAR
                 Location = "The Exceptionally Long Named Meeting Room",
                 Priority = 0
             };
-            calendarEvent.SetAttachments(new List<CalendarAttachment>()
-            {
+            calendarEvent.SetAttachments(
+            [
                 //Add url attachment
                 new CalendarAttachment(new Uri("ldap://example.com:3333/o=eExample Industries,c=3DUS??(cn=3DBJohn Smith)"), ""),
                 //Add byte attachment
                 new CalendarAttachment(Encoding.UTF8.GetBytes(""), "application/msword")
-            });
+            ]);
             calendar.SubComponents.Add(calendarEvent);
             //Add an alarm
             calendar.SubComponents.Add(
@@ -143,10 +143,10 @@ Mr Smith"));
         }
 
         [Benchmark]
-        public void DeserializeCalendar() => Calendar.LoadCalendar(_sampleEvent)!.GetEvents().First();
+        public static CalendarEvent DeserializeCalendar() => Calendar.LoadCalendar(_sampleEvent)!.GetEvents().First();
 
         [Benchmark]
-        public void SerializeCalendar() => new CalSerializor().SerializeCalendar(SimpleCalendar());
+        public static string SerializeCalendar() => new CalSerializor().SerializeCalendar(SimpleCalendar());
 
         [Benchmark]
         public string Deserialize_And_Serialize_Tiny_Calendar()
@@ -157,15 +157,15 @@ Mr Smith"));
         }
 
         [Benchmark]
-        public void Deserialize_And_Serialize_all_Calendars()
+        public IEnumerable<string> Deserialize_And_Serialize_all_Calendars()
         {
             var serializer = new CalSerializor();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, ICalStrings));
-            _ = calendars.Select(serializer.SerializeCalendar);
+            return calendars.Select(serializer.SerializeCalendar);
         }
 
         [Benchmark]
-        public string Deserialize_And_Serialize_Event()
+        public static string Deserialize_And_Serialize_Event()
         {
             var serializer = new CalSerializor();
             var icalvar = $"BEGIN:VEVENT\r\nCREATED:20060717T210517Z\r\nLAST-MODIFIED:20060717T210718Z\r\nDTSTAMP:20060717T210718Z\r\nUID:uuid1153170430406\r\nSUMMARY:Test event\r\nDTSTART:20060718T100000\r\nDTEND:20060718T110000\r\nLOCATION:Daywest\r\nEND:VEVENT";

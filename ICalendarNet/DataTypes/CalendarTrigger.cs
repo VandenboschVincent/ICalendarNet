@@ -44,7 +44,7 @@ namespace ICalendarNet.DataTypes
         {
             Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
             {
-                new KeyValuePair<string, IEnumerable<string>>("VALUE", new List<string>() { "DATE_TIME" })
+                new("VALUE", ["DATE_TIME"])
             }.ToDictionary();
         }
 
@@ -55,7 +55,7 @@ namespace ICalendarNet.DataTypes
         {
             Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
             {
-                new KeyValuePair<string, IEnumerable<string>>("RELATED", new List<string>() { triggerStartEnd.ToString() })
+                new("RELATED", [triggerStartEnd.ToString()])
             }.ToDictionary();
         }
     }

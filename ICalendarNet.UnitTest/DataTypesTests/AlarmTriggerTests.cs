@@ -12,8 +12,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("TRIGGER;RELATED=START:P7W", 4233600)]
         public void Test_Duration_Deserialize(string value, int seconds)
         {
-            CalSerializor calSerializor = new();
-            ICalendarProperty? prop = calSerializor.DeserializeICalProperty(value);
+            ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
             CalendarTrigger attachment = prop.Should().BeOfType<CalendarTrigger>().Subject;
             attachment.Should().NotBeNull();
@@ -26,15 +25,14 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [TestCase("TRIGGER;RELATED=START:P7W", 4233600)]
         public void Test_Duration_Serialize(string value, int seconds)
         {
-            CalSerializor calSerializor = new();
-            string serilized = calSerializor.SerializeICalProperty(new CalendarTrigger(TimeSpan.FromSeconds(seconds)));
+            string serilized = CalSerializor.SerializeICalProperty(new CalendarTrigger(TimeSpan.FromSeconds(seconds)));
             serilized.Should().Be(value);
         }
 
         [Test]
         public void Test_Trigger_Deserialize()
         {
-            var icalvar = GetIcalStrings("Trigger2").First();
+            var icalvar = GetIcalStrings("Trigger2")[0];
             var calendar = Calendar.LoadCalendar(icalvar);
             calendar.Should().NotBeNull();
             var alarm = calendar.GetEvents().SelectMany(t => t.GetAlarms()).FirstOrDefault();

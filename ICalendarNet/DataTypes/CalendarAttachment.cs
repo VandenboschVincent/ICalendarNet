@@ -13,6 +13,7 @@ namespace ICalendarNet.DataTypes
     public class CalendarAttachment : ContentLine
     {
         private static readonly Encoding dataEncoding = Encoding.UTF8;
+        private const string fmttypeString = "FMTTYPE";
 
         /// <summary>
         /// Gets the location of the attachment if any.
@@ -41,8 +42,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public string? FMTTYPE
         {
-            get => Parameters.GetValue("FMTTYPE");
-            set => Parameters.SetOrAddValue("FMTTYPE", value!);
+            get => Parameters.GetValue(fmttypeString);
+            set => Parameters.SetOrAddValue(fmttypeString, value!);
         }
 
         /// <summary>
@@ -73,14 +74,14 @@ namespace ICalendarNet.DataTypes
             : base("ATTACH", uri.ToString(), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.SetOrAddValue("FMTTYPE", fmttype);
+                Parameters.SetOrAddValue(fmttypeString, fmttype);
         }
 
         public CalendarAttachment(byte[] data, string? fmttype, string valueType = "BINARY", string encoding = "BASE64")
             : base("ATTACH", dataEncoding.GetString(data), null)
         {
             if (!string.IsNullOrEmpty(fmttype))
-                Parameters.SetOrAddValue("FMTTYPE", fmttype);
+                Parameters.SetOrAddValue(fmttypeString, fmttype);
             if (!string.IsNullOrEmpty(valueType))
                 Parameters.SetOrAddValue("VALUE", valueType);
             if (!string.IsNullOrEmpty(encoding))

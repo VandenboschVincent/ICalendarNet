@@ -108,14 +108,14 @@ namespace ICalendarNet.Components
         private static int ConvertToOffsetInMinutes(ReadOnlySpan<char> offset)
         {
             var sign = offset.StartsWith("-") ? -1 : 1;
-            var hourParts = offset.TrimStart("+-").Slice(0, 2);
+            var hourParts = offset.TrimStart("+-")[..2];
             var minuteParts = offset.TrimStart("+-").Slice(2, 2);
             if (int.TryParse(hourParts, out int hours) && int.TryParse(minuteParts, out int minutes))
                 return sign * (hours * 60 + minutes);
             return 0;
         }
 
-        private class DateTimeAndOffset
+        private sealed class DateTimeAndOffset
         {
             public DateTimeAndOffset(int offset, DateTimeOffset date)
             {

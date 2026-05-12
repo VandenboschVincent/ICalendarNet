@@ -10,7 +10,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
     internal class RecurrenceIdentifierTests : UnitTestBase
     {
         static IEnumerable<string> RecurrenceIcal => GetIcalFiles("Recurrence/*");
-        static IEnumerable<RecurrenceTest> RecurrenceTestCases()
+        static List<RecurrenceTest> RecurrenceTestCases()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, "Calendars", "Recurrence"));
@@ -18,7 +18,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             return RecurrenceParser.Parse(file);
         }
 
-        private void TestCase(RecurrenceTest exampleCase, int limit = 10, bool addstart = true)
+        private static void TestCase(RecurrenceTest exampleCase, int limit = 10, bool addstart = true)
         {
             var rrule = new CalendarRecurrenceRule(exampleCase.RRule);
             var evaluator = new RecurrenceRuleEvaluator(rrule);
@@ -174,7 +174,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         public string? Comment { get; set; }
         public string RRule { get; set; } = string.Empty;
         public DateTime? DtStart { get; set; }
-        public List<DateTime> Instances { get; set; } = new();
+        public List<DateTime> Instances { get; set; } = [];
         public string? Exception { get; set; }
 
         override public string ToString()
@@ -190,7 +190,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var result = new List<RecurrenceTest>();
 
             var blocks = input.Split(
-                new[] { "\r\n\r\n", "\n\n" },
+                ["\r\n\r\n", "\n\n"],
                 StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var block in blocks)
@@ -198,40 +198,39 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                 var test = new RecurrenceTest();
 
                 var lines = block.Split(
-                    new[] { "\r\n", "\n" },
+                    ["\r\n", "\n"],
                     StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (var line in lines)
                 {
                     var trimmed = line.Trim();
 
-                    if (trimmed.StartsWith("#"))
+                    if (trimmed.StartsWith('#'))
                     {
-                        test.Comment = trimmed.Substring(1).Trim();
+                        test.Comment = trimmed[1..].Trim();
                     }
                     else if (trimmed.StartsWith("RRULE:"))
                     {
-                        test.RRule = trimmed.Substring("RRULE:".Length);
+                        test.RRule = trimmed["RRULE:".Length..];
                     }
                     else if (trimmed.StartsWith("DTSTART:"))
                     {
-                        test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset((trimmed.Substring("DTSTART:".Length) + "Z")
+                        test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset(string.Concat(trimmed.AsSpan("DTSTART:".Length), "Z")
                             .Replace("ZZ","Z"), null)?.DateTime;
                     }
                     else if (trimmed.StartsWith("INSTANCES:"))
                     {
-                        var values = trimmed.Substring("INSTANCES:".Length)
+                        var values = trimmed["INSTANCES:".Length..]
                             .Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-                        test.Instances = values
+                        test.Instances = [.. values
                             .Select(v => ICalTypeConverters.ConvertToDateTimeOffset(v + "Z", null))
                             .Where(d => d.HasValue)
-                            .Select(d => d!.Value.DateTime)
-                            .ToList();
+                            .Select(d => d!.Value.DateTime)];
                     }
                     else if (trimmed.StartsWith("EXCEPTION:"))
                     {
-                        test.Exception = trimmed.Substring("EXCEPTION:".Length);
+                        test.Exception = trimmed["EXCEPTION:".Length..];
                     }
                 }
 

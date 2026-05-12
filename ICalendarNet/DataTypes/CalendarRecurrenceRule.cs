@@ -34,8 +34,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public FrequencyType Frequency
         {
-            get => freqMap.GetValueOrDefault(valueParameters.GetValue("FREQ") ?? string.Empty);
-            set => valueParameters.SetOrAddValue("FREQ", freqMap.First(t => t.Value == value).Key);
+            get => freqMap.GetValueOrDefault(ValueParameters.GetValue("FREQ") ?? string.Empty);
+            set => ValueParameters.SetOrAddValue("FREQ", freqMap.First(t => t.Value == value).Key);
         }
 
         /// <summary>
@@ -44,8 +44,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public DateTimeOffset? Until
         {
-            get => ICalTypeConverters.ConvertToDateTimeOffset(valueParameters.GetValue("UNTIL"), GetTimeZone());
-            set => valueParameters.SetOrAddValue("UNTIL", ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value, GetTimeZone()));
+            get => ICalTypeConverters.ConvertToDateTimeOffset(ValueParameters.GetValue("UNTIL"), GetTimeZone());
+            set => ValueParameters.SetOrAddValue("UNTIL", ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value, GetTimeZone()));
         }
 
         /// <summary>
@@ -55,10 +55,10 @@ namespace ICalendarNet.DataTypes
         public int? Count
         {
             get { 
-                var found = valueParameters.GetValue("COUNT");
+                var found = ValueParameters.GetValue("COUNT");
                 return found is null ? null : int.Parse(found);
             }
-            set => valueParameters.SetOrAddValue("COUNT", value!.ToString()!);
+            set => ValueParameters.SetOrAddValue("COUNT", value!.ToString()!);
         }
 
 
@@ -75,42 +75,42 @@ namespace ICalendarNet.DataTypes
         {
             get
             {
-                var found = valueParameters.GetValue("INTERVAL");
+                var found = ValueParameters.GetValue("INTERVAL");
                 return found is null ? 1 : int.Parse(found);
             }
-            set => valueParameters.SetOrAddValue("INTERVAL", value!.ToString());
+            set => ValueParameters.SetOrAddValue("INTERVAL", value!.ToString());
         }
 
         public List<int> BySecond
         {
-            get => [.. valueParameters.GetValues("BYSECOND")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYSECOND", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYSECOND")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYSECOND", value.Select(t => t.ToString()));
         }
 
         /// <summary> The ordinal minutes of the hour associated with this recurrence pattern. Valid values are 0-59. </summary>
         public List<int> ByMinute
         {
-            get => [.. valueParameters.GetValues("BYMINUTE")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYMINUTE", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYMINUTE")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYMINUTE", value.Select(t => t.ToString()));
         }
 
         public List<int> ByHour
         {
-            get => [.. valueParameters.GetValues("BYHOUR")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYHOUR", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYHOUR")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYHOUR", value.Select(t => t.ToString()));
         }
 
         public List<WeekDay> ByDay
         {
-            get => [.. valueParameters.GetValues("BYDAY")?.Select(t => new WeekDay(t)) ?? []];
-            set => valueParameters.SetOrAddValue("BYDAY", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYDAY")?.Select(t => new WeekDay(t)) ?? []];
+            set => ValueParameters.SetOrAddValue("BYDAY", value.Select(t => t.ToString()));
         }
 
         /// <summary> The ordinal days of the month associated with this recurrence pattern. Valid values are 1-31. </summary>
         public List<int> ByMonthDay
         {
-            get => [.. valueParameters.GetValues("BYMONTHDAY")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYMONTHDAY", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYMONTHDAY")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYMONTHDAY", value.Select(t => t.ToString()));
         }
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public List<int> ByYearDay
         {
-            get => [.. valueParameters.GetValues("BYYEARDAY")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYYEARDAY", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYYEARDAY")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYYEARDAY", value.Select(t => t.ToString()));
         }
 
         /// <summary>
@@ -129,8 +129,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public List<int> ByWeekNo
         {
-            get => [.. valueParameters.GetValues("BYWEEKNO")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYWEEKNO", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYWEEKNO")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYWEEKNO", value.Select(t => t.ToString()));
         }
 
         /// <summary>
@@ -138,8 +138,8 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public List<int> ByMonth
         {
-            get => [.. valueParameters.GetValues("BYMONTH")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYMONTH", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYMONTH")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYMONTH", value.Select(t => t.ToString()));
         }
 
         /// <summary>
@@ -148,29 +148,29 @@ namespace ICalendarNet.DataTypes
         /// </summary>
         public List<int> BySetPosition
         {
-            get => [.. valueParameters.GetValues("BYSETPOS")?.Select(int.Parse) ?? []];
-            set => valueParameters.SetOrAddValue("BYSETPOS", value.Select(t => t.ToString()));
+            get => [.. ValueParameters.GetValues("BYSETPOS")?.Select(int.Parse) ?? []];
+            set => ValueParameters.SetOrAddValue("BYSETPOS", value.Select(t => t.ToString()));
         }
 
         public DayOfWeek FirstDayOfWeek
         {
-            get => dayMap.GetValueOrDefault(valueParameters.GetValue("WKST") ?? "MO");
-            set => valueParameters.SetOrAddValue("WKST", dayMap.First(t => t.Value == value).Key);
+            get => dayMap.GetValueOrDefault(ValueParameters.GetValue("WKST") ?? "MO");
+            set => ValueParameters.SetOrAddValue("WKST", dayMap.First(t => t.Value == value).Key);
         }
 
         public override string Value 
         { 
-            get => string.Join(';',valueParameters.Select(t => $"{t.Key}={string.Join(",", t.Value)}"));
+            get => string.Join(';',ValueParameters.Select(t => $"{t.Key}={string.Join(",", t.Value)}"));
             set {
                 if (!string.IsNullOrWhiteSpace(value))
-                    valueParameters = new ContentLineParameters(value.Split(";").Select(t => t.Split('=')).ToDictionary(t => t[0], t => t[1].Split(",").AsEnumerable()));
+                    ValueParameters = new ContentLineParameters(value.Split(";").Select(t => t.Split('=')).ToDictionary(t => t[0], t => t[1].Split(",").AsEnumerable()));
             }
         }
 
         /// <summary>
         /// store value as different obj since it is handled as a value but it is actually a set of parameters.
         /// </summary>
-        private ContentLineParameters valueParameters
+        private ContentLineParameters ValueParameters
         {
             get;
             set;
@@ -181,7 +181,7 @@ namespace ICalendarNet.DataTypes
         }
         public CalendarRecurrenceRule(string name, string value, ContentLineParameters? parameter) : base(name, value, null)
         {
-           valueParameters = valueParameters ?? parameter ?? new ContentLineParameters();
+           ValueParameters ??= parameter ?? [];
         }
     }
 }

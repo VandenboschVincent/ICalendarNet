@@ -92,17 +92,17 @@ END:VCALENDAR
         private static Calendar SimpleCalendar()
         {
             //Add an event
-            CalendarEvent calendarEvent = new CalendarEvent()
+            CalendarEvent calendarEvent = new()
             {
                 Start = new CalDateTime(DateTime.Now, _aTzid),
                 End = new CalDateTime(DateTime.Now + TimeSpan.FromHours(1), _aTzid),
-                RecurrenceRules = new List<RecurrencePattern>
-                {
+                RecurrenceRules =
+                [
                     new RecurrencePattern(FrequencyType.Daily, 1)
                     {
                         Count = 100,
                     }
-                },
+                ],
                 Location = "The Exceptionally Long Named Meeting Room",
                 Priority = 0
             };
@@ -114,17 +114,17 @@ END:VCALENDAR
         }
 
         [Benchmark]
-        public void ICal_Net_DeserializeCalendar() => Calendar.Load(_sampleEvent)!.Events.First();
+        public static CalendarEvent ICal_Net_DeserializeCalendar() => Calendar.Load(_sampleEvent)!.Events.First();
 
         [Benchmark]
-        public void ICal_Net_SerializeCalendar() => new CalendarSerializer().SerializeToString(SimpleCalendar());
+        public static string? ICal_Net_SerializeCalendar() => new CalendarSerializer().SerializeToString(SimpleCalendar());
 
         [Benchmark]
-        public void ICal_Net_Deserialize_And_Serialize_all_Calendars()
+        public IEnumerable<string?> ICal_Net_Deserialize_And_Serialize_all_Calendars()
         {
             var serializer = new CalendarSerializer();
             var calendars = CalendarCollection.Load(string.Join(Environment.NewLine, ICalStrings));
-            _ = calendars.Select(t => serializer.SerializeToString(t));
+            return calendars.Select(t => serializer.SerializeToString(t));
         }
 
         [Benchmark]
