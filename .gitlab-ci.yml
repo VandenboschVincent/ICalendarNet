@@ -13,11 +13,14 @@ image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
+  - dotnet tool install --global dotnet-sonarscanner
+  - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN"
 
 build:
   stage: build
   script:
     - dotnet build $PROJECT_PATH --configuration Release
+    - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
 test:
   stage: test
