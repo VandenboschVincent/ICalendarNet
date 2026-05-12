@@ -3,17 +3,11 @@ stages:
   - publish
   - deploy
 
-variables:
-  PROJECT_PATH: "ICalendarNet/ICalendarNet.csproj"
-  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
-  PUBLISH_DIR: "publish"
-
 image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
   - dotnet tool install --global dotnet-sonarscanner
-  - dotnet tool install --global coverlet.console
   - export PATH=\"$PATH:$HOME/.dotnet/tools\"
 
 test:
@@ -27,7 +21,7 @@ test:
   script: 
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build
-      - dotnet test --coverlet
+      - dotnet test --no-build --collect:"XPlat Code Coverage"
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
   only:
     - merge_requests
