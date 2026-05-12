@@ -83,14 +83,14 @@ namespace ICalendarNet.Components
                         periods.AddRange(foundDates.Select(t => new DateTimeAndOffset(offset, t.DateStart)));
                 }
                 var savedProperties = standard.RecurrenceDates?
-                    .Where(t => t.DateEnd is null || t.DateEnd > dateTime);
+                    .Where(t => t.DateEnd is null || ConvertToOffset(t.DateEnd, assumeOffset) >= dateTime);
                 if (savedProperties is not null && savedProperties.Any())
                     periods.AddRange(savedProperties.Select(t => new DateTimeAndOffset(offset, t.DateStart)));
                 else if (components.Count() == 1)
                     periods.Add(new DateTimeAndOffset(offset, start.Value));
             }
 
-            var currentPeriod = periods.OrderByDescending(t => t.date).FirstOrDefault(t => t.date <= dateTime.Value);
+            var currentPeriod = periods.OrderByDescending(t => t.date).FirstOrDefault(t => ConvertToOffset(t.date, assumeOffset) <= dateTime.Value);
             return currentPeriod is null ? 0 : currentPeriod.offset;
         }
 

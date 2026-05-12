@@ -168,7 +168,7 @@ namespace ICalendarNet.DataTypes.Recurrence
                 var candidates =
                     GetCandidates((lowerLimit > intervalRefTime) ? lowerLimit : intervalRefTime, pattern, expandBehavior);
 
-                if (!candidates.Any(x => x < lowerLimit) && searchEndDate < lowerLimit)
+                if (!candidates.Any(x => x <= lowerLimit) && searchEndDate < lowerLimit)
                     break;
 
                 foreach (var t in candidates.Where(t => t >= originalDate))
