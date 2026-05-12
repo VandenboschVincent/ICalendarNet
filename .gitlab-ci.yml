@@ -5,7 +5,7 @@ stages:
 
 variables:
   PROJECT_PATH: "ICalendarNet/ICalendarNet.csproj"
-  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
+  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/bin/Debug/net10.0/ICalendarNet.UnitTest.dll"
   PUBLISH_DIR: "publish"
 
 image: mcr.microsoft.com/dotnet/sdk:10.0
@@ -29,7 +29,7 @@ test:
       - export PATH=\"$PATH:$HOME/.dotnet/tools\"
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build
-      - coverlet .\CovExample.Tests\bin\Debug\net6.0\CovExample.Tests.dll --target "dotnet"  --targetargs "test --no-build" -f=opencover -o="coverage.xml"
+      - coverlet $TEST_PROJECT_PATH --target "dotnet"  --targetargs "test --no-build" -f=opencover -o="coverage.xml"
       - dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
   allow_failure: true
