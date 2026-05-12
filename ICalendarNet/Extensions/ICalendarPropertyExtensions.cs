@@ -119,6 +119,18 @@ namespace ICalendarNet.Extensions
             lines.UpdateLineProperty(value.ToString()!, key, parameters);
         }
 
+        private static DateTimeOffset? GetDateTime(ICalendarProperty? line, MetadataContainer? metadata)
+        {
+            if (line is null)
+                return null;
+            if (line.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && metadata is not null)
+            {
+                var timezone = metadata.GetTimeZone(tzid);
+                return ICalTypeConverters.ConvertToDateTimeOffset(line.Value, timezone);
+            }
+            return ICalTypeConverters.ConvertToDateTimeOffset(line.Value);
+        }
+
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, string value, ICalProperty key, ContentLineParameters? parameters = null)
         {
             var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));

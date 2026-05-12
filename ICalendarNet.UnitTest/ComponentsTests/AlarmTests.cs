@@ -5,6 +5,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class AlarmTests : UnitTestBase
     {
+        static IEnumerable<string> IcalFiles => GetIcalFiles("Alarm*");
+
         [Test]
         public void Test_Serialize_Alarm()
         {
@@ -28,24 +30,23 @@ DESCRIPTION:Breakfast meeting with executive\nteam at 8:30 AM EST.
 END:VALARM");
         }
 
-        [Test]
-        public void Test_ChangeProperty_Alarm()
+        [TestCaseSource(nameof(IcalFiles))]
+        public void Test_ChangeProperty_Alarm(string file)
         {
+            string icalvar = File.ReadAllText(file);
             CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
-            foreach (var icalvar in GetIcalStrings("Alarm*"))
-            {
-                Calendar? calendar = Calendar.LoadCalendar(icalvar);
-                calendar.Should().NotBeNull();
-                calendar!.GetEvents().First().GetAlarms().First().Description = calDescr;
+            Calendar? calendar = Calendar.LoadCalendar(icalvar);
+            calendar.Should().NotBeNull();
+            calendar!.GetEvents().First().GetAlarms().First().Description = calDescr;
+            calendar!.GetEvents().First().DTSTART.Should().NotBeNull();
 
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
 
-                Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
-                serializedCalender.Should().NotBeNull();
-                serializedCalender!.GetEvents().Any(t => t.GetAlarms().Any(x => x.Description == calDescr)).Should().BeTrue();
-                serializedCalender.GetEvents().First().GetAlarms().First().Properties.Should().HaveCountGreaterThan(1);
-            }
+            Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
+            serializedCalender.Should().NotBeNull();
+            serializedCalender!.GetEvents().Any(t => t.GetAlarms().Any(x => x.Description == calDescr)).Should().BeTrue();
+            serializedCalender.GetEvents().First().GetAlarms().First().Properties.Should().HaveCountGreaterThan(1);
         }
     }
 }

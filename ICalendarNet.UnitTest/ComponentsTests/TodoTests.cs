@@ -4,6 +4,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class TodoTests : UnitTestBase
     {
+        static IEnumerable<string> IcalFiles => GetIcalFiles("Todo*");
+
         [Test]
         public void Test_Serialize_Todo()
         {
@@ -44,24 +46,22 @@ DTSTAMP:20060728T195437Z
 END:VTODO");
         }
 
-        [Test]
-        public void Test_ChangeProperty_Todo()
+        [TestCaseSource(nameof(IcalFiles))]
+        public void Test_ChangeProperty_Todo(string file)
         {
+            string icalvar = File.ReadAllText(file);
             CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
-            foreach (var icalvar in GetIcalStrings("Todo*"))
-            {
-                Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+            Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
 
-                calendar!.GetTodos().First().Summary = calDescr;
+            calendar!.GetTodos().First().Summary = calDescr;
 
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
 
-                Calendar? serializedCalender = calSerializor.DeserializeCalendar(serializedCalendar);
+            Calendar? serializedCalender = calSerializor.DeserializeCalendar(serializedCalendar);
 
-                serializedCalender!.GetTodos().Any(t => t.Summary == calDescr).Should().BeTrue();
-                serializedCalender.GetTodos().First().Properties.Should().HaveCountGreaterThan(1);
-            }
+            serializedCalender!.GetTodos().Any(t => t.Summary == calDescr).Should().BeTrue();
+            serializedCalender.GetTodos().First().Properties.Should().HaveCountGreaterThan(1);
         }
     }
 }

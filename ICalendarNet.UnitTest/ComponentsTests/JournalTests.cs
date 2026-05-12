@@ -4,6 +4,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class JournalTests : UnitTestBase
     {
+        static IEnumerable<string> IcalFiles => GetIcalFiles("Journal*");
+
         [Test]
         public void Test_Serialize_Journal()
         {
@@ -40,26 +42,24 @@ SUMMARY:Project xyz Review Meeting
 END:VJOURNAL");
         }
 
-        [Test]
-        public void Test_ChangeProperty_Journal()
+        [TestCaseSource(nameof(IcalFiles))]
+        public void Test_ChangeProperty_Journal(string file)
         {
+            string icalvar = File.ReadAllText(file);
             CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
-            foreach (var icalvar in GetIcalStrings("Journal*"))
-            {
-                Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
-                CalendarJournal journal = calendar!.GetJournals().First();
-                List<string> description = journal.Descriptions!.ToList();
-                description.Add(calDescr);
-                journal.Descriptions = description;
+            Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+            CalendarJournal journal = calendar!.GetJournals().First();
+            List<string> description = journal.Descriptions!.ToList();
+            description.Add(calDescr);
+            journal.Descriptions = description;
 
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
 
-                Calendar? serializedCalender = calSerializor.DeserializeCalendar(serializedCalendar);
-                journal = serializedCalender!.GetJournals().First();
-                journal.Descriptions!.Contains(calDescr).Should().BeTrue();
-                serializedCalender.GetJournals().First().Properties.Should().HaveCountGreaterThan(1);
-            }
+            Calendar? serializedCalender = calSerializor.DeserializeCalendar(serializedCalendar);
+            journal = serializedCalender!.GetJournals().First();
+            journal.Descriptions!.Contains(calDescr).Should().BeTrue();
+            serializedCalender.GetJournals().First().Properties.Should().HaveCountGreaterThan(1);
         }
     }
 }

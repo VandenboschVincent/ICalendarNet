@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICalendarNet.Components;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -64,7 +65,7 @@ namespace ICalendarNet.Converters
             return result;
         }
 
-        public static DateTimeOffset? ConvertToDateTimeOffset(string? value)
+        public static DateTimeOffset? ConvertToDateTimeOffset(string? value, CalendarTimeZone? tzone = null)
         {
             if (string.IsNullOrEmpty(value)) return null;
             if (value[^1] == 'Z' && (TryParseToDateTime(value, "yyyyMMddTHHmmssZ") ??
@@ -73,16 +74,16 @@ namespace ICalendarNet.Converters
                 TryParseToDateTime(value, "yyyyMMddZ") ??
                 TryParseToDateTime(value, "yyyyMMddHHmmssZ") ??
                 TryParseToDateTime(value, "yyyyMMddHHmmZ") ??
-                TryParseToDateTime(value, "yyyyMMddHHZ")) is DateTimeOffset uoffset)
-                return uoffset;
-            else if ((TryParseToDateTime(value, "yyyyMMddTHHmmss") ??
-                TryParseToDateTime(value, "yyyyMMddTHHmm") ??
-                TryParseToDateTime(value, "yyyyMMddTHH") ??
-                TryParseToDateTime(value, "yyyyMMdd") ??
-                TryParseToDateTime(value, "yyyyMMddHHmmss") ??
-                TryParseToDateTime(value, "yyyyMMddHHmm") ??
-                TryParseToDateTime(value, "yyyyMMddHH")) is DateTimeOffset offset)
-                return offset;
+                TryParseToDateTime(value, "yyyyMMddHHZ")) is DateTimeOffset udate)
+                return udate;
+            else if ((TryParseToDateTime(value, "yyyyMMddTHHmmss", tzone) ??
+                TryParseToDateTime(value, "yyyyMMddTHHmm", tzone) ??
+                TryParseToDateTime(value, "yyyyMMddTHH", tzone) ??
+                TryParseToDateTime(value, "yyyyMMdd", tzone) ??
+                TryParseToDateTime(value, "yyyyMMddHHmmss", tzone) ??
+                TryParseToDateTime(value, "yyyyMMddHHmm", tzone) ??
+                TryParseToDateTime(value, "yyyyMMddHH", tzone)) is DateTimeOffset date)
+                return date;
             return null;
         }
 
@@ -138,15 +139,25 @@ namespace ICalendarNet.Converters
             return format;
         }
 
-        public static string ConvertFromDateTimeOffset(DateTimeOffset value)
+        public static string ConvertFromDateTimeOffset(DateTimeOffset value, CalendarTimeZone? tzone = null)
         {
-            value = value.ToUniversalTime();
             string format = "yyyyMMdd";
+            if (tzone == null || value.Offset == TimeSpan.Zero)
+            {
+                value = value.ToUniversalTime();
+                if (value.Hour > 0 || value.Minute > 0 || value.Second > 0)
+                {
+                    format += "THHmmss";
+                }
+                return value.ToString(format + "Z");
+            }
+            int offset = tzone.GetOffsetInMinutes(value);
+            value = value.ToOffset(TimeSpan.FromMinutes(offset));
             if (value.Hour > 0 || value.Minute > 0 || value.Second > 0)
             {
                 format += "THHmmss";
             }
-            return value.ToString(format + "Z");
+            return value.ToString(format);
         }
 
         public static string ConvertFromInt(int value)
@@ -154,11 +165,18 @@ namespace ICalendarNet.Converters
             return value.ToString();
         }
 
-        private static DateTimeOffset? TryParseToDateTime(string value, string format)
+        private static DateTimeOffset? TryParseToDateTime(string value, string format, CalendarTimeZone? tzone = null)
         {
             DateTimeStyles timeStyles = format.EndsWith('Z') ? DateTimeStyles.AssumeUniversal : DateTimeStyles.AssumeLocal;
             if (DateTimeOffset.TryParseExact(value, format, CultureInfo.InvariantCulture, timeStyles, out DateTimeOffset UtcTime))
+            {
+                if (timeStyles == DateTimeStyles.AssumeLocal && tzone is not null)
+                {
+                    int offset = tzone.GetOffsetInMinutes(UtcTime);
+                    return new DateTimeOffset(UtcTime.DateTime, TimeSpan.FromMinutes(offset));
+                }
                 return UtcTime;
+            }
             return null;
         }
     }

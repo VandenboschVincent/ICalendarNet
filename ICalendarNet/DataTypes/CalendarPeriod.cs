@@ -15,28 +15,30 @@ namespace ICalendarNet.DataTypes
         {
             get
             {
-                return ICalTypeConverters.ConvertToDateTimeOffset(Value.Split('/').FirstOrDefault()) ??
+                return ICalTypeConverters.ConvertToDateTimeOffset(Value.Split('/').FirstOrDefault(), GetTimeZone()) ??
                     throw new ArgumentException($"Could not parse {Value} to period");
             }
             set
             {
-                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value) + "/" + Value.Split('/')[^1];
+                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value, GetTimeZone()) + "/" + Value.Split('/')[^1];
             }
         }
 
-        public DateTimeOffset DateEnd
+        public DateTimeOffset? DateEnd
         {
             get
             {
+                if (!Value.Contains('/'))
+                    return null;
                 string endValue = ValueParts.LastOrDefault()
                     ?? throw new ArgumentException($"Could not parse {Value} to period");
                 if (endValue.StartsWith('P'))
                     return DateStart.Add(ICalTypeConverters.ConvertToTimeSpan(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period"));
-                return ICalTypeConverters.ConvertToDateTimeOffset(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period");
+                return ICalTypeConverters.ConvertToDateTimeOffset(endValue, GetTimeZone()) ?? throw new ArgumentException($"Could not parse {Value} to period");
             }
             set
             {
-                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value);
+                Value = ValueParts.First() + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(value!.Value, GetTimeZone());
             }
         }
 
@@ -48,7 +50,7 @@ namespace ICalendarNet.DataTypes
                     ?? throw new ArgumentException($"Could not parse {Value} to period");
                 if (endValue.StartsWith('P'))
                     return ICalTypeConverters.ConvertToTimeSpan(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period");
-                return (ICalTypeConverters.ConvertToDateTimeOffset(endValue) ?? throw new ArgumentException($"Could not parse {Value} to period"))
+                return (ICalTypeConverters.ConvertToDateTimeOffset(endValue, GetTimeZone()) ?? throw new ArgumentException($"Could not parse {Value} to period"))
                     .Subtract(DateStart);
             }
             set
@@ -65,12 +67,19 @@ namespace ICalendarNet.DataTypes
 
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, DateTimeOffset dateEnd) : base(ICalProperties[(int)key], string.Empty, null)
         {
-            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(dateEnd);
+            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + ICalTypeConverters.ConvertFromDateTimeOffset(dateEnd, GetTimeZone());
         }
 
         public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(ICalProperties[(int)key], string.Empty, null)
         {
-            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart) + "/" + ICalTypeConverters.ConvertFromTimeSpan(duration);
+            Value = ICalTypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + ICalTypeConverters.ConvertFromTimeSpan(duration);
+        }
+
+        public override string ToString()
+        {
+            if (DateEnd is null)
+                return DateStart.ToString("o");
+            return DateStart.ToString("o") + "/" + DateEnd.Value.ToString("o");
         }
     }
 }

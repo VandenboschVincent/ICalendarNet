@@ -38,7 +38,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public DateTimeOffset? DTEND
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTEND);
+            get => Properties.GetContentlineDateTime(ICalProperty.DTEND, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTEND);
         }
 
@@ -92,7 +92,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public DateTimeOffset? DTSTAMP
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP);
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTAMP);
         }
 
@@ -101,7 +101,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public DateTimeOffset? Created
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.CREATED);
+            get => Properties.GetContentlineDateTime(ICalProperty.CREATED, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.CREATED);
         }
 
@@ -110,7 +110,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public DateTimeOffset? LastModified
         {
-            get => Properties.GetContentlineDateTime(ICalProperty.LAST_MODIFIED);
+            get => Properties.GetContentlineDateTime(ICalProperty.LAST_MODIFIED, Metadata);
             set => Properties.UpdateLineProperty(value!, ICalProperty.LAST_MODIFIED);
         }
 

@@ -165,11 +165,11 @@ namespace ICalendarNet.DataTypes.Recurrence
             {
                 var lowerLimit = GetIntervalLowerLimit(intervalRefTime, pattern, originalDate);
 
-                if (searchEndDate < lowerLimit)
-                    break;
-
                 var candidates =
                     GetCandidates((lowerLimit > intervalRefTime) ? lowerLimit : intervalRefTime, pattern, expandBehavior);
+
+                if (!candidates.Any(x => x <= lowerLimit) && searchEndDate < lowerLimit)
+                    break;
 
                 foreach (var t in candidates.Where(t => t >= originalDate))
                 {
@@ -308,6 +308,13 @@ namespace ICalendarNet.DataTypes.Recurrence
                         // interval lower limit to the first day of the week so expansion over
                         // the week (including days before Jan 1st) is handled correctly.
                         return GetFirstDayOfWeekDate(intervalRefTime, pattern.FirstDayOfWeek);
+                    }
+
+                case { Frequency: FrequencyType.Weekly, ByMonth.Count: 0, ByWeekNo.Count: 0, ByDay.Count: 0, ByMonthDay.Count: 0, ByYearDay.Count: 0 }:
+                    {
+                        // Return intervalRefTime but use the weekday from the original DTSTART.
+                        var adjusted = GetFirstDayOfWeekDate(intervalRefTime.AddDays(6), originalDate.DayOfWeek);
+                        return adjusted;
                     }
 
                 default:

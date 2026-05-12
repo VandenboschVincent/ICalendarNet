@@ -25,11 +25,11 @@ namespace ICalendarNet.DataTypes
 
         public DateTimeOffset? DateValue
         {
-            get { return ICalTypeConverters.ConvertToDateTimeOffset(Value); }
+            get { return ICalTypeConverters.ConvertToDateTimeOffset(Value, GetTimeZone()); }
             set
             {
                 if (value == null) return;
-                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value.Value);
+                Value = ICalTypeConverters.ConvertFromDateTimeOffset(value.Value, GetTimeZone());
             }
         }
 

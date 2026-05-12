@@ -1,28 +1,33 @@
 stages:
-  - build
   - test
   - publish
   - deploy
-
-variables:
-  PROJECT_PATH: "ICalendarNet/ICalendarNet.csproj"
-  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
-  PUBLISH_DIR: "publish"
 
 image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
-
-build:
-  stage: build
-  script:
-    - dotnet build $PROJECT_PATH --configuration Release
+  - dotnet tool install --global dotnet-sonarscanner
+  - export PATH=\"$PATH:$HOME/.dotnet/tools\"
 
 test:
-  stage: test
-  script:
-    - dotnet test $PROJECT_PATH --verbosity normal
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  script: 
+      - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent" /d:sonar.cs.opencover.reportsPaths="**/TestResults/*/*.xml"
+      - dotnet build
+      - dotnet test --no-build --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
+  only:
+    - merge_requests
+    - master
+    - main
+    - develop
 
 publish:
   stage: publish
@@ -32,6 +37,8 @@ publish:
 deploy:
   stage: deploy
   only:
+    - master
+    - main
     - develop
   script:
     - echo "Deploying to server..."
