@@ -75,7 +75,7 @@ END:VTIMEZONE";
             CalSerializor serializor = new();
             var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
-            var offSet = calendar!.GetOffsetInMinutes(DateTime.Parse(date));
+            var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date));
             offSet.Should().Be(offset);
         }
 
@@ -121,7 +121,7 @@ END:VTIMEZONE";
             var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
-            var offSet = calendar!.GetOffsetInMinutes(DateTime.Parse(date));
+            var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date));
             offSet.Should().Be(offset);
         }
 
@@ -151,15 +151,15 @@ END:VTIMEZONE";
             var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
-            var offSet = calendar!.GetOffsetInMinutes(DateTime.Parse(date));
+            var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date));
             offSet.Should().Be(offset);
         }
 
-        [TestCase("2024-03-31T02:00:00", 120)]
-        [TestCase("2024-06-15T12:00:00", 120)]
-        [TestCase("2024-10-27T02:59:59", 120)]
-        [TestCase("2024-10-27T03:00:00", 60)]
-        [TestCase("2024-12-15T12:00:00", 60)]
+        [TestCase("2024-03-31T02:00:00 +1:00", 120)]
+        [TestCase("2024-06-15T12:00:00 +1:00", 120)]
+        [TestCase("2024-10-27T02:59:59 +1:00", 120)]
+        [TestCase("2024-10-27T03:00:00 +1:00", 60)]
+        [TestCase("2024-12-15T12:00:00 +1:00", 60)]
 
         public void Test_Try_EuropeBrussels_RDATE_Timezone(string date, int offset)
         {
@@ -190,7 +190,7 @@ END:VTIMEZONE";
             var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
-            var offSet = calendar!.GetOffsetInMinutes(DateTime.Parse(date));
+            var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date));
             offSet.Should().Be(offset);
         }
 
@@ -229,7 +229,7 @@ END:VTIMEZONE";
             var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
-            var offSet = calendar!.GetOffsetInMinutes(DateTime.Parse(date));
+            var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date));
             offSet.Should().Be(offset);
         }
     }

@@ -58,6 +58,7 @@ namespace ICalendarNet.Components
             dateTime ??= DateTimeOffset.UtcNow;
             List<DateTimeAndOffset> periods = new();
             var components = SubComponents.Where(t => t.ComponentType == ICalComponent.STANDARD || t.ComponentType == ICalComponent.DAYLIGHT).Cast<CalendarStandard>();
+            //Assume current offset for getting the correct time zone
             var assumeOffset = dateTime.Value.Offset.TotalMinutes;
             foreach (var standard in components)
             {

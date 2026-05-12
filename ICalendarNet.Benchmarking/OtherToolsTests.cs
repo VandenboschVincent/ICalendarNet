@@ -128,10 +128,10 @@ END:VCALENDAR
         }
 
         [Benchmark]
-        public string ICal_Net_Deserialize_And_Serialize_Big_Calendar()
+        public string? ICal_Net_Deserialize_And_Serialize_Big_Calendar()
         {
             Calendar? calendar = Calendar.Load(AmericanAwernessDays);
-            return new CalendarSerializer().SerializeToString(calendar!);
+            return new CalendarSerializer().SerializeToString(calendar);
         }
     }
 }
