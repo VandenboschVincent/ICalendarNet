@@ -25,14 +25,14 @@ namespace ICalendarNet.Serialization
 
         public List<T> DeserializeICalComponents<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
         {
-            StringHandler handler = new StringHandler(source);
+            StringHandler handler = new(source);
             if (handler.BlocksLeft < 1)
                 throw new ArgumentException("Could not deserialize source");
 
             return InternalDeserializeComponents<T>(ref handler);
         }
 
-        public ICalendarProperty? DeserializeICalProperty(ReadOnlySpan<char> source)
+        public static ICalendarProperty? DeserializeICalProperty(ReadOnlySpan<char> source)
         {
             return InternalDeserializeContentLines(source).FirstOrDefault();
         }
@@ -47,7 +47,7 @@ namespace ICalendarNet.Serialization
             return SerializeComponent(calendarObject).Trim();
         }
 
-        public string SerializeICalProperty(ICalendarProperty contentLine)
+        public static string SerializeICalProperty(ICalendarProperty contentLine)
         {
             return SerializeProperty(contentLine).Trim();
         }

@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.Base;
 using ICalendarNet.Converters;
 using ICalendarNet.DataTypes;
+using ICalendarNet.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -85,9 +86,9 @@ namespace ICalendarNet.Extensions
             return ICalTypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
-        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key)
+        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
         {
-            return ICalTypeConverters.ConvertToDateTimeOffset(lines.GetContentlineValue(ICalProperties[(int)key]));
+            return GetDateTime(lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase)), metadata);
         }
 
         public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)
@@ -95,10 +96,22 @@ namespace ICalendarNet.Extensions
             return ICalTypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(ICalProperties[(int)key]));
         }
 
-        public static IEnumerable<DateTimeOffset>? GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key)
+        public static IEnumerable<DateTimeOffset>? GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
         {
-            var dateLines = lines.GetContentlines(ICalProperties[(int)key]).Select(t => ICalTypeConverters.ConvertToDateTimeOffset(t.Value));
+            var dateLines = lines.GetContentlines(ICalProperties[(int)key]).Select(t => GetDateTime(t, metadata));
             return dateLines.Where(t => t.HasValue).Select(t => t!.Value);
+        }
+
+        private static DateTimeOffset? GetDateTime(ICalendarProperty? line, MetadataContainer? metadata)
+        {
+            if (line is null)
+                return null;
+            if (line.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && metadata is not null)
+            {
+                var timezone = metadata.GetTimeZone(tzid);
+                return ICalTypeConverters.ConvertToDateTimeOffset(line.Value, timezone);
+            }
+            return ICalTypeConverters.ConvertToDateTimeOffset(line.Value);
         }
 
         public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
@@ -144,12 +157,26 @@ namespace ICalendarNet.Extensions
         {
             if (!value.HasValue)
                 return;
+            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
+            {
+                var timezone = foundLine.Metadata.GetTimeZone(tzid);
+                lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value, timezone), key, parameters);
+                return;
+            }
             lines.UpdateLineProperty(ICalTypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<DateTimeOffset> value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            lines.UpdateLineProperty(string.Join(",", value.Select(ICalTypeConverters.ConvertFromDateTimeOffset)), key, parameters);
+            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
+            {
+                var timezone = foundLine.Metadata.GetTimeZone(tzid);
+                lines.UpdateLineProperty(string.Join(",", value.Select(t => ICalTypeConverters.ConvertFromDateTimeOffset(t, timezone))), key, parameters);
+                return;
+            }
+            lines.UpdateLineProperty(string.Join(",", value.Select(t => ICalTypeConverters.ConvertFromDateTimeOffset(t))), key, parameters);
         }
 
         internal static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty> value, string key)

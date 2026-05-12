@@ -99,10 +99,10 @@ namespace ICalendarNet.DataTypes.Recurrence
 
             // Pre-order those BY values that don't allow for negative values. Those with negative values can only
             // be ordered once the individual position is known.
-            if (r.BySecond.Count > 0) r.BySecond = r.BySecond.OrderBy(x => x).ToList();
-            if (r.ByMinute.Count > 0) r.ByMinute = r.ByMinute.OrderBy(x => x).ToList();
-            if (r.ByHour.Count > 0) r.ByHour = r.ByHour.OrderBy(x => x).ToList();
-            if (r.ByMonth.Count > 0) r.ByMonth = r.ByMonth.OrderBy(x => x).ToList();
+            if (r.BySecond.Count > 0) r.BySecond = [.. r.BySecond.OrderBy(x => x)];
+            if (r.ByMinute.Count > 0) r.ByMinute = [.. r.ByMinute.OrderBy(x => x)];
+            if (r.ByHour.Count > 0) r.ByHour = [.. r.ByHour.OrderBy(x => x)];
+            if (r.ByMonth.Count > 0) r.ByMonth = [.. r.ByMonth.OrderBy(x => x)];
 
             return r;
         }
@@ -114,7 +114,7 @@ namespace ICalendarNet.DataTypes.Recurrence
         /// For example, if the search start date (start) is Wed, Mar 23, 12:19PM, but the recurrence is Mon - Fri, 9:00AM - 5:00PM,
         /// the start dates returned should all be at 9:00AM, and not 12:19PM.
         /// </summary>
-        private IEnumerable<DateTimeOffset> GetDates(DateTimeOffset seed, DateTimeOffset? periodStart, CalendarRecurrenceRule pattern,
+        private static IEnumerable<DateTimeOffset> GetDates(DateTimeOffset seed, DateTimeOffset? periodStart, CalendarRecurrenceRule pattern,
              EvaluationOptions? options)
         {
             var originalDate = seed;
@@ -143,7 +143,7 @@ namespace ICalendarNet.DataTypes.Recurrence
             else
             {
                 if (pattern.Count < 1)
-                    throw new Exception("Count must be greater than 0");
+                    throw new ArgumentException("Count must be greater than 0");
             }
 
             // Do the enumeration in a separate method, as it is a generator method that is
@@ -152,7 +152,7 @@ namespace ICalendarNet.DataTypes.Recurrence
             return EnumerateDates(originalDate, seedCopy, pattern, options);
         }
 
-        private IEnumerable<DateTimeOffset> EnumerateDates(DateTimeOffset originalDate, DateTimeOffset intervalRefTime, CalendarRecurrenceRule pattern, EvaluationOptions? options)
+        private static IEnumerable<DateTimeOffset> EnumerateDates(DateTimeOffset originalDate, DateTimeOffset intervalRefTime, CalendarRecurrenceRule pattern, EvaluationOptions? options)
         {
             var expandBehavior = RecurrenceUtil.GetExpandBehaviorList(pattern);
 
@@ -338,7 +338,7 @@ namespace ICalendarNet.DataTypes.Recurrence
         /// <param name="pattern"></param>
         /// <param name="expandBehaviors"></param>
         /// <returns>A list of possible dates.</returns>
-        private IEnumerable<DateTimeOffset> GetCandidates(DateTimeOffset seedDate, CalendarRecurrenceRule pattern, bool?[] expandBehaviors)
+        private static IEnumerable<DateTimeOffset> GetCandidates(DateTimeOffset seedDate, CalendarRecurrenceRule pattern, bool?[] expandBehaviors)
         {
             var expandContext = new ExpandContext { IsCandidateSetFullyExpanded = false };
 
@@ -368,20 +368,19 @@ namespace ICalendarNet.DataTypes.Recurrence
             if (pattern.BySetPosition.Count == 0)
                 return dates;
 
-            ISet<int> bySetPos;
+            HashSet<int> bySetPos;
 
             if (pattern.BySetPosition.Any(p => p < 0))
             {
                 var tmp = dates.ToList();
                 var count = tmp.Count;
                 dates = tmp;
-                bySetPos = new HashSet<int>(
-                    pattern.BySetPosition
-                    .Select(p => (p < 0) ? count + p + 1 : p));
+                bySetPos = [.. pattern.BySetPosition
+                    .Select(p => (p < 0) ? count + p + 1 : p)];
             }
             else
             {
-                bySetPos = new HashSet<int>(pattern.BySetPosition);
+                bySetPos = [.. pattern.BySetPosition];
             }
 
             return dates.Where((d, i) => bySetPos.Contains(i + 1));
@@ -485,10 +484,9 @@ namespace ICalendarNet.DataTypes.Recurrence
         private static List<int> GetByWeekNoForYearNormalized(CalendarRecurrenceRule pattern, int year)
         {
             var weeksInYear = new Lazy<int>(() => Calendar.GetIso8601WeeksInYear(year, pattern.FirstDayOfWeek));
-            return pattern.ByWeekNo
+            return [.. pattern.ByWeekNo
                 .Select(weekNo => weekNo >= 0 ? weekNo : weeksInYear.Value + weekNo + 1)
-                .OrderBy(x => x)
-                .ToList();
+                .OrderBy(x => x)];
         }
 
         /// <summary>
@@ -691,8 +689,8 @@ namespace ICalendarNet.DataTypes.Recurrence
             var dates = pattern switch
             {
                 { Frequency: FrequencyType.Daily } => GetAbsWeekDaysDaily(date, weekDay),
-                { Frequency: FrequencyType.Weekly } or { ByWeekNo: { Count: > 0 } } => GetAbsWeekDaysWeekly(date, pattern, weekDay),
-                { Frequency: FrequencyType.Monthly } or { ByMonth: { Count: > 0 } } => GetAbsWeekDaysMonthly(date, pattern, weekDay),
+                { Frequency: FrequencyType.Weekly } or { ByWeekNo.Count: > 0 } => GetAbsWeekDaysWeekly(date, pattern, weekDay),
+                { Frequency: FrequencyType.Monthly } or { ByMonth.Count: > 0 } => GetAbsWeekDaysMonthly(date, pattern, weekDay),
                 { Frequency: FrequencyType.Yearly } => GetAbsWeekDaysYearly(date, weekDay),
                 _ => []
             };
@@ -812,7 +810,7 @@ namespace ICalendarNet.DataTypes.Recurrence
                     return dates;
                 case < 0:
                     {
-                        var list = dates as IList<DateTimeOffset> ?? dates.ToList();
+                        var list = dates as IList<DateTimeOffset> ?? [.. dates];
                         var index = list.Count + offset;
                         return index >= 0 && index < list.Count
                             ? [list[index]]
