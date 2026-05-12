@@ -19,9 +19,9 @@ test:
     paths:
       - .sonar/cache
   script: 
-      - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
+      - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent" /d:sonar.cs.opencover.reportsPaths="**/TestResults/*.xml"
       - dotnet build
-      - dotnet test --no-build --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
+      - dotnet test --no-build --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
   only:
     - merge_requests
