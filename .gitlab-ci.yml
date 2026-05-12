@@ -5,13 +5,16 @@ stages:
 
 variables:
   PROJECT_PATH: "ICalendarNet/ICalendarNet.csproj"
-  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/bin/Debug/net10.0/ICalendarNet.UnitTest.dll"
+  TEST_PROJECT_PATH: "ICalendarNet.UnitTest/ICalendarNet.UnitTest.csproj"
   PUBLISH_DIR: "publish"
 
 image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
+  - dotnet tool install --global dotnet-sonarscanner
+  - dotnet tool install --global coverlet.console
+  - export PATH=\"$PATH:$HOME/.dotnet/tools\"
 
 test:
   variables:
@@ -22,17 +25,10 @@ test:
     paths:
       - .sonar/cache
   script: 
-      - apt-get update
-      - apt-get install --yes openjdk-17-jre
-      - dotnet tool install --global dotnet-sonarscanner
-      - dotnet tool install --global coverlet.console
-      - export PATH=\"$PATH:$HOME/.dotnet/tools\"
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build
-      - coverlet $TEST_PROJECT_PATH --target "dotnet"  --targetargs "test --no-build" -f=opencover -o="coverage.xml"
-      - dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
+      - dotnet test --coverlet
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
-  allow_failure: true
   only:
     - merge_requests
     - master
