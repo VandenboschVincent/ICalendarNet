@@ -1,7 +1,5 @@
 stages:
-  - build
-  - test
-  - sonarqube-check
+  - build_and_test
   - publish
   - deploy
 
@@ -14,19 +12,8 @@ image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
-  - dotnet tool install --global dotnet-sonarscanner
 
-build:
-  stage: build
-  script:
-    - dotnet build $PROJECT_PATH --configuration Release
-
-test:
-  stage: test
-  script:
-    - dotnet test $PROJECT_PATH --verbosity normal
-
-sonarqube-check:
+build_and_test:
   variables:
     SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
     GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
@@ -38,9 +25,12 @@ sonarqube-check:
       - apt-get update
       - apt-get install --yes openjdk-17-jre
       - dotnet tool install --global dotnet-sonarscanner
+      - dotnet tool install --global coverlet.console
       - export PATH=\"$PATH:$HOME/.dotnet/tools\"
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build
+      - coverlet .\CovExample.Tests\bin\Debug\net6.0\CovExample.Tests.dll --target "dotnet"  --targetargs "test --no-build" -f=opencover -o="coverage.xml"
+      - dotnet-coverage collect "dotnet test" -f xml -o "coverage.xml"
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
   allow_failure: true
   only:
