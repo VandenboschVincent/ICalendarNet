@@ -21,7 +21,7 @@ test:
   script: 
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build
-      - dotnet test --no-build --collect:"XPlat Code Coverage"
+      - dotnet test --no-build --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
       - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN"
   only:
     - merge_requests
