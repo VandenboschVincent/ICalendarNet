@@ -41,7 +41,7 @@ sonarqube-check:
       - export PATH=\"$PATH:$HOME/.dotnet/tools\"
       - dotnet sonarscanner begin /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
       - dotnet build $PROJECT_PATH
-      - dotnet sonarscanner end /k:"vandenbosch_vincent_icalendarnet" /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL" /o:"vandenbosch-vincent"
+      - dotnet sonarscanner end /d:sonar.token="$SONAR_TOKEN" /d:sonar.host.url="$SONAR_HOST_URL"
   allow_failure: true
   only:
     - merge_requests
