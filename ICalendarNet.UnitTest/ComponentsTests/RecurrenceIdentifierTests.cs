@@ -90,7 +90,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var test = new RecurrenceTest()
             {
                 Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
-                DtStart = new DateTime(2026,5,5),
+                DtStart = new DateTime(2026,5,5,0,0,0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
             };
@@ -116,7 +116,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var test = new RecurrenceTest()
             {
                 Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
-                DtStart = new DateTime(2026, 5, 8, 15, 0, 0),
+                DtStart = new DateTime(2026, 5, 8, 15, 0, 0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
             };
@@ -133,12 +133,12 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             }
         }
 
-        [TestCase("FREQ=DAILY;UNTIL=20260511", "20260509", "20260510")]
-        [TestCase("FREQ=YEARLY;UNTIL=20280509", "20270508", "20280508")]
-        [TestCase("FREQ=WEEKLY;UNTIL=20260608", "20260515", "20260522", "20260529", "20260605")]
-        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260608", "20260522", "20260605")]
-        [TestCase("FREQ=WEEKLY;UNTIL=20260520;WKST=SU;BYDAY=TU,TH", "20260512", "20260514", "20260519")]
-        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260530;WKST=SU;BYDAY=MO,WE,FR", "20260518", "20260520", "20260522")]
+        [TestCase("FREQ=DAILY;UNTIL=20260511Z", "20260509", "20260510", "20260511")]
+        [TestCase("FREQ=YEARLY;UNTIL=20280509Z", "20270508", "20280508")]
+        [TestCase("FREQ=WEEKLY;UNTIL=20260608Z", "20260515", "20260522", "20260529", "20260605")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260608Z", "20260522", "20260605")]
+        [TestCase("FREQ=WEEKLY;UNTIL=20260520Z;WKST=SU;BYDAY=TU,TH", "20260512", "20260514", "20260519")]
+        [TestCase("FREQ=WEEKLY;INTERVAL=2;UNTIL=20260530Z;WKST=SU;BYDAY=MO,WE,FR", "20260518", "20260520", "20260522")]
         [TestCase("FREQ=DAILY;COUNT=3", "20260509", "20260510")]
         [TestCase("FREQ=YEARLY;COUNT=3", "20270508", "20280508")]
         [TestCase("FREQ=WEEKLY;COUNT=3", "20260515", "20260522")]
@@ -152,7 +152,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var test = new RecurrenceTest()
             {
                 Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
-                DtStart = new DateTime(2026, 5, 8),
+                DtStart = new DateTime(2026, 5, 8, 0, 0, 0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
             };

@@ -3,7 +3,6 @@ using ICalendarNet.Components;
 using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace ICalendarNet.Serialization
@@ -11,7 +10,7 @@ namespace ICalendarNet.Serialization
     public partial class CalSerializor
     {
         private List<CalendarTimeZone> TimeZones { get; set; } = [];
-        private CalendarTimeZone InternalDeserializeTimeZone<T>(ref StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
+        private CalendarTimeZone InternalDeserializeTimeZone(ref StringHandler handler, CalCompontentBlock parentBlock)
         {
             var block = InternalDeserializeComponentsBlock(ref handler, new CalendarTimeZone(), parentBlock);
             TimeZones.Add(block);
@@ -26,7 +25,7 @@ namespace ICalendarNet.Serialization
                 ICalComponent.VTODO => InternalDeserializeComponentsBlock(ref handler, new CalendarTodo(), parentBlock),
                 ICalComponent.VJOURNAL => InternalDeserializeComponentsBlock(ref handler, new CalendarJournal(), parentBlock),
                 ICalComponent.VFREEBUSY => InternalDeserializeComponentsBlock(ref handler, new CalendarFreeBusy(), parentBlock),
-                ICalComponent.VTIMEZONE => InternalDeserializeTimeZone(ref handler, new CalendarTimeZone(), parentBlock),
+                ICalComponent.VTIMEZONE => InternalDeserializeTimeZone(ref handler, parentBlock),
                 ICalComponent.STANDARD => InternalDeserializeComponentsBlock(ref handler, new CalendarStandard(), parentBlock),
                 ICalComponent.DAYLIGHT => InternalDeserializeComponentsBlock(ref handler, new CalendarDaylight(), parentBlock),
                 ICalComponent.VALARM => InternalDeserializeComponentsBlock(ref handler, new CalendarAlarm(), parentBlock),
