@@ -171,11 +171,11 @@ namespace ICalendarNet.UnitTest.ComponentsTests
     }
     public class RecurrenceTest
     {
-        public string Comment { get; set; }
-        public string RRule { get; set; }
+        public string? Comment { get; set; }
+        public string RRule { get; set; } = string.Empty;
         public DateTime? DtStart { get; set; }
         public List<DateTime> Instances { get; set; } = new();
-        public string Exception { get; set; }
+        public string? Exception { get; set; }
 
         override public string ToString()
         {
@@ -226,7 +226,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                         test.Instances = values
                             .Select(v => ICalTypeConverters.ConvertToDateTimeOffset(v + "Z", null))
                             .Where(d => d.HasValue)
-                            .Select(d => d.Value.DateTime)
+                            .Select(d => d!.Value.DateTime)
                             .ToList();
                     }
                     else if (trimmed.StartsWith("EXCEPTION:"))

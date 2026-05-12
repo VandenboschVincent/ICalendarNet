@@ -13,6 +13,7 @@
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<GenerateAssemblyInfo>true</GenerateAssemblyInfo>
 	<LangVersion>12.0</LangVersion>
+	<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
   </PropertyGroup>
 
   <ItemGroup>
