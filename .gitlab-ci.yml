@@ -44,4 +44,3 @@ deploy:
     - develop
   script:
     - echo "Deploying to server..."
-    - TODO!!
