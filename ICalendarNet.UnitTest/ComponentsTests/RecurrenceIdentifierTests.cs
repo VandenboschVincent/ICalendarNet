@@ -39,6 +39,34 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             }
         }
 
+        [Test]
+        public void Test_Serialization_Deserialization_Of_Recurrence_Rule()
+        {
+            var calendar = new Calendar();
+            var calEvent = new CalendarEvent();
+            var rrule = new CalendarRecurrenceRule(string.Empty)
+            {
+                Frequency = FrequencyType.Monthly,
+                Interval = 2,
+                ByDay = [new WeekDay(DayOfWeek.Sunday)],
+                BySetPosition = [4]
+            };
+            calEvent.SetRecurrenceRule(rrule);
+            calendar.SubComponents.Add(calEvent);
+            var serialized = CalSerializor.SerializeCalendar(calendar);
+            serialized.Should().Contain("FREQ=MONTHLY;INTERVAL=2;BYDAY=SU;BYSETPOS=4");
+
+            var newCalendar = CalSerializor.DeserializeCalendar(serialized);
+            newCalendar.Should().NotBeNull();
+            var newRrule = newCalendar.GetEvents().First().GetRecurrenceRule();
+            newRrule.Should().NotBeNull();
+            newRrule.Frequency.Should().Be(FrequencyType.Monthly);
+            newRrule.Interval.Should().Be(2);
+            newRrule.ByDay.Should().HaveCount(1);
+            newRrule.ByDay[0].DayOfWeek.Should().Be(DayOfWeek.Sunday);
+            newRrule.BySetPosition.Should().HaveCount(1);
+        }
+
         [TestCaseSource(nameof(RecurrenceIcal))]
         public void TestAllRecurrence(string file)
         {
