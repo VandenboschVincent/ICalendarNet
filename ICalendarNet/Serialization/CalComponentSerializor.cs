@@ -9,13 +9,13 @@ namespace ICalendarNet.Serialization
 {
     internal static class CalComponentSerializor
     {
-        private static CalendarTimeZone InternalDeserializeTimeZone(ref StringHandler handler, CalCompontentBlock parentBlock)
+        private static CalendarTimeZone InternalDeserializeTimeZone(ref StringHandler handler, CalComponentBlock parentBlock)
         {
             var block = InternalDeserializeComponentsBlock(ref handler, new CalendarTimeZone(), parentBlock);
             handler.TimeZones.Add(block);
             return block;
         }
-        private static ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalCompontentBlock parentBlock)
+        private static ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalComponentBlock parentBlock)
         {
             return parentBlock.CalComponent!.Value switch
             {
@@ -55,8 +55,6 @@ namespace ICalendarNet.Serialization
                 return;
             for (int x = 0; x < component.Properties.Count; x++)
             {
-                if (component.ComponentType == ICalComponent.VTIMEZONE)
-                    break;
                 component.Properties[x].Metadata.SetTimeZones(handler.TimeZones);
             }
             component.Metadata.SetTimeZones(handler.TimeZones);
@@ -68,18 +66,18 @@ namespace ICalendarNet.Serialization
 
         private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent) where T : ICalendarComponent, new()
         {
-            CalCompontentBlock parentBlock = handler.GetNextBlock();
+            CalComponentBlock parentBlock = handler.GetNextBlock();
             return InternalDeserializeComponentsBlock(ref handler, parent, parentBlock);
         }
 
-        private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
+        private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent, CalComponentBlock parentBlock) where T : ICalendarComponent, new()
         {
             if (!parentBlock.CalComponent.HasValue)
                 throw new ArgumentException($"Could not deserialize to {nameof(parent)}");
             parent.Properties.AddRange(CalPropertySerializor.InternalDeserializeContentLines(parentBlock.Properties));
             for (int i = 0; i < parentBlock.ComponentCount; i++)
             {
-                CalCompontentBlock block = handler.GetNextBlock();
+                CalComponentBlock block = handler.GetNextBlock();
                 if (!block.CalComponent.HasValue)
                     continue;
                 parent.SubComponents.Add(InternalDeserializeComponents(ref handler, block));
