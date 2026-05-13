@@ -4,14 +4,14 @@ using System.Text;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class CalSerializor
+    internal static class CalPropertyParameterSerializor
     {
-        private static string SerializeProperty(ICalendarProperty parentObject)
+        internal static string SerializeProperty(ICalendarProperty parentObject)
         {
             return SerializeProperty(parentObject, new StringBuilder()).ToString();
         }
 
-        private static StringBuilder SerializeProperty(ICalendarProperty component, StringBuilder builder)
+        internal static StringBuilder SerializeProperty(ICalendarProperty component, StringBuilder builder)
         {
             if (component.Parameters.Any())
             {

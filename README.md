@@ -37,7 +37,6 @@ How to create a new calendar and serialize
 private static string SimpleCalendar()
 {
     Calendar calendar = new Calendar();
-    CalSerializor serializor = new CalSerializor();
     //Add an event
     CalendarEvent calendarEvent = new CalendarEvent()
     {
@@ -85,7 +84,7 @@ private static string SimpleCalendar()
             DTSTART = DateTimeOffset.UtcNow,
             DTEND = DateTimeOffset.UtcNow.AddHours(1),
         });
-    return serializor.SerializeCalendar(calendar);
+    return CalSerializor.SerializeCalendar(calendar);
 }
 ```
 

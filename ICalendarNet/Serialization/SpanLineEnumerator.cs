@@ -67,8 +67,8 @@ namespace ICalendarNet.Serialization
                     stride = 2;
                 }
 
-                _current = remaining.Slice(0, idx);
-                _remaining = remaining.Slice(idx + stride);
+                _current = remaining[..idx];
+                _remaining = remaining[(idx + stride)..];
             }
             else
             {

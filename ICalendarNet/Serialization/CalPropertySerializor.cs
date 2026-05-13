@@ -8,9 +8,9 @@ using System.Text;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class CalSerializor
+    internal static class CalPropertySerializor
     {
-        private static IEnumerable<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
+        internal static List<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
         {
             List<ICalendarProperty> calendarProperties = [.. new List<ICalendarProperty>()];
             SpanLineEnumerator lineEnumerator = new(source);
@@ -81,7 +81,7 @@ namespace ICalendarNet.Serialization
             return calendarProperties;
         }
 
-        public static ICalendarProperty ToContentLine(Statics.ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
+        internal static ICalendarProperty ToContentLine(Statics.ICalProperty? property, ReadOnlySpan<char> key, ReadOnlySpan<char> value)
         {
             if (property != null)
             {

@@ -47,10 +47,9 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         [Test]
         public void Test_Attachment_FromEvent()
         {
-            CalSerializor calSerializor = new();
             foreach (var icalvar in GetIcalStrings("Serialization\\Attachment*"))
             {
-                Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+                Calendar? calendar = CalSerializor.DeserializeCalendar(icalvar);
                 calendar.Should().NotBeNull();
                 CalendarEvent? calendarEvent = calendar!.GetEvents().FirstOrDefault();
                 calendarEvent.Should().NotBeNull();

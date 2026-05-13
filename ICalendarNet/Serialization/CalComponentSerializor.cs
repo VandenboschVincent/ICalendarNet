@@ -7,16 +7,15 @@ using System.Text;
 
 namespace ICalendarNet.Serialization
 {
-    public partial class CalSerializor
+    internal static class CalComponentSerializor
     {
-        private List<CalendarTimeZone> TimeZones { get; set; } = [];
-        private CalendarTimeZone InternalDeserializeTimeZone(ref StringHandler handler, CalCompontentBlock parentBlock)
+        private static CalendarTimeZone InternalDeserializeTimeZone(ref StringHandler handler, CalCompontentBlock parentBlock)
         {
             var block = InternalDeserializeComponentsBlock(ref handler, new CalendarTimeZone(), parentBlock);
-            TimeZones.Add(block);
+            handler.TimeZones.Add(block);
             return block;
         }
-        private ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalCompontentBlock parentBlock)
+        private static ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalCompontentBlock parentBlock)
         {
             return parentBlock.CalComponent!.Value switch
             {
@@ -33,24 +32,24 @@ namespace ICalendarNet.Serialization
             };
         }
 
-        private List<T> InternalDeserializeComponents<T>(ref StringHandler handler) where T : ICalendarComponent, new()
+        internal static List<T> InternalDeserializeComponents<T>(ref StringHandler handler) where T : ICalendarComponent, new()
         {
             var result = new List<T>();
             while (handler.BlocksLeft > 0)
             {
                 result.Add(InternalDeserializeComponentsBlock(ref handler, new T()));
             }
-            if (TimeZones.Count > 0)
+            if (handler.TimeZones.Count > 0)
             {
                 for (int i = 0; i < result.Count; i++)
                 {
-                    SetMetaData(result[i]);
+                    SetMetaData(ref handler, result[i]);
                 }
             }
             return result;
         }
 
-        private void SetMetaData(ICalendarComponent component)
+        private static void SetMetaData(ref StringHandler handler, ICalendarComponent component)
         {
             if (component.ComponentType == ICalComponent.VTIMEZONE)
                 return;
@@ -58,26 +57,26 @@ namespace ICalendarNet.Serialization
             {
                 if (component.ComponentType == ICalComponent.VTIMEZONE)
                     break;
-                component.Properties[x].Metadata.SetTimeZones(TimeZones);
+                component.Properties[x].Metadata.SetTimeZones(handler.TimeZones);
             }
-            component.Metadata.SetTimeZones(TimeZones);
+            component.Metadata.SetTimeZones(handler.TimeZones);
             for (int i = 0; i < component.SubComponents.Count; i++)
             {
-                SetMetaData(component.SubComponents[i]);
+                SetMetaData(ref handler, component.SubComponents[i]);
             }
         }
 
-        private T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent) where T : ICalendarComponent, new()
+        private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent) where T : ICalendarComponent, new()
         {
             CalCompontentBlock parentBlock = handler.GetNextBlock();
             return InternalDeserializeComponentsBlock(ref handler, parent, parentBlock);
         }
 
-        private T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
+        private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent, CalCompontentBlock parentBlock) where T : ICalendarComponent, new()
         {
             if (!parentBlock.CalComponent.HasValue)
                 throw new ArgumentException($"Could not deserialize to {nameof(parent)}");
-            parent.Properties.AddRange(InternalDeserializeContentLines(parentBlock.Properties));
+            parent.Properties.AddRange(CalPropertySerializor.InternalDeserializeContentLines(parentBlock.Properties));
             for (int i = 0; i < parentBlock.ComponentCount; i++)
             {
                 CalCompontentBlock block = handler.GetNextBlock();
@@ -90,12 +89,12 @@ namespace ICalendarNet.Serialization
             return parent;
         }
 
-        private StringBuilder SerializeComponent(ICalendarComponent component, StringBuilder builder)
+        internal static StringBuilder SerializeComponent(ICalendarComponent component, StringBuilder builder)
         {
             builder.AppendLine(component.ComponentType.ToBegin());
             for (int i = 0; i < component.Properties.Count; i++)
             {
-                SerializeProperty(component.Properties[i], builder);
+                CalPropertyParameterSerializor.SerializeProperty(component.Properties[i], builder);
                 builder.AppendLine();
             }
             for (int i = 0; i < component.SubComponents.Count; i++)
@@ -107,7 +106,7 @@ namespace ICalendarNet.Serialization
             return builder;
         }
 
-        private string SerializeComponent(ICalendarComponent parentObject)
+        internal static string SerializeComponent(ICalendarComponent parentObject)
         {
             return SerializeComponent(parentObject, new StringBuilder()).ToString();
         }
