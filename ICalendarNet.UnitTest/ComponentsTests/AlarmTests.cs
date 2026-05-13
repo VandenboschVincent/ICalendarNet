@@ -10,19 +10,18 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Alarm()
         {
-            CalSerializor calSerializor = new();
             var icalvar = @"BEGIN:VALARM
 TRIGGER;RELATED=END:-PT30M
 ACTION:DISPLAY
 DESCRIPTION:Breakfast meeting with executive\nteam at 8:30 AM EST.
 END:VALARM";
-            CalendarAlarm? calendar = calSerializor.DeserializeICalComponent<CalendarAlarm>(icalvar);
+            CalendarAlarm? calendar = CalSerializor.DeserializeICalComponent<CalendarAlarm>(icalvar);
             calendar.Should().NotBeNull();
             calendar!.Properties.Should().HaveCount(3);
             calendar.Trigger!.TimeValue.Should().Be(TimeSpan.FromMinutes(-30));
             calendar.Action.Should().Be(AlarmAction.DISPLAY);
             calendar.Description.Should().Be("Breakfast meeting with executive\\nteam at 8:30 AM EST.");
-            string serialized = calSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObjec(calendar);
             serialized.Should().Be(@"BEGIN:VALARM
 TRIGGER;RELATED=END:-PT30M
 ACTION:DISPLAY
@@ -34,14 +33,13 @@ END:VALARM");
         public void Test_ChangeProperty_Alarm(string file)
         {
             string icalvar = File.ReadAllText(file);
-            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             calendar.Should().NotBeNull();
             calendar!.GetEvents().First().GetAlarms().First().Description = calDescr;
             calendar!.GetEvents().First().DTSTART.Should().NotBeNull();
 
-            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
 
             Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
             serializedCalender.Should().NotBeNull();

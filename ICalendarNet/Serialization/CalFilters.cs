@@ -2,9 +2,9 @@
 
 namespace ICalendarNet.Serialization
 {
-    public partial class CalSerializor
+    internal static class CalFilters
     {
-        public static int GetEndLength(ICalComponent component)
+        internal static int GetEndLength(ICalComponent component)
         {
             switch (component)
             {
@@ -61,14 +61,6 @@ namespace ICalendarNet.Serialization
         internal const string vDaylightBegin = "BEGIN:DAYLIGHT";
         internal const string vAlarmBegin = "BEGIN:VALARM";
 
-        internal static readonly string[] searchBeginKeys = new string[] { vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin };
-        //internal static readonly string[] searchEndKeys = [vCalendarEnd, vEventEnd, vTodoEnd, vJournalEnd, vFreeBusyEnd, vTimezoneEnd, vStandardEnd, vDaylightEnd, vAlarmEnd]
-        //internal static readonly List<string> allKeys = [.. searchBeginKeys, .. searchEndKeys]
-
-        //[GeneratedRegex(@"\r\n?|\n", RegexOptions.Compiled)]
-        //internal static partial Regex ReplaceAllNewLinesRegex()
-
-        //[GeneratedRegex("(.+?)((;(.+?)=(.+?))*):(.+)", RegexOptions.Singleline | RegexOptions.Compiled)]
-        //internal static partial Regex ContentLineRegex()
+        internal static readonly string[] searchBeginKeys = [vCalendarBegin, vEventBegin, vTodoBegin, vJournalBegin, vFreeBusyBegin, vTimezoneBegin, vStandardBegin, vDaylightBegin, vAlarmBegin];
     }
 }

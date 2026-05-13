@@ -26,8 +26,7 @@ ATTENDEE;PARTSTAT=ACCEPTED;CN=Sber500 &amp; 2080 Acceleration Program;ROLE=REQ-P
 LAST-MODIFIED:20230914T230524Z
 CLASS:PUBLIC
 END:VEVENT";
-            CalSerializor calSerializor = new();
-            CalendarEvent? calendar = calSerializor.DeserializeICalComponent<CalendarEvent>(ical);
+            CalendarEvent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(ical);
             calendar!.Properties.Should().NotBeEmpty();
             calendar.Organizer!.Value.Should().Be("mailto:c_4eb66b106265305aa178a912be02479cb3c4a71159c9db935e8b515afff2f88f@group.calendar.google.com");
             calendar.Organizer.Parameters.Should().HaveCount(2);

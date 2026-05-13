@@ -114,17 +114,17 @@ END:VCALENDAR
         }
 
         [Benchmark]
-        public static CalendarEvent ICal_Net_DeserializeCalendar() => Calendar.Load(_sampleEvent)!.Events.First();
+        public CalendarEvent ICal_Net_DeserializeCalendar() => Calendar.Load(_sampleEvent)!.Events.First();
 
         [Benchmark]
-        public static string? ICal_Net_SerializeCalendar() => new CalendarSerializer().SerializeToString(SimpleCalendar());
+        public string? ICal_Net_SerializeCalendar() => new CalendarSerializer().SerializeToString(SimpleCalendar());
 
         [Benchmark]
-        public IEnumerable<string?> ICal_Net_Deserialize_And_Serialize_all_Calendars()
+        public List<string?> ICal_Net_Deserialize_And_Serialize_all_Calendars()
         {
             var serializer = new CalendarSerializer();
             var calendars = CalendarCollection.Load(string.Join(Environment.NewLine, ICalStrings));
-            return calendars.Select(t => serializer.SerializeToString(t));
+            return [.. calendars.Select(serializer.SerializeToString)];
         }
 
         [Benchmark]

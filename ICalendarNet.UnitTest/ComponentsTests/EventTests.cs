@@ -11,7 +11,6 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [Test]
         public void Test_Serialize_Event()
         {
-            CalSerializor calSerializor = new();
             var icalvar = @"BEGIN:VEVENT
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
@@ -26,7 +25,7 @@ DTSTART:20060718T100000
 DTEND:20060718T110000
 LOCATION:Daywest
 END:VEVENT";
-            CalendarEvent? calendar = calSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
+            CalendarEvent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
             calendar!.Properties.Should().HaveCount(10);
             calendar.Uid.Should().Be("uuid1153170430406");
             calendar.Summary.Should().Be($"Test event{Environment.NewLine}Newline Test event{Environment.NewLine}https://learn.microsoft.com/en-us/dotnet/api/system.string.join?view=net-8.0");
@@ -37,7 +36,7 @@ END:VEVENT";
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.Should().HaveCount(1);
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Key.Should().Be("testparam");
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Value.Should().BeEquivalentTo(new List<string>() { "paramvalue", "paramvalue2" });
-            string serialized = calSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObjec(calendar);
             serialized.Should().Be(@"BEGIN:VEVENT
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
@@ -58,13 +57,12 @@ END:VEVENT");
         public void Test_ChangeProperty_Event(string file)
         {
             string icalvar = File.ReadAllText(file);
-            CalSerializor calSerializor = new();
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             calendar.Should().NotBeNull();
             calendar!.GetEvents().First().Description = calDescr;
 
-            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
+            string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
 
             Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
             serializedCalender.Should().NotBeNull();
@@ -76,11 +74,10 @@ END:VEVENT");
         public void Test_GetAppleStrucured_Location(string file)
         {
             string icalvar = File.ReadAllText(file);
-            CalSerializor calSerializor = new();
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             calendar.Should().NotBeNull();
 
-            string serializedCalendar = calSerializor.SerializeCalendar(calendar!);
+            string serializedCalendar = CalSerializor.SerializeCalendar(calendar!);
 
             Calendar? serializedCalender = Calendar.LoadCalendar(serializedCalendar);
             serializedCalender.Should().NotBeNull();

@@ -1,4 +1,5 @@
-﻿using ICalendarNet.Extensions;
+﻿using ICalendarNet.Components;
+using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,7 +38,7 @@ namespace ICalendarNet.Serialization
         private readonly ReadOnlySpan<char> reader;
         private readonly List<CalComponentIndex> indexes;
         private int currentWorkingBlock;
-
+        public List<CalendarTimeZone> TimeZones { get; set; } = [];
         public readonly int BlocksLeft => indexes.Count - currentWorkingBlock;
 
         /// <summary>
@@ -47,13 +48,13 @@ namespace ICalendarNet.Serialization
         public StringHandler(ReadOnlySpan<char> s)
         {
             reader = s;
-            indexes = new List<CalComponentIndex>();
+            indexes = [];
             currentWorkingBlock = 0;
             int i = 0;
             while (i < s.Length)
             {
                 //Find the next BEGIN statement
-                int indexFound = s.FindIndexOf(CalSerializor.vBeginString, i, StringComparison.OrdinalIgnoreCase);
+                int indexFound = s.FindIndexOf(CalFilters.vBeginString, i, StringComparison.OrdinalIgnoreCase);
 
                 if (indexes.Count > 0)
                 {
@@ -68,7 +69,7 @@ namespace ICalendarNet.Serialization
                 //Move the index to after BEGIN:
                 i = indexFound + 6;
 
-                CalComponentIndex currentWorkingItem = new CalComponentIndex()
+                CalComponentIndex currentWorkingItem = new()
                 {
                     StartIndex = indexFound,
                     CalComponent = GetComponent(i, s)
@@ -79,7 +80,7 @@ namespace ICalendarNet.Serialization
 
                 //Sets the End index (including subcomponents) to just after this BEGIN
                 currentWorkingItem.EndIndex =
-                    s.FindIndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + CalSerializor.GetEndLength(currentWorkingItem.CalComponent.Value);
+                    s.FindIndexOf($"END:{currentWorkingItem.CalComponent.Value}", i, StringComparison.OrdinalIgnoreCase) + CalFilters.GetEndLength(currentWorkingItem.CalComponent.Value);
 
                 indexes.Add(currentWorkingItem);
             }

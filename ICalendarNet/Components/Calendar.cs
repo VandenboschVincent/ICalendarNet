@@ -15,12 +15,12 @@ namespace ICalendarNet.Components
     {
         public static Calendar? LoadCalendar(ReadOnlySpan<char> source)
         {
-            return new CalSerializor().DeserializeCalendar(source);
+            return CalSerializor.DeserializeCalendar(source);
         }
 
         public static List<Calendar> LoadCalendars(ReadOnlySpan<char> source)
         {
-            return new CalSerializor().DeserializeCalendars(source);
+            return CalSerializor.DeserializeCalendars(source);
         }
 
         /// <summary>

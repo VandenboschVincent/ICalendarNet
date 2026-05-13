@@ -72,8 +72,7 @@ TZNAME:CEST
 END:DAYLIGHT
 
 END:VTIMEZONE";
-            CalSerializor serializor = new();
-            var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
+            var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
             var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));
             offSet.Should().Be(offset);
@@ -117,8 +116,7 @@ END:DAYLIGHT
 
 END:VTIMEZONE";
 
-            CalSerializor serializor = new();
-            var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
+            var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
             var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));
@@ -147,8 +145,7 @@ END:STANDARD
 
 END:VTIMEZONE";
 
-            CalSerializor serializor = new();
-            var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
+            var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
             var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));
@@ -186,8 +183,7 @@ END:DAYLIGHT
 
 END:VTIMEZONE";
 
-            CalSerializor serializor = new();
-            var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
+            var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
             var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));
@@ -225,8 +221,7 @@ END:DAYLIGHT
 
 END:VTIMEZONE";
 
-            CalSerializor serializor = new();
-            var calendar = serializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
+            var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
             var offSet = calendar!.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));

@@ -11,16 +11,15 @@ namespace ICalendarNet.UnitTest
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
         public async Task Test_Online_vCalendar_Should_Serialize(string icalString)
         {
-            CalSerializor calSerializor = new();
             using var httpClient = new HttpClient();
             string icalvar = await httpClient.GetStringAsync(icalString);
 
-            Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+            Calendar? calendar = CalSerializor.DeserializeCalendar(icalvar);
             calendar!.Properties.Should().NotBeEmpty();
             calendar.SubComponents.Should().NotBeEmpty();
 
-            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
-            Calendar? calendarAfterSerialize = calSerializor.DeserializeCalendar(serializedCalendar);
+            string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
+            Calendar? calendarAfterSerialize = CalSerializor.DeserializeCalendar(serializedCalendar);
 
             calendarAfterSerialize!.Properties.Should().BeEquivalentTo(calendar.Properties);
             calendarAfterSerialize.SubComponents.Count.Should().Be(calendar.SubComponents.Count);
@@ -46,14 +45,13 @@ namespace ICalendarNet.UnitTest
         [Test]
         public void Test_Offline_vCalendar_Should_Serialize_Combined()
         {
-            CalSerializor calSerializor = new();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, GetIcalStrings()));
             calendars.Should().HaveCount(140);
             foreach (var calendar in calendars)
             {
                 calendar!.Properties.Should().NotBeEmpty();
-                string serializedCalendar = calSerializor.SerializeCalendar(calendar);
-                Calendar? calendarAfterSerialize = calSerializor.DeserializeCalendar(serializedCalendar);
+                string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
+                Calendar? calendarAfterSerialize = CalSerializor.DeserializeCalendar(serializedCalendar);
                 calendarAfterSerialize!.Properties.Should().BeEquivalentTo(calendar.Properties, serializedCalendar);
                 calendarAfterSerialize.SubComponents.Should().HaveCount(calendar.SubComponents.Count, serializedCalendar);
 
@@ -73,7 +71,6 @@ namespace ICalendarNet.UnitTest
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=142")]
         public async Task Test_Update_Param_Should_Serialize(string icalString)
         {
-            CalSerializor calSerializor = new();
             DateTime dt = DateTime.UtcNow;
             DateTime date = new(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second, DateTimeKind.Utc);
             string calDescr = "Test123456789,&é\"'(§èo!çà)'§è!çà)à_°98^$¨*ù%+:;,+/.?*//";
@@ -81,7 +78,7 @@ namespace ICalendarNet.UnitTest
             using var httpClient = new HttpClient();
             string icalvar = await httpClient.GetStringAsync(icalString);
 
-            Calendar? calendar = calSerializor.DeserializeCalendar(icalvar);
+            Calendar? calendar = CalSerializor.DeserializeCalendar(icalvar);
             calendar!.Properties.Should().NotBeEmpty();
             calendar.SubComponents.Should().NotBeEmpty();
 
@@ -91,8 +88,8 @@ namespace ICalendarNet.UnitTest
             calendar.GetEvents().First().DTSTART = date;
             calendar.GetEvents().First().Description = eventDescr;
 
-            string serializedCalendar = calSerializor.SerializeCalendar(calendar);
-            Calendar? calendarAfterSerialize = calSerializor.DeserializeCalendar(serializedCalendar);
+            string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
+            Calendar? calendarAfterSerialize = CalSerializor.DeserializeCalendar(serializedCalendar);
 
             calendarAfterSerialize!.Created.Should().Be(date);
             calendarAfterSerialize.Description.Should().Be(calDescr);

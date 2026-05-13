@@ -143,41 +143,39 @@ Mr Smith"));
         }
 
         [Benchmark]
-        public static CalendarEvent DeserializeCalendar() => Calendar.LoadCalendar(_sampleEvent)!.GetEvents().First();
+        public CalendarEvent DeserializeCalendar() => Calendar.LoadCalendar(_sampleEvent)!.GetEvents().First();
 
         [Benchmark]
-        public static string SerializeCalendar() => new CalSerializor().SerializeCalendar(SimpleCalendar());
+        public string SerializeCalendar() => CalSerializor.SerializeCalendar(SimpleCalendar());
 
         [Benchmark]
         public string Deserialize_And_Serialize_Tiny_Calendar()
         {
             var icalvar = ICalStrings[^1];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
-            return new CalSerializor().SerializeCalendar(calendar!);
-        }
+            return CalSerializor.SerializeCalendar(calendar!);
+        }   
 
         [Benchmark]
-        public IEnumerable<string> Deserialize_And_Serialize_all_Calendars()
+        public List<string> Deserialize_And_Serialize_all_Calendars()
         {
-            var serializer = new CalSerializor();
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, ICalStrings));
-            return calendars.Select(serializer.SerializeCalendar);
+            return [.. calendars.Select(CalSerializor.SerializeCalendar)];
         }
 
         [Benchmark]
-        public static string Deserialize_And_Serialize_Event()
+        public string Deserialize_And_Serialize_Event()
         {
-            var serializer = new CalSerializor();
             var icalvar = $"BEGIN:VEVENT\r\nCREATED:20060717T210517Z\r\nLAST-MODIFIED:20060717T210718Z\r\nDTSTAMP:20060717T210718Z\r\nUID:uuid1153170430406\r\nSUMMARY:Test event\r\nDTSTART:20060718T100000\r\nDTEND:20060718T110000\r\nLOCATION:Daywest\r\nEND:VEVENT";
-            ICalendarComponent? calendar = serializer.DeserializeICalComponent<CalendarEvent>(icalvar);
-            return new CalSerializor().SerializeICalObjec(calendar!);
+            ICalendarComponent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
+            return CalSerializor.SerializeICalObjec(calendar!);
         }
 
         [Benchmark]
         public string Deserialize_And_Serialize_Big_Calendar()
         {
             Calendar? calendar = Calendar.LoadCalendar(AmericanAwernessDays);
-            return new CalSerializor().SerializeCalendar(calendar!);
+            return CalSerializor.SerializeCalendar(calendar!);
         }
     }
 }
