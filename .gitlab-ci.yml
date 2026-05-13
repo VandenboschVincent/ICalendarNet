@@ -33,6 +33,8 @@ publish:
   stage: publish
   script:
     - dotnet publish $PROJECT_PATH -f net10.0 --configuration Release --output $PUBLISH_DIR
+  only:
+    - none
 
 deploy:
   stage: deploy
