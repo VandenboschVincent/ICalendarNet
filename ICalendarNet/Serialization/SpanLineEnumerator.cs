@@ -14,7 +14,7 @@ namespace ICalendarNet.Serialization
 #if NET8_0_OR_GREATER
         private static readonly SearchValues<char> NewLineSearchValues = SearchValues.Create(NewLineChars);
 #endif
-        private const string NewLineChars = "\r\f\u0085\u2028\u2029\n";
+        private const string NewLineChars = "\r\n\f\u0085\u2028\u2029";
         private ReadOnlySpan<char> _remaining;
         private ReadOnlySpan<char> _current;
         private bool _isEnumeratorActive;
@@ -57,7 +57,7 @@ namespace ICalendarNet.Serialization
 #else
             int idx = remaining.IndexOfAny(NewLineChars);
 #endif
-
+            //(uint) => Fixes correctness bug + removes JIT bounds checks
             if ((uint)idx < (uint)remaining.Length)
             {
                 int stride = 1;
@@ -74,7 +74,6 @@ namespace ICalendarNet.Serialization
             {
                 // We've reached EOF, but we still need to return 'true' for this final
                 // iteration so that the caller can query the Current property once more.
-
                 _current = remaining;
                 _remaining = default;
                 _isEnumeratorActive = false;
