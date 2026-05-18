@@ -9,6 +9,11 @@ namespace ICalendarNet.Extensions
             return dateTimeOffset.TimeOfDay != TimeSpan.Zero;
         }
 
+        public static bool Between(this DateTimeOffset? input, DateTimeOffset date1, DateTimeOffset date2)
+        {
+            return input >= date1 && input <= date2;
+        }
+
         public static DateTimeOffset AddWeeks(this DateTimeOffset dt, int interval, DayOfWeek firstDayOfWeek)
         {
             dt = dt.AddDays(interval * 7);

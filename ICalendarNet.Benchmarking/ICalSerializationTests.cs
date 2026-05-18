@@ -63,7 +63,7 @@ namespace ICalendarNet.Benchmarking
         public string Deserialize_And_Serialize_Event()
         {
             ICalendarComponent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(SampleData.SampleEvent);
-            return CalSerializor.SerializeICalObjec(calendar!);
+            return CalSerializor.SerializeICalObject(calendar!);
         }
 
         [Benchmark]

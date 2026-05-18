@@ -11,7 +11,7 @@ namespace ICalendarNet.Components
     /// <summary>
     /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.4
     /// </summary>
-    public class CalendarFreeBusy : CalendarObject
+    public class CalendarFreeBusy : CalendarOccurableObject
     {
         public override ICalComponent ComponentType => ICalComponent.VFREEBUSY;
 
@@ -49,15 +49,6 @@ namespace ICalendarNet.Components
         {
             get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
             set => Properties.UpdateLineProperty(value!, ICalProperty.COMMENT);
-        }
-
-        /// <summary>
-        ///   <see cref="ICalProperty.DTSTART" />
-        /// </summary>
-        public DateTimeOffset? DTSTART
-        {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART, Metadata);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
         }
 
         /// <summary>
@@ -100,7 +91,7 @@ namespace ICalendarNet.Components
         /// </summary>
         public void SetFreeBusy(IEnumerable<CalendarPeriod> freebusy)
         {
-            Properties.UpdateLineProperty(new List<CalendarPeriods>() { new CalendarPeriods(ICalProperty.FREEBUSY, freebusy) }, ICalProperty.FREEBUSY);
+            Properties.UpdateLineProperty(new List<CalendarPeriods>() { new(ICalProperty.FREEBUSY, freebusy) }, ICalProperty.FREEBUSY);
         }
     }
 }

@@ -28,7 +28,7 @@ END:VJOURNAL";
             calendar.Status.Should().Be("FINAL");
             calendar.Categories.Should().BeEquivalentTo(new List<string>() { "Project Report", "XYZ", "Weekly Meeting", });
             calendar.Summary.Should().Be("Project xyz Review Meeting");
-            string serialized = CalSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VJOURNAL
 DTSTAMP:19970324T120000Z
 UID:uid5@host1.com

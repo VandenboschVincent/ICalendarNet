@@ -3,6 +3,7 @@ using ICalendarNet.DataTypes;
 using ICalendarNet.DataTypes.Recurrence;
 using ICalendarNet.UnitTest.Base;
 using System.Reflection;
+using ICalendarNet.Extensions;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
@@ -65,6 +66,21 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             newRrule.ByDay.Should().HaveCount(1);
             newRrule.ByDay[0].DayOfWeek.Should().Be(DayOfWeek.Sunday);
             newRrule.BySetPosition.Should().HaveCount(1);
+        }
+
+        [Test]
+        public void Test_BuildCalendar_ShouldIncludeRecurringEvents()
+        {
+            //Every week on monday/thursday
+            var testCase = GetIcalStrings("Recurrence/DailyByDay1").FirstOrDefault();
+            if (string.IsNullOrEmpty(testCase)) throw new InvalidDataException("Could not load test");
+            Calendar? calendar = Calendar.LoadCalendar(testCase);
+            calendar.Should().NotBeNull();
+            var currentDate = DateTimeOffset.Now;
+            var startOfWeek = new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0, TimeSpan.Zero).GetStartOfWeek(DayOfWeek.Monday);
+            var endOfWeek = startOfWeek.AddDays(7);
+            var events = calendar.BuildCalendar(startOfWeek, endOfWeek);
+            events.Should().HaveCount(2); //Monday, Thursday 
         }
 
         [TestCaseSource(nameof(RecurrenceIcal))]

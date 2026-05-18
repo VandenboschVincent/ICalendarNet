@@ -36,7 +36,7 @@ END:VEVENT";
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.Should().HaveCount(1);
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Key.Should().Be("testparam");
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Value.Should().BeEquivalentTo(new List<string>() { "paramvalue", "paramvalue2" });
-            string serialized = CalSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VEVENT
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z

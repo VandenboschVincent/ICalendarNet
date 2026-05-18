@@ -42,7 +42,7 @@ namespace ICalendarNet.Serialization
             return CalComponentSerializor.SerializeComponent(calendar).Trim();
         }
 
-        public static string SerializeICalObjec(ICalendarComponent calendarObject)
+        public static string SerializeICalObject(ICalendarComponent calendarObject)
         {
             return CalComponentSerializor.SerializeComponent(calendarObject).Trim();
         }
