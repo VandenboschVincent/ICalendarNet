@@ -162,10 +162,10 @@ namespace ICalendarNet.Components
         /// <summary>
         ///   <see cref="ICalProperty.RESOURCES" />
         /// </summary>
-        public string? Resources
+        public IEnumerable<string> Resources
         {
-            get => Properties.GetContentlineValue(ICalProperty.RESOURCES);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.RESOURCES);
+            get => Properties.GetContentlinesSeperatedValue(ICalProperty.RESOURCES);
+            set => Properties.UpdateLinesProperty(value, ICalProperty.RESOURCES);
         }
 
         /// <summary>
@@ -246,6 +246,16 @@ namespace ICalendarNet.Components
         public override string ToString()
         {
             return $"VEVENT: {Summary} {DTSTART.GetValueOrDefault():dd/MM/yy HH:mm} - {DTEND.GetValueOrDefault():dd/MM/yy HH:mm}";
+        }
+
+        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        {
+            var cloned = CloneComponent(this, period);
+            var oldEnd = DTEND;
+            var oldStart = DTSTART;
+            if (oldEnd.HasValue && oldStart.HasValue)
+                cloned.DTEND = period.DateStart.Add(oldEnd.Value - oldStart.Value);
+            return cloned;
         }
     }
 }

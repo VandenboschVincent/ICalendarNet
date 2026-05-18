@@ -22,7 +22,7 @@ namespace ICalendarNet.Converters
                 !value!.Any(char.IsDigit)) return null;
             bool isNegative = string.Equals(value[..2], "-P", StringComparison.OrdinalIgnoreCase);
             var enumerator = value.GetEnumerator();
-            StringBuilder currentNumber = new StringBuilder();
+            StringBuilder currentNumber = new();
             TimeSpan result = TimeSpan.Zero;
             while (enumerator.MoveNext())
             {

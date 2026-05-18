@@ -1,6 +1,7 @@
 ﻿using ICalendarNet.DataTypes;
 using ICalendarNet.DataTypes.Recurrence;
 using ICalendarNet.Extensions;
+using ICalendarNet.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,16 +9,12 @@ using static ICalendarNet.Statics;
 
 namespace ICalendarNet.Base
 {
-    public abstract class CalendarRecurrableObject : CalendarObject
+    public abstract class CalendarRecurrableObject : CalendarOccurableObject
     {
-        /// <summary>
-        ///   <see cref="ICalProperty.DTSTART" />
-        /// </summary>
-        public virtual DateTimeOffset? DTSTART
-        {
-            get => Properties.GetContentlineDateTime(ICalProperty.DTSTART, Metadata);
-            set => Properties.UpdateLineProperty(value!, ICalProperty.DTSTART);
-        }
+        private readonly static List<string> rruleProperties = [ICalProperties[(int)ICalProperty.EXDATE]
+            , ICalProperties[(int)ICalProperty.RRULE]
+            , ICalProperties[(int)ICalProperty.EXRULE]
+            , ICalProperties[(int)ICalProperty.RDATE]];
 
         /// <summary>
         ///   <see cref="ICalProperty.EXDATE" />
@@ -68,10 +65,29 @@ namespace ICalendarNet.Base
             var dtstart = DTSTART;
             if (rrule is null || dtstart is null)
                 return null;
+            if (rrule.Until < start)
+                return null;
             var exdates = ExceptionDateTimes;
             return RecurrenceUtil.GetRecurrenceDates(rrule, dtstart.Value, amount, start, addStartDay, end, exceptionDates: exdates) ?? 
                 Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
                 .SelectMany(t => t.GetPeriods());
+        }
+
+        public IEnumerable<CalendarRecurrableObject> GetOccuring(int amount = 1, DateTimeOffset? start = null, bool addStartDay = true, DateTimeOffset? end = null)
+        {
+            var recurrences = GetRecurrence(amount, start, addStartDay, end);
+            return recurrences?.Select(Clone) ?? [];
+        }
+
+        protected abstract CalendarRecurrableObject Clone(CalendarPeriod period);
+
+        protected static T CloneComponent<T>(T obj, CalendarPeriod period) where T : CalendarRecurrableObject, new()
+        {
+            var serialized = CalSerializor.SerializeICalObject(obj);
+            var clone = CalSerializor.DeserializeICalComponent<T>(serialized) ?? throw new InvalidOperationException("cloning object failed");
+            clone.DTSTART = period.DateStart;
+            clone.Properties.RemoveAll(t => rruleProperties.Contains(t.Name));
+            return clone;
         }
     }
 }

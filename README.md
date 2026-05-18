@@ -17,7 +17,9 @@ Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton o
  - [x] RFC 5545 compliancy
  - [x] Make it easier to create/edit occurency
  - [x] Make it easier to create/edit alarms
- - [ ] Timezones fully implemented
+ - [x] Timezones fully implemented
+ - [] Including specific occurences with RECURRENCE-ID and UID
+ - [] Building calendar(s) (incl recurring) between dates
 
 ## How to use:
 

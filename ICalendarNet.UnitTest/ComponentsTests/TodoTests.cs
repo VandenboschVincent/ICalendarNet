@@ -34,7 +34,7 @@ END:VTODO";
             calendar.GetRecurrenceRule()!.ByDay[0].DayOfWeek.Should().Be(DayOfWeek.Friday);
             calendar.GetRecurrenceRule()!.ByDay[0].Offset.Should().Be(1);
             calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(1154116477));
-            string serialized = CalSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VTODO
 UID:fed50a1c-1e72-11db-a465-aae271be3660
 SUMMARY:Test Todo

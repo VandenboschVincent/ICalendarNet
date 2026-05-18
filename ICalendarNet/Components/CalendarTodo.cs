@@ -210,7 +210,7 @@ namespace ICalendarNet.Components
         public virtual IEnumerable<string>? Attendee
         {
             get => Properties.GetContentlinesSeperatedValue(ICalProperty.ATTENDEE);
-            set => Properties.UpdateLinesSeperatedProperty(value!.ToList(), ICalProperty.ATTENDEE);
+            set => Properties.UpdateLinesSeperatedProperty([.. value!], ICalProperty.ATTENDEE);
         }
 
         /// <summary>
@@ -227,6 +227,10 @@ namespace ICalendarNet.Components
         public void SetAttachments(IEnumerable<CalendarAttachment> attachments)
         {
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
+        }
+        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        {
+            return CloneComponent(this, period);
         }
     }
 }

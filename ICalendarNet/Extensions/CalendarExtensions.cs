@@ -28,7 +28,7 @@ namespace ICalendarNet.Extensions
         /// Calculate and return the date that represents the first day of the week the given date is
         /// in, according to the week numbering required by RFC 5545.
         /// </summary>
-        private static DateTimeOffset GetStartOfWeek(this DateTimeOffset t, DayOfWeek firstDayOfWeek)
+        public static DateTimeOffset GetStartOfWeek(this DateTimeOffset t, DayOfWeek firstDayOfWeek)
         {
             var t0 = ((int)firstDayOfWeek) % 7;
             var tn = ((int)t.DayOfWeek) % 7;

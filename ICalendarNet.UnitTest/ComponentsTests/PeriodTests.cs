@@ -28,7 +28,7 @@ END:VFREEBUSY";
             freeBusy.DateEnd.Should().Be(DateTimeOffset.FromUnixTimeSeconds(876922200));
             freeBusy.Duration.Should().Be(TimeSpan.FromSeconds(30600));
 
-            string serialized = CalSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VFREEBUSY
 UID:19970901T095957Z-76A912@example.com
 ORGANIZER:mailto:jane_doe@example.com
@@ -58,7 +58,7 @@ END:VFREEBUSY");
             calendar.Should().NotBeNull();
             calendar!.SetFreeBusy([new(Statics.ICalProperty.FREEBUSY, calPeriod, null)]);
 
-            string serializedCalendar = CalSerializor.SerializeICalObjec(calendar);
+            string serializedCalendar = CalSerializor.SerializeICalObject(calendar);
 
             serializedCalendar.Split(Environment.NewLine).Should().Contain("FREEBUSY:19971015T050000Z/PT8H30M,19971015T160000Z/PT5H30M");
             CalendarFreeBusy? serializedCalender = CalSerializor.DeserializeICalComponent<CalendarFreeBusy>(serializedCalendar);

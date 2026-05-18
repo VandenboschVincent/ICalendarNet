@@ -160,5 +160,22 @@ namespace ICalendarNet.Components
         ///   <see cref="ICalComponent.VTIMEZONE" />
         /// </summary>
         public IEnumerable<CalendarTimeZone> GetTimeZones() => SubComponents.Where(t => t.ComponentType == ICalComponent.VTIMEZONE).Cast<CalendarTimeZone>();
+
+        public IEnumerable<ICalendarComponent> BuildCalendar(DateTimeOffset start, DateTimeOffset end)
+        {
+            var recurrable = SubComponents.Where(t => t is CalendarRecurrableObject o  
+                && (o.RecurrenceDates?.Any() == true || o.GetRecurrenceRule() != null))
+                .Cast<CalendarRecurrableObject>();
+            foreach (var item in recurrable)
+            {
+                var occures = item.GetOccuring(int.MaxValue, start, false, end);
+                foreach (var occur in occures)
+                    yield return occur;
+            }
+            var occurable = SubComponents.Where(t => t is CalendarOccurableObject o && o.DTSTART.Between(start, end))
+                .Cast<CalendarOccurableObject>();
+            foreach (var item in occurable)
+                yield return item;
+        }
     }
 }

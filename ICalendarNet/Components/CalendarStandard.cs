@@ -1,4 +1,5 @@
 ﻿using ICalendarNet.Base;
+using ICalendarNet.DataTypes;
 using ICalendarNet.Extensions;
 using System;
 using System.Collections.Generic;
@@ -46,5 +47,9 @@ namespace ICalendarNet.Components
             set => Properties.UpdateLineProperty(value!, ICalProperty.TZNAME);
         }
 
+        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        {
+            return CloneComponent(this, period);
+        }
     }
 }

@@ -56,7 +56,7 @@ namespace ICalendarNet.Components
         public int GetOffsetInMinutes(DateTimeOffset? dateTime = null)
         {
             dateTime ??= DateTimeOffset.UtcNow;
-            List<DateTimeAndOffset> periods = new();
+            List<DateTimeAndOffset> periods = [];
             var components = SubComponents.Where(t => t.ComponentType == ICalComponent.STANDARD || t.ComponentType == ICalComponent.DAYLIGHT).Cast<CalendarStandard>();
             //Assume current offset for getting the correct time zone
             var assumeOffset = dateTime.Value.Offset.TotalMinutes;
@@ -90,8 +90,8 @@ namespace ICalendarNet.Components
                     periods.Add(new DateTimeAndOffset(offset, start.Value));
             }
 
-            var currentPeriod = periods.OrderByDescending(t => t.date).FirstOrDefault(t => ConvertToOffset(t.date, assumeOffset) <= dateTime.Value);
-            return currentPeriod is null ? 0 : currentPeriod.offset;
+            var currentPeriod = periods.OrderByDescending(t => t.Date).FirstOrDefault(t => ConvertToOffset(t.Date, assumeOffset) <= dateTime.Value);
+            return currentPeriod is null ? 0 : currentPeriod.Offset;
         }
 
         private static DateTimeOffset? ConvertToOffset(DateTimeOffset? dateTime, double offsetInMinutes)
@@ -119,16 +119,16 @@ namespace ICalendarNet.Components
         {
             public DateTimeAndOffset(int offset, DateTimeOffset date)
             {
-                this.offset = offset;
-                this.date = date;
+                this.Offset = offset;
+                this.Date = date;
             }
 
-            public int offset { get; set; }
-            public DateTimeOffset date { get; set; }
+            public int Offset { get; set; }
+            public DateTimeOffset Date { get; set; }
 
             public override string ToString()
             {
-                return date.ToString("o");
+                return Date.ToString("o");
             }
         }
     }

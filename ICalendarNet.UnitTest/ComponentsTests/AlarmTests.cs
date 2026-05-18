@@ -21,7 +21,7 @@ END:VALARM";
             calendar.Trigger!.TimeValue.Should().Be(TimeSpan.FromMinutes(-30));
             calendar.Action.Should().Be(AlarmAction.DISPLAY);
             calendar.Description.Should().Be("Breakfast meeting with executive\\nteam at 8:30 AM EST.");
-            string serialized = CalSerializor.SerializeICalObjec(calendar);
+            string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VALARM
 TRIGGER;RELATED=END:-PT30M
 ACTION:DISPLAY
