@@ -124,21 +124,21 @@ AMD Ryzen 9 5900HX with Radeon Graphics 3.30GHz, 1 CPU, 16 logical and 8 physica
 ```
 | Method                                  | Mean          | Error       | StdDev      | Gen0      | Gen1      | Gen2     | Allocated  |
 |---------------------------------------- |--------------:|------------:|------------:|----------:|----------:|---------:|-----------:|
-| DeserializeCalendar                     |     19.581 μs |   0.3853 μs |   0.3604 μs |    2.1362 |    0.0916 |        - |   17.55 KB |
-| SerializeCalendar                       |      1.417 μs |   0.0273 μs |   0.0594 μs |    0.6104 |    0.0019 |        - |       5 KB |
-| Deserialize_And_Serialize_Tiny_Calendar |      1.886 μs |   0.0367 μs |   0.0514 μs |    0.4749 |    0.0019 |        - |    3.89 KB |
-| Deserialize_And_Serialize_all_Calendars | 11,184.971 μs | 213.8932 μs | 262.6801 μs | 1203.1250 | 1125.0000 | 140.6250 | 9144.94 KB |
-| Deserialize_And_Serialize_Event         |      3.462 μs |   0.0529 μs |   0.0495 μs |    0.5302 |    0.0038 |        - |    4.36 KB |
-| Deserialize_And_Serialize_Big_Calendar  |  9,614.212 μs | 191.5210 μs | 378.0437 μs | 1156.2500 | 1000.0000 | 421.8750 | 7790.84 KB |
+| DeserializeCalendar                     |     20.389 μs |   0.3866 μs |   0.4136 μs |    1.8616 |    0.0610 |        - |    15.3 KB |
+| SerializeCalendar                       |      1.509 μs |   0.0283 μs |   0.0552 μs |    0.5493 |    0.0019 |        - |    4.49 KB |
+| Deserialize_And_Serialize_Tiny_Calendar |      2.028 μs |   0.0369 μs |   0.0379 μs |    0.4463 |         - |        - |    3.66 KB |
+| Deserialize_And_Serialize_all_Calendars | 11,808.863 μs | 233.8408 μs | 439.2098 μs | 1140.6250 | 1078.1250 | 125.0000 | 8754.97 KB |
+| Deserialize_And_Serialize_Event         |      3.487 μs |   0.0470 μs |   0.0417 μs |    0.4845 |         - |        - |    3.98 KB |
+| Deserialize_And_Serialize_Big_Calendar  |  7,715.103 μs | 150.3429 μs | 251.1892 μs |  992.1875 |  875.0000 | 343.7500 | 7006.71 KB |
 
 When using ICal.Net
 
 | Method                                           | Mean         | Error        | StdDev       | Median       | Gen0      | Gen1      | Gen2     | Allocated   |
 |------------------------------------------------- |-------------:|-------------:|-------------:|-------------:|----------:|----------:|---------:|------------:|
-| ICal_Net_DeserializeCalendar                     |     77.46 μs |     1.344 μs |     1.257 μs |     77.40 μs |   19.6533 |    2.6855 |        - |   160.66 KB |
-| ICal_Net_SerializeCalendar                       |     19.17 μs |     0.288 μs |     0.269 μs |     19.24 μs |    5.2490 |    0.2441 |        - |    43.69 KB |
-| ICal_Net_Deserialize_And_Serialize_all_Calendars | 50,355.16 μs | 1,003.946 μs | 2,095.609 μs | 49,809.74 μs | 6200.0000 | 1600.0000 | 600.0000 | 48845.91 KB |
-| ICal_Net_Deserialize_And_Serialize_Big_Calendar  | 55,801.74 μs | 1,100.835 μs | 2,120.936 μs | 54,727.54 μs | 6750.0000 | 2000.0000 | 750.0000 | 53087.93 KB |
+| ICal_Net_DeserializeCalendar                     |     84.88 μs |     1.696 μs |     2.377 μs |     85.20 μs |   19.5313 |    2.4414 |        - |   160.66 KB |
+| ICal_Net_SerializeCalendar                       |     20.55 μs |     0.401 μs |     0.521 μs |     20.53 μs |    5.2490 |    0.2441 |        - |    43.69 KB |
+| ICal_Net_Deserialize_And_Serialize_all_Calendars | 53,953.75 μs |   484.078 μs |   404.227 μs | 54,074.80 μs | 6250.0000 | 1750.0000 | 750.0000 | 48846.21 KB |
+| ICal_Net_Deserialize_And_Serialize_Big_Calendar  | 56,897.45 μs | 1,135.218 μs | 2,240.810 μs | 55,792.09 μs | 6400.0000 | 2000.0000 | 800.0000 | 51236.02 KB |
 
 Benchmarks with issues:
   OtherToolsTests.ICal_Net_Deserialize_And_Serialize_all_Calendars: DefaultJob

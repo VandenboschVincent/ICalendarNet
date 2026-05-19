@@ -36,7 +36,7 @@ namespace ICalendarNet.Models.Base
 
         public virtual bool OverwritesRecurrence()
         {
-            return Properties.GetContentlines(ICalProperty.RECURRENCE_ID).FirstOrDefault()?.Parameters.GetValueOrDefault("RANGE")?.FirstOrDefault() ==
+            return Properties.GetContentlines(ICalProperty.RECURRENCE_ID).FirstOrDefault()?.Parameters.GetValue("RANGE") ==
                 "THISANDFUTURE";
         }
 

@@ -1,9 +1,6 @@
-﻿using ICalendarNet.Extensions;
-using ICalendarNet.Logic;
+﻿using ICalendarNet.Logic;
 using ICalendarNet.Models.Base;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using static ICalendarNet.Models.Enum.Statics;
 
 namespace ICalendarNet.Models.DataTypes
@@ -42,10 +39,10 @@ namespace ICalendarNet.Models.DataTypes
                   TypeConverters.ConvertFromDateTimeOffset(dateTime),
                   null)
         {
-            Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
-            {
+            Parameters = new ContentLineParameters(
+            [
                 new("VALUE", ["DATE_TIME"])
-            }.ToDictionary();
+            ]);
         }
 
         public CalendarTrigger(TimeSpan timeSpan, TriggerStartEnd triggerStartEnd = TriggerStartEnd.START)
@@ -53,10 +50,10 @@ namespace ICalendarNet.Models.DataTypes
                   TypeConverters.ConvertFromTimeSpan(timeSpan),
                   null)
         {
-            Parameters = new List<KeyValuePair<string, IEnumerable<string>>>()
-            {
+            Parameters = new ContentLineParameters(
+            [
                 new("RELATED", [triggerStartEnd.ToString()])
-            }.ToDictionary();
+            ]);
         }
     }
 

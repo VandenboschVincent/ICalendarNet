@@ -146,7 +146,7 @@ namespace ICalendarNet.Serialization
                 int equalsIndex = segment.IndexOf('=');
                 if (equalsIndex < 0)
                 {
-                    dict[segment.ToString()] = [];
+                    dict.Add(new(segment.ToString(), []));
                     continue;
                 }
 
@@ -157,7 +157,7 @@ namespace ICalendarNet.Serialization
                 foreach (Range valueRange in rest.Split(','))
                     values.Add(rest[valueRange].ToString());
 
-                dict[name] = values;
+                dict.Add(new(name, values));
             }
 
             return dict;
@@ -165,11 +165,10 @@ namespace ICalendarNet.Serialization
 #else
         private static ContentLineParameters ParseParameters(ReadOnlySpan<char> paramsSpan)
         {
-            return new ContentLineParameters(paramsSpan
+            return [.. paramsSpan
                 .ToString()
                 .Split(';', StringSplitOptions.RemoveEmptyEntries)
-                .Select(ParseParameterSegment)
-                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value));
+                .Select(ParseParameterSegment)];
         }
 
         private static KeyValuePair<string, IEnumerable<string>> ParseParameterSegment(string segment)
@@ -178,6 +177,10 @@ namespace ICalendarNet.Serialization
             IEnumerable<string> values = parts.Length == 1
                 ? []
                 : parts[^1].Split(',');
+            if (string.IsNullOrWhiteSpace(parts[0]))
+            {
+
+            }
             return new KeyValuePair<string, IEnumerable<string>>(parts[0], values);
         }
 #endif
