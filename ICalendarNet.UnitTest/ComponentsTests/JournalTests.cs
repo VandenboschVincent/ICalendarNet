@@ -1,10 +1,11 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.Models.Components;
+using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class JournalTests : UnitTestBase
     {
-        static IEnumerable<string> IcalFiles => GetIcalFiles("Journal*");
+        private static IEnumerable<string> IcalFiles => GetIcalFiles("Journal*");
 
         [Test]
         public void Test_Serialize_Journal()
@@ -21,7 +22,7 @@ SUMMARY:Project xyz Review Meeting
 END:VJOURNAL";
             CalendarJournal? calendar = CalSerializor.DeserializeICalComponent<CalendarJournal>(icalvar);
             calendar!.Properties.Should().HaveCount(8);
-            calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(859204800));
+            calendar.DateTimeStamp.Should().Be(DateTimeOffset.FromUnixTimeSeconds(859204800));
             calendar.Uid.Should().Be("uid5@host1.com");
             calendar.Descriptions.Should().OnlyContain(t => t == "Project xyz Review Meeting Minutes.");
             calendar.Organizer.Should().Be("jane_doe@host.com\";CN=JohnSmith");

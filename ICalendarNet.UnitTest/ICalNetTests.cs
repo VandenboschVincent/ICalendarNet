@@ -1,10 +1,11 @@
+using ICalendarNet.Models.Components;
 using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest
 {
     public class ICalNetTests : UnitTestBase
     {
-        static IEnumerable<string> IcalFiles => GetIcalFiles();
+        private static IEnumerable<string> IcalFiles => GetIcalFiles();
 
         [TestCase("https://www.officeholidays.com/ics-all/belgium")]
         [TestCase("https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10")]
@@ -85,7 +86,7 @@ namespace ICalendarNet.UnitTest
             calendar.Created = date;
             calendar.Description = calDescr;
 
-            calendar.GetEvents().First().DTSTART = date;
+            calendar.GetEvents().First().DateTimeStart = date;
             calendar.GetEvents().First().Description = eventDescr;
 
             string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
@@ -94,7 +95,7 @@ namespace ICalendarNet.UnitTest
             calendarAfterSerialize!.Created.Should().Be(date);
             calendarAfterSerialize.Description.Should().Be(calDescr);
 
-            calendarAfterSerialize.GetEvents().Any(t => t.DTSTART == date).Should().BeTrue();
+            calendarAfterSerialize.GetEvents().Any(t => t.DateTimeStart == date).Should().BeTrue();
             calendarAfterSerialize.GetEvents().Any(t => t.Description == eventDescr).Should().BeTrue();
         }
     }

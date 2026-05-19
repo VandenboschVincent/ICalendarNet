@@ -1,4 +1,6 @@
-﻿namespace ICalendarNet.Extensions
+﻿using ICalendarNet.Models.Enum;
+
+namespace ICalendarNet.Extensions
 {
     public static class ICalComponentExtensions
     {

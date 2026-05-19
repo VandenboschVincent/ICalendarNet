@@ -1,4 +1,5 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.Models.Components;
+using ICalendarNet.UnitTest.Base;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
@@ -130,7 +131,6 @@ END:VTIMEZONE";
         // Cross-year consistency
         [TestCase("2025-03-10T02:00:00", 540)]
         [TestCase("2030-10-27T03:00:00", 540)]
-
         public void Test_Try_AsiaTokyo_Fixed_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -157,7 +157,6 @@ END:VTIMEZONE";
         [TestCase("2024-10-27T02:59:59 +1:00", 120)]
         [TestCase("2024-10-27T03:00:00 +1:00", 60)]
         [TestCase("2024-12-15T12:00:00 +1:00", 60)]
-
         public void Test_Try_EuropeBrussels_RDATE_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -195,7 +194,6 @@ END:VTIMEZONE";
         [TestCase("2024-10-27T02:59:59", 120)]
         [TestCase("2024-10-27T03:00:00", 60)]
         [TestCase("2024-12-15T12:00:00", 60)]
-
         public void Test_Try_EuropeBrussels_RDATE_End_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE

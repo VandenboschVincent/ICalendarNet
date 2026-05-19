@@ -1,6 +1,7 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.DataTypes;
-using ICalendarNet.Extensions;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
+using ICalendarNet.Models.DataTypes;
+using ICalendarNet.Models.Enum;
 using System.Globalization;
 
 namespace ICalendarNet.UnitTest.DataTypesTests

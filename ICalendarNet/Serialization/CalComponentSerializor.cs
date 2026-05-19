@@ -1,6 +1,7 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.Components;
-using ICalendarNet.Extensions;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
+using ICalendarNet.Models.Components;
+using ICalendarNet.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,6 +16,7 @@ namespace ICalendarNet.Serialization
             handler.TimeZones.Add(block);
             return block;
         }
+
         private static ICalendarComponent InternalDeserializeComponents(ref StringHandler handler, CalComponentBlock parentBlock)
         {
             return parentBlock.CalComponent!.Value switch

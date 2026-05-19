@@ -1,0 +1,89 @@
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
+using ICalendarNet.Models.DataTypes;
+using ICalendarNet.Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using static ICalendarNet.Models.Enum.Statics;
+
+namespace ICalendarNet.Models.Components
+{
+    /// <summary>
+    /// https://datatracker.ietf.org/doc/html/rfc5545#section-3.6.4
+    /// </summary>
+    public class CalendarFreeBusy : CalendarOccurableObject
+    {
+        public override ICalComponent ComponentType => ICalComponent.VFREEBUSY;
+
+        /// <summary>
+        ///   <see cref="ICalProperty.DTEND" />
+        /// </summary>
+        public DateTimeOffset? DateTimeEnd
+        {
+            get => Properties.GetContentlineDateTime(ICalProperty.DTEND, Metadata);
+            set => Properties.UpdateLineProperty(value, ICalProperty.DTEND);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.URL" />
+        /// </summary>
+        public string? Url
+        {
+            get => Properties.GetContentlineValue(ICalProperty.URL);
+            set => Properties.UpdateLineProperty(value, ICalProperty.URL);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.COMMENT" />
+        /// </summary>
+        public virtual string? Comment
+        {
+            get => string.Join(Environment.NewLine, Properties.GetContentlinesValue(ICalProperty.COMMENT));
+            set => Properties.UpdateLineProperty(value, ICalProperty.COMMENT);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.CONTACT" />
+        /// </summary>
+        public string? Contact
+        {
+            get => Properties.GetContentlineValue(ICalProperty.CONTACT);
+            set => Properties.UpdateLineProperty(value, ICalProperty.CONTACT);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.DTSTAMP" />
+        /// </summary>
+        public DateTimeOffset? DTSTAMP
+        {
+            get => Properties.GetContentlineDateTime(ICalProperty.DTSTAMP, Metadata);
+            set => Properties.UpdateLineProperty(value, ICalProperty.DTSTAMP);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.REQUEST_STATUS" />
+        /// </summary>
+        public string? RequestStatus
+        {
+            get => Properties.GetContentlineValue(ICalProperty.REQUEST_STATUS);
+            set => Properties.UpdateLineProperty(value, ICalProperty.REQUEST_STATUS);
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.FREEBUSY" />
+        /// </summary>
+        public IEnumerable<CalendarPeriod> GetFreeBusy()
+        {
+            return Properties.GetContentlines(ICalProperty.FREEBUSY).Cast<CalendarPeriods>().SelectMany(t => t.GetPeriods());
+        }
+
+        /// <summary>
+        ///   <see cref="ICalProperty.FREEBUSY" />
+        /// </summary>
+        public void SetFreeBusy(IEnumerable<CalendarPeriod> freebusy)
+        {
+            Properties.UpdateLineProperty(new List<CalendarPeriods>() { new(ICalProperty.FREEBUSY, freebusy) }, ICalProperty.FREEBUSY);
+        }
+    }
+}

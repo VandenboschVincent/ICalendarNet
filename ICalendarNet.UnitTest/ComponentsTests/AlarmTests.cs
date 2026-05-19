@@ -1,11 +1,12 @@
-﻿using ICalendarNet.DataTypes;
+﻿using ICalendarNet.Models.Components;
+using ICalendarNet.Models.Enum;
 using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class AlarmTests : UnitTestBase
     {
-        static IEnumerable<string> IcalFiles => GetIcalFiles("Alarm*");
+        private static IEnumerable<string> IcalFiles => GetIcalFiles("Alarm*");
 
         [Test]
         public void Test_Serialize_Alarm()
@@ -37,7 +38,7 @@ END:VALARM");
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             calendar.Should().NotBeNull();
             calendar!.GetEvents().First().GetAlarms().First().Description = calDescr;
-            calendar!.GetEvents().First().DTSTART.Should().NotBeNull();
+            calendar!.GetEvents().First().DateTimeStart.Should().NotBeNull();
 
             string serializedCalendar = CalSerializor.SerializeCalendar(calendar);
 

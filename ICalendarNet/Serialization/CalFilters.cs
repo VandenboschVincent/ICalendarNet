@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICalendarNet.Models.Enum;
+using System;
 
 namespace ICalendarNet.Serialization
 {

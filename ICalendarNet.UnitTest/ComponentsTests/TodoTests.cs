@@ -1,10 +1,11 @@
-﻿using ICalendarNet.UnitTest.Base;
+﻿using ICalendarNet.Models.Components;
+using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class TodoTests : UnitTestBase
     {
-        static IEnumerable<string> IcalFiles => GetIcalFiles("Todo*");
+        private static IEnumerable<string> IcalFiles => GetIcalFiles("Todo*");
 
         [Test]
         public void Test_Serialize_Todo()
@@ -28,12 +29,12 @@ END:VTODO";
             calendar.Status.Should().Be("COMPLETED");
             calendar.Completed!.Value.Year.Should().Be(2006);
             calendar.Class.Should().Be("PRIVATE");
-            calendar.DTSTART!.Value.Year.Should().Be(2006);
-            calendar.GetRecurrenceRule()!.Frequency.Should().Be(DataTypes.Recurrence.FrequencyType.Monthly);
+            calendar.DateTimeStart!.Value.Year.Should().Be(2006);
+            calendar.GetRecurrenceRule()!.Frequency.Should().Be(Models.Enum.FrequencyType.Monthly);
             calendar.GetRecurrenceRule()!.Count.Should().Be(10);
             calendar.GetRecurrenceRule()!.ByDay[0].DayOfWeek.Should().Be(DayOfWeek.Friday);
             calendar.GetRecurrenceRule()!.ByDay[0].Offset.Should().Be(1);
-            calendar.DTSTAMP.Should().Be(DateTimeOffset.FromUnixTimeSeconds(1154116477));
+            calendar.DateTimeStamp.Should().Be(DateTimeOffset.FromUnixTimeSeconds(1154116477));
             string serialized = CalSerializor.SerializeICalObject(calendar);
             serialized.Should().Be(@"BEGIN:VTODO
 UID:fed50a1c-1e72-11db-a465-aae271be3660

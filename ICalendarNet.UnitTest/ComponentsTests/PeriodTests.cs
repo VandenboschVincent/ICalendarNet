@@ -1,6 +1,8 @@
-﻿using ICalendarNet.DataTypes;
+﻿using ICalendarNet.Models.Components;
+using ICalendarNet.Models.DataTypes;
+using ICalendarNet.Models.Enum;
 using ICalendarNet.UnitTest.Base;
-using static ICalendarNet.Statics;
+using static ICalendarNet.Models.Enum.Statics;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {

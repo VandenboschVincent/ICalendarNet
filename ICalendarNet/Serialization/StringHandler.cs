@@ -1,5 +1,6 @@
-﻿using ICalendarNet.Components;
-using ICalendarNet.Extensions;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Components;
+using ICalendarNet.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +37,7 @@ namespace ICalendarNet.Serialization
     public ref struct StringHandler
     {
         private const int BeginPrefixLength = 6; // "BEGIN:"
+
         private static readonly Dictionary<ICalComponent, string> EndTokens = new()
         {
             [ICalComponent.VCALENDAR] = "END:VCALENDAR",
@@ -48,6 +50,7 @@ namespace ICalendarNet.Serialization
             [ICalComponent.DAYLIGHT] = "END:DAYLIGHT",
             [ICalComponent.VALARM] = "END:VALARM",
         };
+
         private readonly ReadOnlySpan<char> reader;
         private readonly List<CalComponentIndex> indexes;
         private int currentWorkingBlock;
@@ -120,7 +123,7 @@ namespace ICalendarNet.Serialization
                 //Content (including subcomponents)
                 reader[nextBlock.StartIndex..nextBlock.EndIndex],
                 //Gets the count of al subcomponents
-#if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
                 CountSubComponents(nextBlock),
 #else
                 indexes.Where(FilterSubComponents(nextBlock.CalComponent!.Value)).Count(t => t.StartIndex > nextBlock.StartIndex && t.EndIndex < nextBlock.EndIndex),
@@ -131,7 +134,8 @@ namespace ICalendarNet.Serialization
                 reader[nextBlock.StartIndex..nextBlock.EndContentIndex]);
         }
 
-#if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
+
         private static bool IsValidChild(ICalComponent parent, ICalComponent child) => parent switch
         {
             ICalComponent.VCALENDAR => child is ICalComponent.VEVENT or ICalComponent.VTODO
@@ -145,7 +149,7 @@ namespace ICalendarNet.Serialization
             _ => throw new ArgumentException("invalid component", nameof(parent))
         };
 
-        private int CountSubComponents(in CalComponentIndex parent)
+        private readonly int CountSubComponents(in CalComponentIndex parent)
         {
             int count = 0;
             var parentType = parent.CalComponent!.Value;
@@ -162,7 +166,8 @@ namespace ICalendarNet.Serialization
             }
             return count;
         }
- #else
+
+#else
 
         /// <summary>
         /// Get all types of component that can be found in the parent component
@@ -212,6 +217,7 @@ namespace ICalendarNet.Serialization
             return t => false;
         }
 #endif
+
         /// <summary>
         /// Tries to find out what type the next block is
         /// </summary>
@@ -221,10 +227,10 @@ namespace ICalendarNet.Serialization
         private static ICalComponent? GetComponent(int startIndex, ReadOnlySpan<char> source)
         {
             // Find end of the BEGIN:XXX line
-            var rest = source.Slice(startIndex);
+            var rest = source[startIndex..];
             int eol = rest.IndexOfAny('\r', '\n');
             if (eol < 0) eol = rest.Length;
-            var name = rest.Slice(0, eol);
+            var name = rest[..eol];
 
             // Case-insensitive switch on span (no allocation, no reflection)
             if (name.Equals("VEVENT", StringComparison.OrdinalIgnoreCase)) return ICalComponent.VEVENT;
@@ -243,7 +249,6 @@ namespace ICalendarNet.Serialization
         {
             public CalComponentIndex()
             {
-
             }
 
             public int StartIndex { get; set; } = -1;
