@@ -1,4 +1,4 @@
-﻿using ICalendarNet.Base;
+﻿using ICalendarNet.Models.Base;
 using System.Linq;
 using System.Text;
 

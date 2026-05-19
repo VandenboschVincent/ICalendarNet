@@ -1,4 +1,6 @@
-﻿namespace ICalendarNet.UnitTest
+﻿using ICalendarNet.Models.Components;
+
+namespace ICalendarNet.UnitTest
 {
     public class ICalExceptionTests
     {

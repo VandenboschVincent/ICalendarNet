@@ -1,7 +1,7 @@
 ﻿using BenchmarkDotNet.Attributes;
-using ICalendarNet.Base;
 using ICalendarNet.Benchmarking.Data;
-using ICalendarNet.Components;
+using ICalendarNet.Models.Base;
+using ICalendarNet.Models.Components;
 using ICalendarNet.Serialization;
 
 namespace ICalendarNet.Benchmarking
@@ -23,14 +23,14 @@ namespace ICalendarNet.Benchmarking
             //Add an event
             CalendarEvent calendarEvent = new()
             {
-                DTSTART = DateTimeOffset.UtcNow,
-                DTEND = DateTimeOffset.UtcNow.AddHours(1),
+                DateTimeStart = DateTimeOffset.UtcNow,
+                DateTimeEnd = DateTimeOffset.UtcNow.AddHours(1),
                 Location = "The Exceptionally Long Named Meeting Room",
                 Priority = 0
             };
-            calendarEvent.SetRecurrenceRule(new DataTypes.CalendarRecurrenceRule(string.Empty)
+            calendarEvent.SetRecurrenceRule(new Models.DataTypes.CalendarRecurrenceRule(string.Empty)
             {
-                Frequency = DataTypes.Recurrence.FrequencyType.Daily,
+                Frequency = Models.Enum.FrequencyType.Daily,
                 Interval = 1,
                 Count = 100
             });
@@ -50,7 +50,7 @@ namespace ICalendarNet.Benchmarking
             var icalvar = _sampleData.ICalStrings[^1];
             Calendar? calendar = Calendar.LoadCalendar(icalvar);
             return CalSerializor.SerializeCalendar(calendar!);
-        }   
+        }
 
         [Benchmark]
         public List<string> Deserialize_And_Serialize_all_Calendars()

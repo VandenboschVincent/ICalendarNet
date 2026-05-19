@@ -1,0 +1,18 @@
+﻿using ICalendarNet.Models.Enum;
+using System.Collections.Generic;
+using static ICalendarNet.Models.Enum.Statics;
+
+namespace ICalendarNet.Models.Base
+{
+    public interface ICalendarComponent
+    {
+        ICalComponent ComponentType { get; }
+        List<ICalendarProperty> Properties { get; }
+        List<ICalendarComponent> SubComponents { get; }
+        MetadataContainer Metadata { get; }
+
+        void AddProperty(ICalProperty key, string value, ContentLineParameters? parameters = null);
+
+        void UpdateProperty(ICalProperty key, IEnumerable<string> value, ContentLineParameters? parameters = null);
+    }
+}

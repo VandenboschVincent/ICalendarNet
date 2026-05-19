@@ -9,6 +9,7 @@ namespace ICalendarNet.Benchmarking.Data
         private const string BigDataCalendar = "https://www.webcal.guru/en-US/download_calendar?calendar_instance_id=10";
 
         public const string SampleEvent = $"BEGIN:VEVENT\r\nCREATED:20060717T210517Z\r\nLAST-MODIFIED:20060717T210718Z\r\nDTSTAMP:20060717T210718Z\r\nUID:uuid1153170430406\r\nSUMMARY:Test event\r\nDTSTART:20060718T100000\r\nDTEND:20060718T110000\r\nLOCATION:Daywest\r\nEND:VEVENT";
+
         private static List<string> GetIcalStrings()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;

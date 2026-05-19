@@ -1,5 +1,6 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.DataTypes;
+﻿using ICalendarNet.Models.Base;
+using ICalendarNet.Models.Components;
+using ICalendarNet.Models.DataTypes;
 using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.DataTypesTests

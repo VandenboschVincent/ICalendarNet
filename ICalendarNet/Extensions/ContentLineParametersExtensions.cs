@@ -1,4 +1,4 @@
-﻿using ICalendarNet.Base;
+﻿using ICalendarNet.Models.Base;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,13 +12,23 @@ namespace ICalendarNet.Extensions
         public static IEnumerable<string>? GetValues(this ContentLineParameters parameters, string key) =>
             parameters.GetValueOrDefault(key);
 
-        public static void SetOrAddValue(this ContentLineParameters parameters, string key, string value)
+        public static void SetOrAddValue(this ContentLineParameters parameters, string key, string? value)
         {
-            parameters.SetOrAddValue(key, new List<string>() { value });
+            if (value is null)
+            {
+                parameters.Remove(key);
+                return;
+            }
+            parameters.SetOrAddValue(key, [value]);
         }
 
-        public static void SetOrAddValue(this ContentLineParameters parameters, string key, IEnumerable<string> value)
+        public static void SetOrAddValue(this ContentLineParameters parameters, string key, IEnumerable<string>? value)
         {
+            if (value is null)
+            {
+                parameters.Remove(key);
+                return;
+            }
             parameters[key] = value;
         }
 

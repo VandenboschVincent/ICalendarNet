@@ -1,17 +1,21 @@
-﻿using ICalendarNet.Converters;
-using ICalendarNet.DataTypes;
-using ICalendarNet.DataTypes.Recurrence;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Logic;
+using ICalendarNet.Logic.Recurrence;
+using ICalendarNet.Models.Components;
+using ICalendarNet.Models.DataTypes;
+using ICalendarNet.Models.DataTypes.Recurrence;
+using ICalendarNet.Models.Enum;
 using ICalendarNet.UnitTest.Base;
 using System.Reflection;
-using ICalendarNet.Extensions;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
     [TestFixture]
     internal class RecurrenceIdentifierTests : UnitTestBase
     {
-        static IEnumerable<string> RecurrenceIcal => GetIcalFiles("Recurrence/*");
-        static List<RecurrenceTest> RecurrenceTestCases()
+        private static IEnumerable<string> RecurrenceIcal => GetIcalFiles("Recurrence/*");
+
+        private static List<RecurrenceTest> RecurrenceTestCases()
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, "Calendars", "Recurrence"));
@@ -22,11 +26,10 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         private static void TestCase(RecurrenceTest exampleCase, int limit = 10, bool addstart = true)
         {
             var rrule = new CalendarRecurrenceRule(exampleCase.RRule);
-            var evaluator = new RecurrenceRuleEvaluator(rrule);
             var startdate = new DateTimeOffset(exampleCase.DtStart!.Value, TimeSpan.Zero);
             var refDate = new DateTimeOffset(exampleCase.DtStart!.Value, TimeSpan.Zero);
-            var datesFound = evaluator.Evaluate(startdate, refDate, new() 
-            { 
+            var datesFound = RecurrenceRuleEvaluator.Evaluate(rrule, startdate, refDate, new()
+            {
                 MaxOccurrencesLimit = limit,
                 AddStartDate = addstart
             }).Select(t => t.DateStart.DateTime).ToList();
@@ -80,7 +83,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var startOfWeek = new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0, TimeSpan.Zero).GetStartOfWeek(DayOfWeek.Monday);
             var endOfWeek = startOfWeek.AddDays(7);
             var events = calendar.BuildCalendar(startOfWeek, endOfWeek);
-            events.Should().HaveCount(2); //Monday, Thursday 
+            events.Should().HaveCount(2); //Monday, Thursday
         }
 
         [TestCaseSource(nameof(RecurrenceIcal))]
@@ -133,8 +136,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         {
             var test = new RecurrenceTest()
             {
-                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
-                DtStart = new DateTime(2026,5,5,0,0,0, DateTimeKind.Utc),
+                Instances = [.. date.Select(d => TypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                DtStart = new DateTime(2026, 5, 5, 0, 0, 0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
             };
@@ -159,7 +162,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         {
             var test = new RecurrenceTest()
             {
-                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                Instances = [.. date.Select(d => TypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
                 DtStart = new DateTime(2026, 5, 8, 15, 0, 0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
@@ -195,7 +198,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         {
             var test = new RecurrenceTest()
             {
-                Instances = [.. date.Select(d => ICalTypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
+                Instances = [.. date.Select(d => TypeConverters.ConvertToDateTimeOffset(d + "Z", null)?.DateTime ?? default)],
                 DtStart = new DateTime(2026, 5, 8, 0, 0, 0, DateTimeKind.Utc),
                 Comment = rrule,
                 RRule = rrule
@@ -213,6 +216,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             }
         }
     }
+
     public class RecurrenceTest
     {
         public string? Comment { get; set; }
@@ -221,13 +225,13 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         public List<DateTime> Instances { get; set; } = [];
         public string? Exception { get; set; }
 
-        override public string ToString()
+        public override string ToString()
         {
             return RRule;
         }
     }
 
-    static class RecurrenceParser
+    internal static class RecurrenceParser
     {
         public static List<RecurrenceTest> Parse(string input)
         {
@@ -259,8 +263,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                     }
                     else if (trimmed.StartsWith("DTSTART:"))
                     {
-                        test.DtStart = ICalTypeConverters.ConvertToDateTimeOffset(string.Concat(trimmed.AsSpan("DTSTART:".Length), "Z")
-                            .Replace("ZZ","Z"), null)?.DateTime;
+                        test.DtStart = TypeConverters.ConvertToDateTimeOffset(string.Concat(trimmed.AsSpan("DTSTART:".Length), "Z")
+                            .Replace("ZZ", "Z"), null)?.DateTime;
                     }
                     else if (trimmed.StartsWith("INSTANCES:"))
                     {
@@ -268,7 +272,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
                             .Split(',', StringSplitOptions.RemoveEmptyEntries);
 
                         test.Instances = [.. values
-                            .Select(v => ICalTypeConverters.ConvertToDateTimeOffset(v + "Z", null))
+                            .Select(v => TypeConverters.ConvertToDateTimeOffset(v + "Z", null))
                             .Where(d => d.HasValue)
                             .Select(d => d!.Value.DateTime)];
                     }
@@ -283,6 +287,5 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 
             return result;
         }
-
     }
 }

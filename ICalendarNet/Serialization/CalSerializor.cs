@@ -1,5 +1,5 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.Components;
+﻿using ICalendarNet.Models.Base;
+using ICalendarNet.Models.Components;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,6 +1,7 @@
-﻿using ICalendarNet.Base;
-using ICalendarNet.DataTypes;
-using ICalendarNet.Extensions;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
+using ICalendarNet.Models.DataTypes;
+using ICalendarNet.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace ICalendarNet.Serialization
     {
         internal static List<ICalendarProperty> InternalDeserializeContentLines(ReadOnlySpan<char> source)
         {
-            List<ICalendarProperty> calendarProperties = new();
+            List<ICalendarProperty> calendarProperties = [];
             SpanLineEnumerator lineEnumerator = new(source);
             bool needValue = false;
             while (lineEnumerator.MoveNext())

@@ -1,12 +1,14 @@
 ﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Components;
+using ICalendarNet.Models.Enum;
 using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
     public class EventTests : UnitTestBase
     {
-        static IEnumerable<string> IcalFiles => GetIcalFiles("Event*");
-        static IEnumerable<string> ICalOccerenceIcalFiles => GetIcalFiles("ICalOccerence");
+        private static IEnumerable<string> IcalFiles => GetIcalFiles("Event*");
+        private static IEnumerable<string> ICalOccerenceIcalFiles => GetIcalFiles("ICalOccerence");
 
         [Test]
         public void Test_Serialize_Event()
