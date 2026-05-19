@@ -157,7 +157,7 @@ namespace ICalendarNet.Models.Components
         public IEnumerable<string> Resources
         {
             get => Properties.GetContentlinesSeperatedValue(ICalProperty.RESOURCES);
-            set => Properties.UpdateLinesProperty(value, ICalProperty.RESOURCES);
+            set => Properties.UpdateLinesSeperatedProperty(value, ICalProperty.RESOURCES);
         }
 
         /// <summary>

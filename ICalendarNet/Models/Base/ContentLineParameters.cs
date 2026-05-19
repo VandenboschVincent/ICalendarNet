@@ -1,9 +1,27 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ICalendarNet.Models.Base
 {
     public class ContentLineParameters : Dictionary<string, IEnumerable<string>>
     {
+        private const string EncodingString = "ENCODING";
+        public string? Encoding
+        {
+            get => this.GetValueOrDefault(EncodingString)?.FirstOrDefault();
+            set
+            {
+                if (value == null)
+                {
+                    Remove(EncodingString);
+                }
+                else
+                {
+                    this[EncodingString] = [value];
+                }
+            }
+        }
+
         public ContentLineParameters() : base()
         {
         }

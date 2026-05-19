@@ -10,7 +10,7 @@ namespace ICalendarNet.Models.Base
         {
             Name = name;
             Value = value;
-            Parameters = parameters ?? new ContentLineParameters();
+            Parameters = parameters ?? [];
         }
 
         public string Name { get; set; }

@@ -36,11 +36,11 @@ namespace ICalendarNet.Extensions
            source.ToDictionary(null);
 
         public static ContentLineParameters ToDictionary(this IEnumerable<KeyValuePair<string, IEnumerable<string>>> source, IEqualityComparer<string>? comparer) =>
-#if NET8_0_OR_GREATER
+#if NET6_0_OR_GREATER
             new(source.DistinctBy(t => t.Key), comparer);
 
 #else
-            new ContentLineParameters(source.GroupBy(t => t.Key).Select(g => g.First()), comparer);
+            new(source.GroupBy(t => t.Key).Select(g => g.First()), comparer);
 #endif
     }
 }

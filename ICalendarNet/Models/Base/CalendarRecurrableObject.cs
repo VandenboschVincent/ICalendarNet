@@ -34,6 +34,12 @@ namespace ICalendarNet.Models.Base
             set => Properties.UpdateLineProperty(value, ICalProperty.RECURRENCE_ID);
         }
 
+        public virtual bool OverwritesRecurrence()
+        {
+            return Properties.GetContentlines(ICalProperty.RECURRENCE_ID).FirstOrDefault()?.Parameters.GetValueOrDefault("RANGE")?.FirstOrDefault() ==
+                "THISANDFUTURE";
+        }
+
         /// <summary>
         ///   <see cref="ICalProperty.SEQUENCE" />
         /// </summary>
@@ -57,13 +63,6 @@ namespace ICalendarNet.Models.Base
         public void SetRecurrenceRule(CalendarRecurrenceRule rrule)
         {
             Properties.UpdateLineProperty([rrule], ICalProperty.RRULE);
-        }
-
-        [Obsolete("EXRULE is marked as deprecated in RFC 5545 and will be removed in a future version")]
-        public IEnumerable<string>? ExceptionRules
-        {
-            get => Properties.GetContentlinesValue(ICalProperty.EXRULE);
-            set => Properties.UpdateLinesProperty(value, ICalProperty.EXRULE);
         }
 
         /// <summary>

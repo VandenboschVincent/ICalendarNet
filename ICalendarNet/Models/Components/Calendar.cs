@@ -1,4 +1,5 @@
 ﻿using ICalendarNet.Extensions;
+using ICalendarNet.Logic.CalendarBuilder;
 using ICalendarNet.Models.Base;
 using ICalendarNet.Models.Enum;
 using ICalendarNet.Serialization;
@@ -162,76 +163,15 @@ namespace ICalendarNet.Models.Components
         /// </summary>
         public IEnumerable<CalendarTimeZone> GetTimeZones() => SubComponents.Where(t => t.ComponentType == ICalComponent.VTIMEZONE).Cast<CalendarTimeZone>();
 
+        /// <summary>
+        /// Builds the calendar by expanding all recurring components and applying overrides, returning a list of components that occur within the specified date range.
+        /// </summary>
+        /// <param name="start">The start date and time of the range.</param>
+        /// <param name="end">The end date and time of the range.</param>
+        /// <returns>A list of calendar components that occur within the specified date range.</returns>
         public IEnumerable<ICalendarComponent> BuildCalendar(DateTimeOffset start, DateTimeOffset end)
         {
-            var recurrable = SubComponents
-                .OfType<CalendarRecurrableObject>()
-                .ToList() ?? [];
-
-            // Group all overrides by UID -> (RecurrenceID -> winning override by highest SEQUENCE)
-            var overridesByUid = recurrable
-                .Where(t => t.RecurrenceID != null && !string.IsNullOrEmpty(t.Uid))
-                .GroupBy(t => t.Uid!)
-                .ToDictionary(
-                    g => g.Key,
-                    g => g.GroupBy(i => i.RecurrenceID!.Value.UtcDateTime)
-                          .ToDictionary(
-                              gg => gg.Key,
-                              gg => gg.OrderByDescending(i => i.Sequence).First()
-                          )
-                );
-
-            // Master components: have a RRULE or RDATEs, and are not themselves overrides
-            var masters = recurrable.Where(t =>
-                t.RecurrenceID is null &&
-                (t.RecurrenceDates?.Any() == true || t.GetRecurrenceRule() != null));
-
-            foreach (var master in masters)
-            {
-                var uid = master.Uid;
-                overridesByUid.TryGetValue(uid ?? string.Empty, out var uidOverrides);
-
-                var occurrences = master.GetOccuring(int.MaxValue, start, false, end);
-                foreach (var occur in occurrences)
-                {
-                    // The RECURRENCE-ID of an override matches the *original* DTSTART
-                    // of the occurrence it replaces.
-                    var originalStart = occur.DateTimeStart;
-                    if (originalStart == null)
-                        continue;
-
-                    if (uidOverrides != null &&
-                        uidOverrides.TryGetValue(originalStart.Value.UtcDateTime, out var overrideInstance))
-                    {
-                        // Yield the override
-                        yield return overrideInstance;
-                    }
-                    else
-                    {
-                        yield return occur;
-                    }
-                }
-            }
-
-            // Orphaned overrides: RECURRENCE-ID set but no master in this calendar
-            var orphanOverrides = recurrable
-                .Where(t => t.RecurrenceID != null &&
-                            (t.Uid == null || !masters.Any(m => m.Uid == t.Uid)) &&
-                            t.DateTimeStart.Between(start, end));
-            foreach (var orphan in orphanOverrides)
-                yield return orphan;
-
-            // Single (non-recurring) occurable items
-            var occurable = SubComponents
-                .OfType<CalendarOccurableObject>()
-                .Where(o => !(o is CalendarRecurrableObject r &&
-                              (r.RecurrenceID != null ||
-                               r.RecurrenceDates?.Any() == true ||
-                               r.GetRecurrenceRule() != null)) &&
-                            o.DateTimeStart.Between(start, end));
-
-            foreach (var item in occurable)
-                yield return item;
+            return CalendarBuilder.BuildCalendar(this, start, end);
         }
     }
 }

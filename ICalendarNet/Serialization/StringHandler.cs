@@ -123,7 +123,7 @@ namespace ICalendarNet.Serialization
                 //Content (including subcomponents)
                 reader[nextBlock.StartIndex..nextBlock.EndIndex],
                 //Gets the count of al subcomponents
-#if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
                 CountSubComponents(nextBlock),
 #else
                 indexes.Where(FilterSubComponents(nextBlock.CalComponent!.Value)).Count(t => t.StartIndex > nextBlock.StartIndex && t.EndIndex < nextBlock.EndIndex),
@@ -134,7 +134,7 @@ namespace ICalendarNet.Serialization
                 reader[nextBlock.StartIndex..nextBlock.EndContentIndex]);
         }
 
-#if NET6_0_OR_GREATER
+#if NET5_0_OR_GREATER
 
         private static bool IsValidChild(ICalComponent parent, ICalComponent child) => parent switch
         {

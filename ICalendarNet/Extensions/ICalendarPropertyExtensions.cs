@@ -1,5 +1,6 @@
 ﻿using ICalendarNet.Logic;
 using ICalendarNet.Models.Base;
+using ICalendarNet.Models.Components;
 using ICalendarNet.Models.DataTypes;
 using System;
 using System.Collections.Generic;
@@ -10,225 +11,181 @@ namespace ICalendarNet.Extensions
 {
     public static class ICalendarPropertyExtensions
     {
-        public static TEnum GetContentlineValue<TEnum>(this List<ICalendarProperty> lines, ICalProperty key, string defaultEnum) where TEnum : struct, Enum
+        // ---------- Internal helpers ----------
+        private static string ToName(this ICalProperty key) => ICalProperties[(int)key];
+
+        private static ICalendarProperty? FindByName(this List<ICalendarProperty> lines, string key)
+            => lines.Find(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+
+        private static CalendarTimeZone? GetTimeZone(ICalendarProperty? line)
         {
-            return Enum.Parse<TEnum>(lines.GetContentlineValue(ICalProperties[(int)key]) ?? defaultEnum, true);
+            if (line?.Metadata is null) return null;
+            if (line.Parameters.GetValue(ICalProperty.TZID.ToName()) is not string tzid) return null;
+            return line.Metadata.GetTimeZone(tzid);
         }
+
+        private static string GetLineValue(this ICalendarProperty line)
+            => line.Parameters.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true
+                ? TypeConverters.ConvertFromBase64(line.Value)
+                : line.Value;
+
+        private static void SetLineValue(this ICalendarProperty line, string value)
+        {
+            if (line.Parameters.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true)
+                line.Value = TypeConverters.ConvertToBase64(value);
+            else
+                line.Value = value;
+        }
+
+        // ---------- Read: single value ----------
 
         public static string? GetContentlineValue(this List<ICalendarProperty> lines, ICalProperty key)
         {
-            return lines.GetContentlineValue(ICalProperties[(int)key]);
+            var line = lines.FindByName(key.ToName());
+            if (line is null) return null;
+            return line.GetLineValue();
         }
 
-        public static string? GetContentlineValue(this List<ICalendarProperty> lines, string key)
+        public static TEnum GetContentlineValue<TEnum>(this List<ICalendarProperty> lines, ICalProperty key, string defaultEnum)
+            where TEnum : struct, Enum
+            => Enum.Parse<TEnum>(lines.GetContentlineValue(key) ?? defaultEnum, ignoreCase: true);
+
+        public static int? GetContentlineInt(this List<ICalendarProperty> lines, ICalProperty key)
+            => TypeConverters.ConvertToInt(lines.GetContentlineValue(key));
+
+        public static double? GetContentlineDouble(this List<ICalendarProperty> lines, ICalProperty key)
+            => TypeConverters.ConvertToDouble(lines.GetContentlineValue(key));
+
+        public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)
+            => TypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(key));
+
+        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
+            => ParseDateTime(lines.FindByName(key.ToName()), metadata);
+
+        public static IEnumerable<DateTimeOffset> GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
+            => lines.GetContentlines(key)
+                    .Select(l => ParseDateTime(l, metadata))
+                    .Where(d => d.HasValue)
+                    .Select(d => d!.Value);
+
+        private static DateTimeOffset? ParseDateTime(ICalendarProperty? line, MetadataContainer? metadata)
         {
-            return lines.Find(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase))?.Value;
+            if (line is null) return null;
+            if (metadata is not null &&
+                line.Parameters.GetValue(ICalProperty.TZID.ToName()) is string tzid)
+            {
+                return TypeConverters.ConvertToDateTimeOffset(line.GetLineValue(), metadata.GetTimeZone(tzid));
+            }
+            return TypeConverters.ConvertToDateTimeOffset(line.GetLineValue());
         }
 
-        public static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return lines.GetContentlinesValue(ICalProperties[(int)key]);
-        }
+        // ---------- Read: multiple lines / values ----------
+
+        public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, ICalProperty key)
+            => lines.Where(t => t.Name.Equals(key.ToName(), StringComparison.OrdinalIgnoreCase));
 
         public static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
         {
-            return lines.GetContentlinesValue(keys.Select(t => ICalProperties[(int)t]));
+            var names = keys.Select(k => k.ToName()).ToHashSet(StringComparer.OrdinalIgnoreCase);
+            return lines.Where(t => names.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).Select(t => t.GetLineValue());
         }
-
-        internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, string key)
-        {
-            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).Select(t => t.Value);
-        }
-
-        internal static IEnumerable<string> GetContentlinesValue(this List<ICalendarProperty> lines, IEnumerable<string> keys)
-        {
-            return lines.Where(t => keys.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).Select(t => t.Value);
-        }
-
-        public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return lines.GetContentlinesSeperatedValue(ICalProperties[(int)key]);
-        }
-
+#if NET5_0_OR_GREATER
         public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
-        {
-            return lines.GetContentlinesSeperatedValue(keys.Select(t => ICalProperties[(int)t]));
-        }
+            => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries));
+#else
+        public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
+            => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()));
+#endif
+        // ---------- Write ----------
 
-        internal static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, string key)
-        {
-            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(','));
-        }
-
-        internal static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, IEnumerable<string> keys)
-        {
-            return lines.Where(t => keys.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).SelectMany(t => t.Value.Split(", "));
-        }
-
-        public static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return lines.GetContentlines(ICalProperties[(int)key]);
-        }
-
-        internal static IEnumerable<ICalendarProperty> GetContentlines(this List<ICalendarProperty> lines, string key)
-        {
-            return lines.Where(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-        }
-
-        public static int? GetContentlineInt(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return TypeConverters.ConvertToInt(lines.GetContentlineValue(ICalProperties[(int)key]));
-        }
-
-        public static double? GetContentlineDouble(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return TypeConverters.ConvertToDouble(lines.GetContentlineValue(ICalProperties[(int)key]));
-        }
-
-        public static DateTimeOffset? GetContentlineDateTime(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
-        {
-            return GetDateTime(lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase)), metadata);
-        }
-
-        public static TimeSpan? GetContentlineTimeSpan(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            return TypeConverters.ConvertToTimeSpan(lines.GetContentlineValue(ICalProperties[(int)key]));
-        }
-
-        public static IEnumerable<DateTimeOffset>? GetContentlineDateTimes(this List<ICalendarProperty> lines, ICalProperty key, MetadataContainer? metadata = null)
-        {
-            var dateLines = lines.GetContentlines(ICalProperties[(int)key]).Select(t => GetDateTime(t, metadata));
-            return dateLines.Where(t => t.HasValue).Select(t => t!.Value);
-        }
-
-        private static DateTimeOffset? GetDateTime(ICalendarProperty? line, MetadataContainer? metadata)
-        {
-            if (line is null)
-                return null;
-            if (line.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && metadata is not null)
-            {
-                var timezone = metadata.GetTimeZone(tzid);
-                return TypeConverters.ConvertToDateTimeOffset(line.Value, timezone);
-            }
-            return TypeConverters.ConvertToDateTimeOffset(line.Value);
-        }
-
-        public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null) where TEnum : struct, Enum
-        {
-            lines.UpdateLineProperty(value.ToString()!, key, parameters);
-        }
+        public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null)
+            where TEnum : struct, Enum
+            => lines.UpdateLineProperty(value.ToString(), key, parameters);
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, string? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            if (value is null)
-            {
-                lines.RemoveLineProperty(key);
-                return;
-            }
-            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (foundLine != null)
-            {
-                if (parameters != null)
-                    foundLine.Parameters = parameters;
-                foundLine.Value = value;
-                return;
-            }
-            lines.Add(key.GetContentLine(value, parameters));
-        }
+            if (value is null) { lines.RemoveLineProperty(key); return; }
 
-        public static void UpdateLineProperty(this List<ICalendarProperty> lines, TimeSpan? value, ICalProperty key, ContentLineParameters? parameters = null)
-        {
-            if (value is null)
+            var foundLine = lines.FindByName(key.ToName());
+            if (foundLine is not null)
             {
-                lines.RemoveLineProperty(key);
-                return;
+                if (parameters is not null) foundLine.Parameters = parameters;
+                foundLine.SetLineValue(value);
             }
-            lines.UpdateLineProperty(TypeConverters.ConvertFromTimeSpan(value.Value), key, parameters);
+            else
+            {
+                if (parameters?.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true)
+                    lines.Add(key.GetContentLine(TypeConverters.ConvertToBase64(value), parameters));
+                else
+                    lines.Add(key.GetContentLine(value, parameters));
+            }
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, int? value, ICalProperty key, ContentLineParameters? parameters = null)
-        {
-            if (value is null)
-            {
-                lines.RemoveLineProperty(key);
-                return;
-            }
-            lines.UpdateLineProperty(TypeConverters.ConvertFromInt(value.Value), key, parameters);
-        }
+            => lines.UpdateOrRemove(value, key, parameters, TypeConverters.ConvertFromInt);
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, double? value, ICalProperty key, ContentLineParameters? parameters = null)
-        {
-            if (value is null)
-            {
-                lines.RemoveLineProperty(key);
-                return;
-            }
-            lines.UpdateLineProperty(TypeConverters.ConvertFromDouble(value.Value), key, parameters);
-        }
+            => lines.UpdateOrRemove(value, key, parameters, TypeConverters.ConvertFromDouble);
+
+        public static void UpdateLineProperty(this List<ICalendarProperty> lines, TimeSpan? value, ICalProperty key, ContentLineParameters? parameters = null)
+            => lines.UpdateOrRemove(value, key, parameters, TypeConverters.ConvertFromTimeSpan);
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, DateTimeOffset? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            if (value is null)
-            {
-                lines.RemoveLineProperty(key);
-                return;
-            }
-            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
-            {
-                var timezone = foundLine.Metadata.GetTimeZone(tzid);
-                lines.UpdateLineProperty(TypeConverters.ConvertFromDateTimeOffset(value.Value, timezone), key, parameters);
-                return;
-            }
-            lines.UpdateLineProperty(TypeConverters.ConvertFromDateTimeOffset(value.Value), key, parameters);
+            if (value is null) { lines.RemoveLineProperty(key); return; }
+            var tz = GetTimeZone(lines.FindByName(key.ToName()));
+            lines.UpdateLineProperty(TypeConverters.ConvertFromDateTimeOffset(value.Value, tz), key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<DateTimeOffset>? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            if (value is null)
-            {
-                lines.RemoveLineProperty(key);
-                return;
-            }
-            var foundLine = lines.Find(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (foundLine?.Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid && foundLine.Metadata is not null)
-            {
-                var timezone = foundLine.Metadata.GetTimeZone(tzid);
-                lines.UpdateLineProperty(string.Join(",", value.Select(t => TypeConverters.ConvertFromDateTimeOffset(t, timezone))), key, parameters);
-                return;
-            }
-            lines.UpdateLineProperty(string.Join(",", value.Select(t => TypeConverters.ConvertFromDateTimeOffset(t))), key, parameters);
-        }
-
-        internal static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty>? value, string key)
-        {
-            lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
-            if (value is not null)
-                lines.AddRange(value);
+            if (value is null) { lines.RemoveLineProperty(key); return; }
+            var tz = GetTimeZone(lines.FindByName(key.ToName()));
+            var joined = string.Join(",", value.Select(d => TypeConverters.ConvertFromDateTimeOffset(d, tz)));
+            lines.UpdateLineProperty(joined, key, parameters);
         }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, IEnumerable<ICalendarProperty>? value, ICalProperty key)
         {
-            lines.UpdateLineProperty(value, ICalProperties[(int)key]);
+            lines.RemoveLineProperty(key);
+            if (value is not null) lines.AddRange(value);
         }
 
         public static void UpdateLinesProperty(this List<ICalendarProperty> lines, IEnumerable<string>? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
-            if (value is not null)
-                lines.AddRange(value.Select(t => key.GetContentLine(t, parameters)));
+            lines.RemoveLineProperty(key);
+            foreach (var newValue in value ?? [])
+            {
+                lines.UpdateLineProperty(newValue, key, parameters);
+            }
         }
 
         public static void UpdateLinesSeperatedProperty(this List<ICalendarProperty> lines, IEnumerable<string>? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
-            lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            lines.RemoveLineProperty(key);
             if (value is not null)
-                lines.Add(key.GetContentLine(string.Join(", ", value), parameters));
+                lines.UpdateLineProperty(string.Join(", ", value), key, parameters); 
         }
 
+        // Generic helper that eliminates the repeated "null -> remove, else convert+update" pattern
+        private static void UpdateOrRemove<T>(this List<ICalendarProperty> lines, T? value, ICalProperty key,
+            ContentLineParameters? parameters, Func<T, string> convert) where T : struct
+        {
+            if (value is null) lines.RemoveLineProperty(key);
+            else lines.UpdateLineProperty(convert(value.Value), key, parameters);
+        }
+
+        // ---------- Remove ----------
+
+        public static void RemoveLineProperty(this List<ICalendarProperty> lines, ICalProperty key)
+            => lines.RemoveLineProperty(key.ToName());
+
+        public static void RemoveLineProperty(this List<ICalendarProperty> lines, string key)
+            => lines.RemoveAll(t => t.Name.Equals(key, StringComparison.OrdinalIgnoreCase));
+
+        // ---------- Parsing ----------
         public static bool TryGetNewProperty(this ReadOnlySpan<char> line, out ICalProperty? property)
         {
-            property = null;
             for (int i = 0; i < ICalProperties.Length; i++)
             {
                 if (line.StartsWith(ICalProperties[i], StringComparison.OrdinalIgnoreCase))
@@ -237,14 +194,8 @@ namespace ICalendarNet.Extensions
                     return true;
                 }
             }
-            if (line.StartsWith("X-"))
-                return true;
-            return false;
-        }
-
-        public static void RemoveLineProperty(this List<ICalendarProperty> lines, ICalProperty key)
-        {
-            lines.RemoveAll(t => t.Name.Equals(ICalProperties[(int)key], StringComparison.OrdinalIgnoreCase));
+            property = null;
+            return line.StartsWith("X-");
         }
 
         internal static ICalendarProperty GetContentLine(this ICalProperty property, ReadOnlySpan<char> value, ContentLineParameters? parameters)

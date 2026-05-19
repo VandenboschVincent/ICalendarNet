@@ -26,8 +26,7 @@ namespace ICalendarNet.Models.DataTypes
             {"SECONDLY", FrequencyType.Secondly}, {"MINUTELY", FrequencyType.Minutely}, {"HOURLY", FrequencyType.Hourly},
             {"DAILY", FrequencyType.Daily}, {"WEEKLY", FrequencyType.Weekly}, {"MONTHLY", FrequencyType.Monthly},
             {"YEARLY", FrequencyType.Yearly }
-        }
-;
+        };
 
         /// <summary>
         /// Specifies the frequency <i>FREQ</i> of the recurrence.
