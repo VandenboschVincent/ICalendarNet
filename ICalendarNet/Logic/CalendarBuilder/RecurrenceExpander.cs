@@ -28,7 +28,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
                 var segOccurrences = seg.Generator.GetOccuring(
                     int.MaxValue,
                     seg.WindowStart,
-                    false,
+                    true,
                     seg.WindowEnd);
 
                 foreach (var occur in segOccurrences)
@@ -40,7 +40,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
         }
 
         private static ICalendarComponent ResolveOccurrence(
-            ICalendarComponent occur,
+            CalendarRecurrableObject occur,
             GenerationSegment seg,
             Dictionary<DateTime, CalendarRecurrableObject>? singleOverrides,
             List<CalendarRecurrableObject>? futureOverrides)
@@ -49,7 +49,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
 
             // 1. Exact single-instance override beats everything else.
             if (singleOverrides != null &&
-                singleOverrides.TryGetValue(originalStart.UtcDateTime, out var singleOverride))
+                singleOverrides.TryGetValue(occur.DateTimeStart!.Value.UtcDateTime, out var singleOverride))
             {
                 return singleOverride;
             }
