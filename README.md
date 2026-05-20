@@ -8,7 +8,8 @@ Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton o
 
 ## Available for
 * Net Standard 2.1
-* Net 8.0/9.0/10.0
+* Net net5.0/net6.0/net7.0/net8.0/net9.0/net10.0;
+(please use net8.0 or highter)
 
 ## Roadmap:
 
@@ -19,8 +20,8 @@ Credits go to [Rianjs](https://github.com/rianjs/ical.net) for providing a ton o
  - [x] Make it easier to create/edit alarms
  - [x] Timezones fully implemented
  - [x] BASE64 encoding
- - [] Including specific occurences with RECURRENCE-ID and UID
- - [] Building calendar(s) (incl recurring) between dates
+ - [x] Including specific occurences with RECURRENCE-ID and UID
+ - [x] Building calendar(s) (incl recurring) between dates
 
 ## How to use:
 
@@ -106,6 +107,23 @@ foreach (var calEvent in calendar.GetEvents())
 	calEvent.SetRecurrenceRule(rrule);
     var recurrence = calEvent.GetRecurrence(10, DateTimeOffset.UtcNow); //Get the upcomming 10 events
 }
+```
+
+How to get the expanded calendar for a lets say a year (expanded incl recurring items)
+```csharp
+DateTimeOffset RangeStart = new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+DateTimeOffset RangeEnd = new(2026, 12, 31, 23, 59, 59, TimeSpan.Zero);
+Calendar? calendar = Calendar.LoadCalendar(icalvar);
+var items = calendar?.ExpandCalendar(RangeStart, RangeEnd)
+
+//all event items
+var eventItems = items.OfType<CalendarEvent>();
+
+//all Todo
+var todoItems = items.OfType<CalendarTodo>();
+
+//all journal items
+var journalItems = items.OfType<CalendarJournal>();
 ```
 
 ## Benchmarking

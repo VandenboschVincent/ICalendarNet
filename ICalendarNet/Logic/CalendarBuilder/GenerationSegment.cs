@@ -24,31 +24,24 @@ namespace ICalendarNet.Logic.CalendarBuilder
     /// (the master, or a THISANDFUTURE override carrying its own RRULE)
     /// is responsible for producing occurrences.
     /// </summary>
-    internal sealed class GenerationSegment
+    internal sealed class GenerationSegment(
+        CalendarRecurrableObject Generator,
+        DateTimeOffset AnchorStart,
+        DateTimeOffset WindowStart,
+        DateTimeOffset WindowEnd)
     {
-        public GenerationSegment(
-            CalendarRecurrableObject Generator,
-            DateTimeOffset AnchorStart,
-            DateTimeOffset WindowStart,
-            DateTimeOffset WindowEnd)
-        {
-            this.Generator = Generator;
-            this.AnchorStart = AnchorStart;
-            this.WindowStart = WindowStart;
-            this.WindowEnd = WindowEnd;
-        }
 
         /// <summary>The component used to expand occurrences in this window.</summary>
-        public CalendarRecurrableObject Generator { get; }
+        public CalendarRecurrableObject Generator { get; } = Generator;
 
         /// <summary>The generator's own DTSTART (or RECURRENCE-ID for overrides).</summary>
-        public DateTimeOffset AnchorStart { get; }
+        public DateTimeOffset AnchorStart { get; } = AnchorStart;
 
         /// <summary>Effective start, clamped to the user-requested range start.</summary>
-        public DateTimeOffset WindowStart { get; }
+        public DateTimeOffset WindowStart { get; } = WindowStart;
 
         /// <summary>Exclusive end: either the user range end or the next RRULE override's RECURRENCE-ID.</summary>
-        public DateTimeOffset WindowEnd { get; }
+        public DateTimeOffset WindowEnd { get; } = WindowEnd;
     }
 #endif
 }

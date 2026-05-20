@@ -7,9 +7,9 @@ using System.Linq;
 
 namespace ICalendarNet.Logic.CalendarBuilder
 {
-    internal static class CalendarBuilder
+    internal static class CalendarExpander
     {
-        public static IEnumerable<ICalendarComponent> BuildCalendar(
+        public static IEnumerable<ICalendarComponent> ExpandCalendar(
             Calendar calendar, DateTimeOffset start, DateTimeOffset end)
         {
             var recurrable = calendar.SubComponents
@@ -21,8 +21,8 @@ namespace ICalendarNet.Logic.CalendarBuilder
 
             // 1. Recurring components: expand each master.
             foreach (var master in masters)
-                foreach (var component in RecurrenceExpander.Expand(master, overrides, start, end))
-                    yield return component;
+                foreach (var component in RecurrenceExpander.Expand(master, overrides, start, end).Where(t => t.DateTimeStart.Between(start, end)))
+                    yield return component; // When count is specified, the expander may return occurrences outside of the requested range, so we filter them here.
 
             // 2. Orphan overrides (override exists but its master does not).
             foreach (var orphan in GetOrphanOverrides(recurrable, masters, start, end))

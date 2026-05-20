@@ -177,10 +177,6 @@ namespace ICalendarNet.Serialization
             IEnumerable<string> values = parts.Length == 1
                 ? []
                 : parts[^1].Split(',');
-            if (string.IsNullOrWhiteSpace(parts[0]))
-            {
-
-            }
             return new KeyValuePair<string, IEnumerable<string>>(parts[0], values);
         }
 #endif
