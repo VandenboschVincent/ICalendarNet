@@ -62,5 +62,14 @@ namespace ICalendarNet.Benchmarking
             Calendar? calendar = Calendar.Load(_sampleData.AmericanAwernessDays);
             return new CalendarSerializer().SerializeToString(calendar);
         }
+
+        [Benchmark]
+        public List<Occurrence> ICal_Net_Deserialize_And_Expand_Daily_Event()
+        {
+            var start = new CalDateTime(2020, 1, 1, 0, 0, 0, "Europe/Zurich");
+            var end = new CalDateTime(2021, 1, 1, 0, 0, 0, "Europe/Zurich");
+            Calendar? calendar = Calendar.Load(SampleData.SampleRecurring);
+            return [.. calendar!.GetOccurrences(start).TakeWhileBefore(end)];
+        }
     }
 }

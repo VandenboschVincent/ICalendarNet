@@ -72,5 +72,12 @@ namespace ICalendarNet.Benchmarking
             Calendar? calendar = Calendar.LoadCalendar(_sampleData.AmericanAwernessDays);
             return CalSerializor.SerializeCalendar(calendar!);
         }
+        [Benchmark]
+        public List<ICalendarComponent> Deserialize_And_Expand_Daily_Event()
+        {
+            var dateTime = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            Calendar? calendar = Calendar.LoadCalendar(SampleData.SampleRecurring);
+            return [.. calendar!.ExpandCalendar(dateTime, dateTime.AddYears(1))];
+        }
     }
 }
