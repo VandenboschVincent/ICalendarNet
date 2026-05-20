@@ -11,7 +11,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
     /// </summary>
     internal static class RecurrenceExpander
     {
-        public static IEnumerable<ICalendarComponent> Expand(
+        public static IEnumerable<CalendarRecurrableObject> Expand(
             CalendarRecurrableObject master,
             RecurrenceOverrideIndex overrides,
             DateTimeOffset start,
@@ -39,7 +39,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
             }
         }
 
-        private static ICalendarComponent ResolveOccurrence(
+        private static CalendarRecurrableObject ResolveOccurrence(
             CalendarRecurrableObject occur,
             GenerationSegment seg,
             Dictionary<DateTime, CalendarRecurrableObject>? singleOverrides,

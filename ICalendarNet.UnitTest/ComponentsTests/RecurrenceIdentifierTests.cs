@@ -82,7 +82,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             var currentDate = DateTimeOffset.Now;
             var startOfWeek = new DateTimeOffset(currentDate.Year, currentDate.Month, currentDate.Day, 0, 0, 0, TimeSpan.Zero).GetStartOfWeek(DayOfWeek.Monday);
             var endOfWeek = startOfWeek.AddDays(7);
-            var events = calendar.BuildCalendar(startOfWeek, endOfWeek);
+            var events = calendar.ExpandCalendar(startOfWeek, endOfWeek);
             events.Should().HaveCount(2); //Monday, Thursday
         }
 

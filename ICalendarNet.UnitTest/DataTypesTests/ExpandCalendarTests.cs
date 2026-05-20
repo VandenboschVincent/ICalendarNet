@@ -1,12 +1,13 @@
 ﻿using ICalendarNet.Models.Base;
 using ICalendarNet.Models.Components;
+using NUnit.Framework.Interfaces;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
-    internal class BuildCalendarTests
+    internal class ExpandCalendarTests
     {
         private static readonly DateTimeOffset RangeStart =
-        new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            new(2026, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
         private static readonly DateTimeOffset RangeEnd =
             new(2026, 12, 31, 23, 59, 59, TimeSpan.Zero);
@@ -14,9 +15,9 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         private static Calendar? Parse(string ical)
             => Calendar.LoadCalendar(ical);
 
-        private static IEnumerable<ICalendarComponent> BuildCalendar(
+        private static IEnumerable<ICalendarComponent> ExpandCalendar(
             Calendar? calendar, DateTimeOffset start, DateTimeOffset end) =>
-            calendar?.BuildCalendar(start, end) ?? [];
+            calendar?.ExpandCalendar(start, end) ?? [];
 
         [Test]
         public void BuildCalendar_EmptyCalendar_ReturnsNoComponents()
@@ -28,7 +29,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().BeEmpty();
         }
@@ -50,10 +51,10 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().ContainSingle()
-                .Which.Should().BeOfType<CalendarRecurrableObject>()
+                .Which.Should().BeOfType<CalendarEvent>()
                 .Which.Uid.Should().Be("plain-1@test");
         }
 
@@ -74,7 +75,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().BeEmpty();
         }
@@ -98,7 +99,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd)
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
                 .Cast<CalendarRecurrableObject>()
                 .OrderBy(c => c.DateTimeStart)
                 .ToList();
@@ -133,7 +134,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().BeEmpty();
         }
@@ -166,7 +167,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd)
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
                 .Cast<CalendarRecurrableObject>()
                 .OrderBy(c => c.DateTimeStart)
                 .ToList();
@@ -201,7 +202,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().ContainSingle()
                 .Which.Should().BeOfType<CalendarEvent>()
@@ -226,7 +227,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd).ToList();
 
             result.Should().BeEmpty();
         }
@@ -251,7 +252,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd)
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
                 .Cast<CalendarRecurrableObject>()
                 .ToList();
 
@@ -305,8 +306,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd)
-                .Cast<CalendarRecurrableObject>()
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
                 .ToList();
 
             // 4 weekly expansions (one is the override) + 1 orphan + 1 plain = 6
@@ -344,7 +344,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd)
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
                 .Cast<CalendarRecurrableObject>()
                 .ToList();
 
@@ -377,7 +377,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             var windowStart = new DateTimeOffset(2026, 3, 3, 0, 0, 0, TimeSpan.Zero);
             var windowEnd = new DateTimeOffset(2026, 3, 6, 23, 59, 59, TimeSpan.Zero);
 
-            var result = BuildCalendar(Parse(ical), windowStart, windowEnd)
+            var result = ExpandCalendar(Parse(ical), windowStart, windowEnd)
                 .Cast<CalendarRecurrableObject>()
                 .OrderBy(c => c.DateTimeStart)
                 .ToList();
@@ -407,7 +407,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeEnd, RangeStart).ToList();
+            var result = ExpandCalendar(Parse(ical), RangeEnd, RangeStart).ToList();
 
             result.Should().BeEmpty();
         }
@@ -422,7 +422,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             END:VCALENDAR
             """;
 
-            var result = BuildCalendar(Parse(ical), RangeStart, RangeEnd);
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd);
 
             result.Should().BeAssignableTo<IEnumerable<ICalendarComponent>>();
             result.Should().NotBeOfType<List<ICalendarComponent>>();
