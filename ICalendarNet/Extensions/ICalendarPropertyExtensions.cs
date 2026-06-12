@@ -3,7 +3,6 @@ using ICalendarNet.Logic;
 using ICalendarNet.Models.Base;
 using ICalendarNet.Models.Components;
 using ICalendarNet.Models.DataTypes;
-using ICalendarNet.Models.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +24,12 @@ namespace ICalendarNet.Extensions
             return line.Metadata.GetTimeZone(tzid);
         }
 
-        private static string GetLineValue(this ICalendarProperty line)
+        internal static string GetLineValue(this ICalendarProperty line)
             => line.Parameters.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true
                 ? TypeConverters.ConvertFromBase64(line.Value)
                 : line.Value;
 
-        private static void SetLineValue(this ICalendarProperty line, string value)
+        internal static void SetLineValue(this ICalendarProperty line, string value)
         {
             if (line.Parameters.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true)
                 line.Value = TypeConverters.ConvertToBase64(value);
@@ -95,7 +94,7 @@ namespace ICalendarNet.Extensions
         }
 #if NET5_0_OR_GREATER
         public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
-            => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries|StringSplitOptions.TrimEntries));
+            => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
 #else
         public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
             => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()));
@@ -105,6 +104,25 @@ namespace ICalendarNet.Extensions
         public static void UpdateLineProperty<TEnum>(this List<ICalendarProperty> lines, TEnum value, ICalProperty key, ContentLineParameters? parameters = null)
             where TEnum : struct, Enum
             => lines.UpdateLineProperty(value.GetString(), key, parameters);
+
+        internal static void UpdateLineProperty(this List<ICalendarProperty> lines, string? value, string key, ContentLineParameters? parameters = null)
+        {
+            if (value is null) { lines.RemoveLineProperty(key); return; }
+
+            var foundLine = lines.FindByName(key);
+            if (foundLine is not null)
+            {
+                if (parameters is not null) foundLine.Parameters = parameters;
+                foundLine.SetLineValue(value);
+            }
+            else
+            {
+                if (parameters?.Encoding?.Equals("BASE64", StringComparison.OrdinalIgnoreCase) == true)
+                    lines.Add(GetContentLine(key, TypeConverters.ConvertToBase64(value), parameters));
+                else
+                    lines.Add(GetContentLine(key, value, parameters));
+            }
+        }
 
         public static void UpdateLineProperty(this List<ICalendarProperty> lines, string? value, ICalProperty key, ContentLineParameters? parameters = null)
         {
@@ -168,7 +186,7 @@ namespace ICalendarNet.Extensions
         {
             lines.RemoveLineProperty(key);
             if (value is not null)
-                lines.UpdateLineProperty(string.Join(", ", value), key, parameters); 
+                lines.UpdateLineProperty(string.Join(", ", value), key, parameters);
         }
 
         // Generic helper that eliminates the repeated "null -> remove, else convert+update" pattern
@@ -234,6 +252,18 @@ namespace ICalendarNet.Extensions
                 ICalProperty.RRULE => new CalendarRecurrenceRule(property.GetString(), value.ToString(), parameters),
                 _ => throw new NotSupportedException(property.GetString()),
             };
+        }
+
+        internal static ICalendarProperty GetContentLine(string propertyName, ReadOnlySpan<char> value, ContentLineParameters? parameters)
+        {
+            if (propertyName.StartsWith("X-", StringComparison.OrdinalIgnoreCase))
+            {
+                return new CalendarDefaultDataType(propertyName, value.ToString(), parameters);
+            }
+            else
+            {
+                throw new NotSupportedException($"Property {propertyName} is not supported and does not follow the experimental 'X-' prefix convention.");
+            }
         }
     }
 }

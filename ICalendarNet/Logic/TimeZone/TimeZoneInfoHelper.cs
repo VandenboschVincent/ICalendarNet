@@ -64,7 +64,7 @@ namespace ICalendarNet.Logic.TimeZone
                 var daylightDelta = TimeSpan.FromMinutes(daylightOffset) - standardUtcOffset;
 
                 DateTime daylightTimeOfDay = new DateTime(1, 1, 1, 0, 0, 0, DateTimeKind.Unspecified)
-                    .Add(daylight.DateTimeStart?.TimeOfDay ?? TimeSpan.FromHours(2));
+                    .Add(daylight.DateTimeStart?.UtcDateTime.TimeOfDay ?? TimeSpan.FromHours(2));
 
                 if (daylightRule != null
                     && standardWeek.HasValue
@@ -101,10 +101,11 @@ namespace ICalendarNet.Logic.TimeZone
                         // Determine the end date of this specific rule adjustment block
                         DateTime? nexBlockStart = rdates.ElementAtOrDefault(i + 1)?.DateStart.Date;
                         DateTime ruleEndDate = rdate.DateEnd?.Date
-                                               ?? nexBlockStart
-                                               ?? daylightRule?.Until?.DateTime.Date
-                                               ?? new DateTimeOffset(9999, 1, 1, 0, 0, 0, TimeSpan.Zero).Date;
-                        if (nexBlockStart != null && ruleEndDate <= nexBlockStart)
+                            ?? (standardDateTime.HasValue ? new DateTime(rdate.DateStart.Year, standardDateTime.Value.Month, standardDateTime.Value.Day, 0, 0, 0, DateTimeKind.Unspecified) : (DateTime?)null)
+                            ?? nexBlockStart
+                            ?? daylightRule?.Until?.DateTime.Date
+                            ?? new DateTimeOffset(9999, 1, 1, 0, 0, 0, TimeSpan.Zero).Date;
+                        if (nexBlockStart != null && ruleEndDate >= nexBlockStart)
                             ruleEndDate = nexBlockStart.Value.AddDays(-1);
 
                         yield return TimeZoneInfo.AdjustmentRule.CreateAdjustmentRule(
