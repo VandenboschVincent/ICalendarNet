@@ -20,7 +20,7 @@ namespace ICalendarNet.Models.Base
 
         protected CalendarTimeZone? GetTimeZone()
         {
-            if (Parameters.GetValue(ICalProperties[(int)ICalProperty.TZID]) is string tzid)
+            if (Parameters.GetValue(nameof(ICalProperty.TZID)) is string tzid)
             {
                 return Metadata.GetTimeZone(tzid);
             }

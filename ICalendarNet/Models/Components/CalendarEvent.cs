@@ -228,16 +228,16 @@ namespace ICalendarNet.Models.Components
 
         public override string ToString()
         {
-            return $"VEVENT: {Summary} {DateTimeStart.GetValueOrDefault():dd/MM/yy HH:mm} - {DateTimeEnd.GetValueOrDefault():dd/MM/yy HH:mm}";
+            return $"VEVENT: {Summary} {DateTimeStart.GetValueOrDefault().UtcDateTime:dd/MM/yy HH:mm} - {DateTimeEnd.GetValueOrDefault().UtcDateTime:dd/MM/yy HH:mm}";
         }
 
-        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        protected override CalendarRecurrableObject Clone(DateTimeOffset occurence)
         {
-            var cloned = CloneComponent(this, period);
+            var cloned = CloneComponent(this, occurence);
             var oldEnd = DateTimeEnd;
             var oldStart = DateTimeStart;
             if (oldEnd.HasValue && oldStart.HasValue)
-                cloned.DateTimeEnd = period.DateStart.Add(oldEnd.Value - oldStart.Value);
+                cloned.DateTimeEnd = occurence.Add(oldEnd.Value - oldStart.Value).ToOffset(oldStart.Value.Offset);
             return cloned;
         }
     }

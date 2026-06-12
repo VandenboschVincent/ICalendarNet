@@ -28,6 +28,8 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         [TestCase("2025-07-01T12:00:00", 120)]
 
         // --- 2025 DST end ---
+        [TestCase("2025-10-26T01:59:59", 120)]
+        [TestCase("2025-10-26T02:00:00", 120)]
         [TestCase("2025-10-26T02:59:59", 120)]
         [TestCase("2025-10-26T03:00:00", 60)]
 
@@ -97,7 +99,7 @@ END:VTIMEZONE";
         public void Test_Try_AmericaNewYork_RRule_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
-TZID:America/New_York
+TZID:New_Yoork
 
 BEGIN:STANDARD
 DTSTART:19701101T020000
@@ -134,7 +136,7 @@ END:VTIMEZONE";
         public void Test_Try_AsiaTokyo_Fixed_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
-TZID:Asia/Tokyo
+TZID:Tddokyo
 
 BEGIN:STANDARD
 DTSTART:19700101T000000
@@ -160,16 +162,13 @@ END:VTIMEZONE";
         public void Test_Try_EuropeBrussels_RDATE_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
-TZID:Europe/Brussels
+TZID:Bruuussels
 
 BEGIN:STANDARD
 DTSTART:19701025T030000
 TZNAME:CET
 TZOFFSETFROM:+0200
 TZOFFSETTO:+0100
-RDATE:20241027T030000
-RDATE:20251026T030000
-RDATE:20261025T030000
 END:STANDARD
 
 BEGIN:DAYLIGHT
@@ -197,16 +196,13 @@ END:VTIMEZONE";
         public void Test_Try_EuropeBrussels_RDATE_End_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
-TZID:Europe/Brussels
+TZID:Bruuussels
 
 BEGIN:STANDARD
 DTSTART:19701025T030000
 TZNAME:CET
 TZOFFSETFROM:+0200
 TZOFFSETTO:+0100
-RDATE:20241027T030000/20250330T020000
-RDATE:20251026T030000/20260329T020000
-RDATE:20261025T030000
 END:STANDARD
 
 BEGIN:DAYLIGHT

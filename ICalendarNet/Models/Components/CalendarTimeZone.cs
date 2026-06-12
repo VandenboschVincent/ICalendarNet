@@ -1,5 +1,4 @@
 ﻿using ICalendarNet.Extensions;
-using ICalendarNet.Logic.Recurrence;
 using ICalendarNet.Logic.TimeZone;
 using ICalendarNet.Models.Base;
 using ICalendarNet.Models.Enum;
@@ -16,6 +15,7 @@ namespace ICalendarNet.Models.Components
     public class CalendarTimeZone : CalendarObject
     {
         public override ICalComponent ComponentType => ICalComponent.VTIMEZONE;
+        private TimeZoneInfo? cachedTimeZone = null;
 
         /// <summary>
         ///   <see cref="ICalProperty.LAST_MODIFIED" />
@@ -56,7 +56,18 @@ namespace ICalendarNet.Models.Components
 
         public int GetOffsetInMinutes(DateTimeOffset? dateTime = null)
         {
-            return TimeZoneHelper.GetOffsetInMinutes(this, dateTime);
+            DateTime dt = dateTime?.DateTime ?? DateTime.Now;
+            cachedTimeZone ??= TimeZoneInfoHelper.GetTimeZone(this);
+            if (cachedTimeZone == null) return 0;
+            if (cachedTimeZone.IsInvalidTime(dt))
+            {
+                // Get the DST delta for this zone (typically +1:00)
+                var adjustment = cachedTimeZone.GetAdjustmentRules()
+                    .FirstOrDefault(r => r.DateStart <= dt && dt <= r.DateEnd);
+                dt = dt + (adjustment?.DaylightDelta ?? cachedTimeZone.BaseUtcOffset);
+            }
+            var offset = Convert.ToInt32(cachedTimeZone.GetUtcOffset(dt).TotalMinutes);
+            return offset;
         }
     }
 }

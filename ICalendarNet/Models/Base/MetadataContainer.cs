@@ -23,9 +23,9 @@ namespace ICalendarNet.Models.Base
             return _TimeZonedata.Find(t => t.TimeZoneId == key);
         }
 
-        public IEnumerable<string?> GetTimeZones()
+        public List<CalendarTimeZone> GetTimeZones()
         {
-            return _TimeZonedata.Select(t => t.TimeZoneId);
+            return _TimeZonedata;
         }
     }
 }

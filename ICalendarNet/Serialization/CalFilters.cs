@@ -1,4 +1,5 @@
-﻿using ICalendarNet.Models.Enum;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Enum;
 using System;
 
 namespace ICalendarNet.Serialization
@@ -39,7 +40,7 @@ namespace ICalendarNet.Serialization
                 default:
                     break;
             }
-            throw new NotSupportedException(component.ToString());
+            throw new NotSupportedException(component.GetString());
         }
 
         internal const string vCalendarEnd = "END:VCALENDAR";

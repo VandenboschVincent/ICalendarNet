@@ -212,9 +212,9 @@ namespace ICalendarNet.Models.Components
             Properties.UpdateLineProperty(attachments, ICalProperty.ATTACH);
         }
 
-        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        protected override CalendarRecurrableObject Clone(DateTimeOffset occurence)
         {
-            return CloneComponent(this, period);
+            return CloneComponent(this, occurence);
         }
     }
 }

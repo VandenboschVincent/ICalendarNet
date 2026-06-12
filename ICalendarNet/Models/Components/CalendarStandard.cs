@@ -1,6 +1,5 @@
 ﻿using ICalendarNet.Extensions;
 using ICalendarNet.Models.Base;
-using ICalendarNet.Models.DataTypes;
 using ICalendarNet.Models.Enum;
 using System;
 using static ICalendarNet.Models.Enum.Statics;
@@ -47,9 +46,9 @@ namespace ICalendarNet.Models.Components
             set => Properties.UpdateLineProperty(value, ICalProperty.TZNAME);
         }
 
-        protected override CalendarRecurrableObject Clone(CalendarPeriod period)
+        protected override CalendarRecurrableObject Clone(DateTimeOffset occurence)
         {
-            return CloneComponent(this, period);
+            return CloneComponent(this, occurence);
         }
     }
 }

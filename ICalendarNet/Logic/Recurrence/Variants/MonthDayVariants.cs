@@ -1,4 +1,5 @@
-﻿using ICalendarNet.Models.DataTypes;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +48,7 @@ namespace ICalendarNet.Logic.Recurrence
             // taking negative values into account (relative to the month's length).
             static bool MatchesAnyMonthDay(DateTimeOffset candidate, IEnumerable<int> monthDays)
             {
-                var daysInMonth = Calendar.GetDaysInMonth(candidate.Year, candidate.Month);
+                var daysInMonth = CalendarExtensions.GetDaysInMonth(candidate.Year, candidate.Month);
                 foreach (var monthDay in monthDays)
                 {
                     var byMonthDay = monthDay > 0 ? monthDay : (daysInMonth + monthDay + 1);
@@ -66,7 +67,7 @@ namespace ICalendarNet.Logic.Recurrence
             {
                 var monthDayDates = new SortedSet<DateTimeOffset>(
                     from monthDay in pattern.ByMonthDay
-                    let daysInMonth = Calendar.GetDaysInMonth(date.Year, date.Month)
+                    let daysInMonth = CalendarExtensions.GetDaysInMonth(date.Year, date.Month)
                     let monthDayAbs = monthDay > 0 ? monthDay : (daysInMonth + monthDay + 1)
                     where monthDayAbs > 0 && monthDayAbs <= daysInMonth
                     select date.AddDays(-date.Day + monthDayAbs));

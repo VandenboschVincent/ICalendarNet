@@ -115,7 +115,7 @@ namespace ICalendarNet.Logic.Recurrence
         {
             var month = date.Month;
             var year = date.Year;
-            var daysInMonth = Calendar.GetDaysInMonth(year, month);
+            var daysInMonth = CalendarExtensions.GetDaysInMonth(year, month);
 
             // Go to first day of month, then find first occurrence of target weekday.
             date = date.AddDays(-date.Day + 1);
@@ -128,14 +128,14 @@ namespace ICalendarNet.Logic.Recurrence
             var byWeekNoNormalized = pattern.ByWeekNo.Count > 0
                 ? GetByWeekNoForYearNormalized(
                     pattern,
-                    Calendar.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek))
+                    CalendarExtensions.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek))
                 : null;
 
             for (var i = 0; i < occurrenceCount; i++)
             {
                 var matchesWeekNo = byWeekNoNormalized == null
                     || byWeekNoNormalized.Contains(
-                        Calendar.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek));
+                        CalendarExtensions.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek));
 
                 var matchesMonth = pattern.ByMonth.Count == 0
                     || pattern.ByMonth.Contains(date.Month);
@@ -150,7 +150,7 @@ namespace ICalendarNet.Logic.Recurrence
         private static IEnumerable<DateTimeOffset> GetAbsWeekDaysWeekly(
             DateTimeOffset date, CalendarRecurrenceRule pattern, WeekDay weekDay)
         {
-            var weekNo = Calendar.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
+            var weekNo = CalendarExtensions.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
 
             // Go to the first day of the week.
             var weekDayOffset = GetWeekDayOffset(date, pattern.FirstDayOfWeek);
@@ -160,13 +160,13 @@ namespace ICalendarNet.Logic.Recurrence
             var offset = ((int)weekDay.DayOfWeek - (int)date.DayOfWeek + 7) % 7;
             date = date.AddDays(offset);
 
-            var currentWeekNo = Calendar.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
+            var currentWeekNo = CalendarExtensions.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
             var nextWeekNo = currentWeekNo;
 
             var byWeekNoNormalized = pattern.ByWeekNo.Count > 0
                 ? GetByWeekNoForYearNormalized(
                     pattern,
-                    Calendar.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek))
+                    CalendarExtensions.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek))
                 : null;
 
             // Boundary case for weekly recurring patterns:
@@ -186,7 +186,7 @@ namespace ICalendarNet.Logic.Recurrence
                     yield return date;
 
                 date = date.AddDays(7);
-                currentWeekNo = Calendar.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
+                currentWeekNo = CalendarExtensions.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
             }
         }
     }

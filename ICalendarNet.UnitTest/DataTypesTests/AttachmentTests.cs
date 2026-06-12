@@ -40,6 +40,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         {
             ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
+
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
             attachment.Should().NotBeNull();
             attachment.FMTTYPE.Should().Be(type);

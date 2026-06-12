@@ -1,4 +1,5 @@
-﻿using ICalendarNet.Logic;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Logic;
 using ICalendarNet.Models.Base;
 using System;
 using System.Collections.Generic;
@@ -59,18 +60,18 @@ namespace ICalendarNet.Models.DataTypes
             }
         }
 
-        public CalendarPeriod(ICalProperty key, string value, ContentLineParameters? param) : base(ICalProperties[(int)key], value, param)
+        public CalendarPeriod(ICalProperty key, string value, ContentLineParameters? param) : base(key.GetString(), value, param)
         { }
 
         public CalendarPeriod(string key, string value, ContentLineParameters? param) : base(key, value, param)
         { }
 
-        public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, DateTimeOffset dateEnd) : base(ICalProperties[(int)key], string.Empty, null)
+        public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, DateTimeOffset dateEnd) : base(key.GetString(), string.Empty, null)
         {
             Value = TypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + TypeConverters.ConvertFromDateTimeOffset(dateEnd, GetTimeZone());
         }
 
-        public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(ICalProperties[(int)key], string.Empty, null)
+        public CalendarPeriod(ICalProperty key, DateTimeOffset dateStart, TimeSpan duration) : base(key.GetString(), string.Empty, null)
         {
             Value = TypeConverters.ConvertFromDateTimeOffset(dateStart, GetTimeZone()) + "/" + TypeConverters.ConvertFromTimeSpan(duration);
         }

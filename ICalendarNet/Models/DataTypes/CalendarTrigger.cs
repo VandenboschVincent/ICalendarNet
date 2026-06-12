@@ -35,7 +35,7 @@ namespace ICalendarNet.Models.DataTypes
         }
 
         public CalendarTrigger(DateTimeOffset dateTime)
-            : base(ICalProperties[(int)ICalProperty.TRIGGER],
+            : base(nameof(ICalProperty.TRIGGER),
                   TypeConverters.ConvertFromDateTimeOffset(dateTime),
                   null)
         {
@@ -46,7 +46,7 @@ namespace ICalendarNet.Models.DataTypes
         }
 
         public CalendarTrigger(TimeSpan timeSpan, TriggerStartEnd triggerStartEnd = TriggerStartEnd.START)
-            : base(ICalProperties[(int)ICalProperty.TRIGGER],
+            : base(nameof(ICalProperty.TRIGGER),
                   TypeConverters.ConvertFromTimeSpan(timeSpan),
                   null)
         {

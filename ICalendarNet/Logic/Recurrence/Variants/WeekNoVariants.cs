@@ -55,11 +55,11 @@ namespace ICalendarNet.Logic.Recurrence
                     date = date.AddDays(-7);
 
                 // Determine our current week number, then move to the target week.
-                var currWeekNo = Calendar.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
+                var currWeekNo = CalendarExtensions.GetIso8601WeekOfYear(date, pattern.FirstDayOfWeek);
                 date = date.AddDays((weekNo - currWeekNo) * 7);
 
                 // Ignore the week if it doesn't belong to the current year.
-                if (Calendar.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek) != t.Year)
+                if (CalendarExtensions.GetIso8601YearOfWeek(date, pattern.FirstDayOfWeek) != t.Year)
                     continue;
 
                 // Step back to the first day of the week.
@@ -77,7 +77,7 @@ namespace ICalendarNet.Logic.Recurrence
         private static List<int> GetByWeekNoForYearNormalized(CalendarRecurrenceRule pattern, int year)
         {
             var weeksInYear = new Lazy<int>(
-                () => Calendar.GetIso8601WeeksInYear(year, pattern.FirstDayOfWeek));
+                () => CalendarExtensions.GetIso8601WeeksInYear(year));
 
             return [.. pattern.ByWeekNo
                 .Select(weekNo => weekNo >= 0 ? weekNo : weeksInYear.Value + weekNo + 1)

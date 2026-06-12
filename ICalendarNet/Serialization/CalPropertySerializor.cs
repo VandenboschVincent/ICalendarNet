@@ -121,10 +121,13 @@ namespace ICalendarNet.Serialization
             ReadOnlySpan<char> key,
             ReadOnlySpan<char> value)
         {
-            string propName = Statics.ICalProperties[(int)property];
+            string propName = property.GetString();
 
             // No parameters attached -> simple content line.
             if (key.Length == propName.Length)
+                return ICalendarPropertyExtensions.GetContentLine(property, value, null);
+
+            if (key.Length <= propName.Length)
                 return ICalendarPropertyExtensions.GetContentLine(property, value, null);
 
             ReadOnlySpan<char> paramsSpan = key[propName.Length..];

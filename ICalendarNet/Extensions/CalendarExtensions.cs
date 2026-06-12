@@ -8,20 +8,15 @@ namespace ICalendarNet.Extensions
         /// <summary>
         /// Calculate the week number according to ISO.8601, as required by RFC 5545.
         /// </summary>
-        public static int GetIso8601WeekOfYear(this System.Globalization.Calendar calendar, DateTimeOffset time, DayOfWeek firstDayOfWeek)
+        public static int GetIso8601WeekOfYear(DateTimeOffset time, DayOfWeek firstDayOfWeek)
         {
-            // A week is defined as a
-            // seven day period, starting on the day of the week defined to be
-            // the week start(see WKST). Week number one of the calendar year
-            // is the first week that contains at least four (4) days in that
-            // calendar year.
-
-            // We add 3 to make sure the test date is in the 'right' year, because
-            // otherwise we might end up with week 53 in a year that only has 52.
-            var tTest = GetStartOfWeek(time, firstDayOfWeek).AddDays(3);
-            var res = calendar.GetWeekOfYear(tTest.DateTime, CalendarWeekRule.FirstFourDayWeek, firstDayOfWeek);
-
-            return res;
+            // The 4th day of the week (the "Thursday-equivalent") is always inside
+            // the week-numbering year this week belongs to. All such mid-week days
+            // are exactly 7 days apart, and the first one of the year is by
+            // definition the mid-week day of week 1 — so integer-dividing its
+            // day-of-year by 7 yields the week number directly.
+            var midWeek = time.GetStartOfWeek(firstDayOfWeek).AddDays(3);
+            return (midWeek.DayOfYear - 1) / 7 + 1;
         }
 
         /// <summary>
@@ -44,25 +39,55 @@ namespace ICalendarNet.Extensions
         /// E.g. for `2019-12-31` with first day of the week being Monday, the method will return 2020,
         /// because the week that contains `2019-12-31` is the first week of 2020.
         /// </remarks>
-        public static int GetIso8601YearOfWeek(this System.Globalization.Calendar calendar, DateTimeOffset time, DayOfWeek firstDayOfWeek)
+        public static int GetIso8601YearOfWeek(DateTimeOffset time, DayOfWeek firstDayOfWeek)
         {
-            var year = time.Year;
-            if ((time.Month >= 12) && (calendar.GetIso8601WeekOfYear(time, firstDayOfWeek) == 1))
-                year++;
-            else if ((time.Month == 1) && (calendar.GetIso8601WeekOfYear(time, firstDayOfWeek) >= 52))
-                year--;
-
-            return year;
+            // Same trick: the year of the 4th day of the week is, by RFC 5545's
+            // "at least 4 days in that calendar year" rule, the week-numbering year.
+            var midWeek = time.GetStartOfWeek(firstDayOfWeek).AddDays(3);
+            return midWeek.Year;
         }
 
         /// <summary>
         /// Calculate the number of weeks in the given year according to ISO 8601, as required by RFC 5545.
         /// </summary>
-        public static int GetIso8601WeeksInYear(this System.Globalization.Calendar calendar, int year, DayOfWeek firstDayOfWeek)
+        public static int GetIso8601WeeksInYear(int year)
         {
-            // The last week of the year is the week that contains the 4th-last day of the year (which is the 28th of December in Gregorian Calendar).
-            var testTime = new DateTimeOffset(year + 1, 1, 1, 0, 0, 0, 0, calendar, TimeSpan.Zero).AddDays(-4);
-            return calendar.GetIso8601WeekOfYear(testTime, firstDayOfWeek);
+            return ISOWeek.GetWeeksInYear(year);
+        }
+
+        /// <summary>
+        /// Calculate the number of days in the month of the given date.
+        /// </summary>
+        public static int GetDaysInMonth(DateTimeOffset time)
+        {
+            return GetDaysInMonth(time.Year, time.Month);
+        }
+
+        /// <summary>
+        /// Calculate the number of days in the given month of the given year.
+        /// </summary>
+        public static int GetDaysInMonth(int year, int month)
+        {
+            return DateTime.DaysInMonth(year, month);
+        }
+
+        public static bool TryFindTimeZone(string tzId, out TimeZoneInfo? tz)
+        {
+#if NET8_0_OR_GREATER
+            return TimeZoneInfo.TryFindSystemTimeZoneById(tzId, out tz);
+#else
+            try
+            {
+                tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
+                return true;
+            }
+            catch (TimeZoneNotFoundException) 
+            {
+                //No other method for tryfind in netstandard2.1, so we have to catch the exception and return null if not found
+                tz = null;
+                return false;
+            }
+#endif
         }
     }
 }

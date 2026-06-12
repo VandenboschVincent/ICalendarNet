@@ -22,20 +22,11 @@ namespace ICalendarNet.Logic.TimeZone
 
             var components = timeZone.SubComponents
                 .Where(t => t.ComponentType is ICalComponent.STANDARD or ICalComponent.DAYLIGHT)
-                .Cast<CalendarStandard>()
-                .ToList();
+                .Cast<CalendarStandard>().ToList();
 
             var periods = CollectPeriods(components, target, assumedOffset);
-
-            var currentPeriod = periods
-                .Where(p => ConvertToOffset(p.Date, assumedOffset) <= target)
-#if NET6_0_OR_GREATER
-                .MaxBy(p => p.Date);
-#else
-                .OrderByDescending(t => t.Date).FirstOrDefault();
-#endif
-
-            return currentPeriod?.Offset ?? 0;
+            return periods.OrderByDescending(p => p.Date)
+                .FirstOrDefault(t => ConvertToOffset(t.Date, assumedOffset) <= target).Offset;
         }
 
         private static List<DateTimeAndOffset> CollectPeriods(
@@ -43,9 +34,8 @@ namespace ICalendarNet.Logic.TimeZone
             DateTimeOffset target,
             double assumedOffset)
         {
-            var periods = new List<DateTimeAndOffset>();
             var isSingleComponent = components.Count == 1;
-
+            List<DateTimeAndOffset> periods = [];
             foreach (var standard in components)
             {
                 if (!TryGetOffsetMinutes(standard.TimezoneOffsetTo, out var offset))
@@ -55,10 +45,9 @@ namespace ICalendarNet.Logic.TimeZone
                 if (start is null || start > target)
                     continue;
 
-                AddRecurrenceRulePeriods(periods, standard, start.Value, offset, target, assumedOffset);
-                AddRecurrenceDatePeriods(periods, standard, start.Value, offset, target, assumedOffset, isSingleComponent);
+                periods.AddRange(AddRecurrenceRulePeriods(standard, start.Value, offset, target, assumedOffset));
+                periods.AddRange(AddRecurrenceDatePeriods(standard, start.Value, offset, target, assumedOffset, isSingleComponent));
             }
-
             return periods;
         }
 
@@ -75,8 +64,7 @@ namespace ICalendarNet.Logic.TimeZone
             return true;
         }
 
-        private static void AddRecurrenceRulePeriods(
-            List<DateTimeAndOffset> periods,
+        private static IEnumerable<DateTimeAndOffset> AddRecurrenceRulePeriods(
             CalendarStandard standard,
             DateTimeOffset start,
             int offset,
@@ -85,14 +73,15 @@ namespace ICalendarNet.Logic.TimeZone
         {
             var rrule = standard.GetRecurrenceRule();
             if (rrule is null)
-                return;
+                return [];
 
             var until = ConvertToOffset(rrule.Until, assumedOffset);
             if (until is not null && until < target)
-                return;
+                return [];
 
             var exDates = standard.ExceptionDateTimes?
-                .Select(t => ConvertToOffset(t, assumedOffset));
+                .Select(t => ConvertToOffset(t, assumedOffset))
+                .ToList();
 
             var lookbackStart = target.AddYears(-1);
             var calculationStart = start > lookbackStart ? start : lookbackStart;
@@ -107,13 +96,12 @@ namespace ICalendarNet.Logic.TimeZone
                 exDates);
 
             if (foundDates is null)
-                return;
+                return [];
 
-            periods.AddRange(foundDates.Select(d => new DateTimeAndOffset(offset, d.DateStart)));
+            return foundDates.Select(d => new DateTimeAndOffset(offset, d));
         }
 
-        private static void AddRecurrenceDatePeriods(
-            List<DateTimeAndOffset> periods,
+        private static IEnumerable<DateTimeAndOffset> AddRecurrenceDatePeriods(
             CalendarStandard standard,
             DateTimeOffset start,
             int offset,
@@ -127,13 +115,14 @@ namespace ICalendarNet.Logic.TimeZone
 
             if (validDates is { Count: > 0 })
             {
-                periods.AddRange(validDates.Select(t => new DateTimeAndOffset(offset, t.DateStart)));
+                return validDates.Select(t => new DateTimeAndOffset(offset, t.DateStart));
             }
             else if (isSingleComponent)
             {
                 // Single component with no recurrence dates is always considered active.
-                periods.Add(new DateTimeAndOffset(offset, start));
+                return [new DateTimeAndOffset(offset, start)];
             }
+            return [];
         }
 
         private static DateTimeOffset? ConvertToOffset(DateTimeOffset? dateTime, double offsetInMinutes)
@@ -150,23 +139,25 @@ namespace ICalendarNet.Logic.TimeZone
 
         private static int ConvertToOffsetInMinutes(ReadOnlySpan<char> offset)
         {
-            var sign = offset.StartsWith("-") ? -1 : 1;
-            var hourParts = offset.TrimStart("+-")[..2];
-            var minuteParts = offset.TrimStart("+-").Slice(2, 2);
-            if (int.TryParse(hourParts, out int hours) && int.TryParse(minuteParts, out int minutes))
+            var sign = 1;
+            if (offset[0] is '+' or '-')
+            {
+                sign = offset[0] == '-' ? -1 : 1;
+                offset = offset[1..];
+            }
+            if (offset.Length < 4) return 0;
+
+            if (int.TryParse(offset[..2], out int hours) &&
+                int.TryParse(offset.Slice(2, 2), out int minutes))
+            {
                 return sign * (hours * 60 + minutes);
+            }
             return 0;
         }
 
-        private sealed class DateTimeAndOffset(int offset, DateTimeOffset date)
+        private readonly record struct DateTimeAndOffset(int Offset, DateTimeOffset Date)
         {
-            public int Offset { get; set; } = offset;
-            public DateTimeOffset Date { get; set; } = date;
-
-            public override string ToString()
-            {
-                return Date.ToString("o");
-            }
+            public override string ToString() => Date.ToString("o");
         }
     }
 }

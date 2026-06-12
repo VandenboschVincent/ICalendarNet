@@ -5,19 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using static ICalendarNet.Models.Enum.Statics;
 
 namespace ICalendarNet.Logic.Recurrence
 {
     public static partial class RecurrenceRuleEvaluator
     {
-        /// <summary>
-        /// Creates a new period from the specified date/time, where the
-        /// <see cref="DateTimeOffset.HasTime"/> is taken into account.
-        /// </summary>
-        private static CalendarPeriod CreatePeriod(DateTimeOffset dateTime)
-            => new(ICalProperty.FREEBUSY, dateTime, dateTime);
-
         private static DateTimeOffset GetMaxYear(DateTimeOffset periodStart)
         {
             if (periodStart > new DateTimeOffset(9800, 1, 1, 0, 0, 0, TimeSpan.Zero))
@@ -64,8 +56,7 @@ namespace ICalendarNet.Logic.Recurrence
             }
         }
 
-        private static void IncrementDate(
-            ref DateTimeOffset dt, CalendarRecurrenceRule pattern, int interval)
+        private static void IncrementDate(ref DateTimeOffset dt, CalendarRecurrenceRule pattern, int interval, string? timeZone)
         {
             if (interval == 0)
                 return;
@@ -104,6 +95,14 @@ namespace ICalendarNet.Logic.Recurrence
                         // Frequency should always be valid at this stage.
                         Debug.Fail($"'{pattern.Frequency}' as RecurrencePattern.Frequency is not implemented.");
                         break;
+                }
+                if (timeZone != null)
+                {
+                    var newTz = pattern.Metadata.GetTimeZone(timeZone)?.GetOffsetInMinutes(dt);
+                    if (newTz != null && newTz.Value != Convert.ToInt32(dt.Offset.TotalMinutes))
+                    {
+                        dt = new DateTimeOffset(dt.DateTime, TimeSpan.FromMinutes(newTz.Value));
+                    }
                 }
             }
             catch (ArgumentOutOfRangeException)

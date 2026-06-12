@@ -11,10 +11,10 @@ namespace ICalendarNet.Models.Base
 {
     public abstract class CalendarRecurrableObject : CalendarOccurableObject
     {
-        private static readonly List<string> rruleProperties = [ICalProperties[(int)ICalProperty.EXDATE]
-            , ICalProperties[(int)ICalProperty.RRULE]
-            , ICalProperties[(int)ICalProperty.EXRULE]
-            , ICalProperties[(int)ICalProperty.RDATE]];
+        private static readonly List<string> rruleProperties = [nameof(ICalProperty.EXDATE)
+            , nameof(ICalProperty.RRULE)
+            , nameof(ICalProperty.EXRULE)
+            , nameof(ICalProperty.RDATE)];
 
         /// <summary>
         ///   <see cref="ICalProperty.EXDATE" />
@@ -75,18 +75,22 @@ namespace ICalendarNet.Models.Base
             set => Properties.UpdateLineProperty(value, ICalProperty.RDATE);
         }
 
-        public IEnumerable<CalendarPeriod>? GetRecurrence(int amount = 1, DateTimeOffset? start = null, bool addStartDay = true, DateTimeOffset? end = null)
+        public IEnumerable<DateTimeOffset>? GetRecurrence(int amount = 1, DateTimeOffset? start = null, bool addStartDay = true, DateTimeOffset? end = null)
         {
             var rrule = GetRecurrenceRule();
             var dtstart = DateTimeStart;
+            var tzstart = Properties.GetContentlines(ICalProperty.DTSTART)
+                .FirstOrDefault()?.Parameters.GetValue(nameof(ICalProperty.TZID));
             if (rrule is null || dtstart is null)
                 return null;
             if (rrule.Until < start)
                 return null;
             var exdates = ExceptionDateTimes;
-            return RecurrenceRuleEvaluator.GetRecurrenceDates(rrule, dtstart.Value, amount, start, addStartDay, end, exceptionDates: exdates) ??
-                Properties.GetContentlines(ICalProperty.RDATE).Cast<CalendarPeriods>()
-                .SelectMany(t => t.GetPeriods());
+            return RecurrenceRuleEvaluator.GetRecurrenceDates(rrule, dtstart.Value, amount, start, addStartDay, end, exceptionDates: exdates, timeZone: tzstart) ??
+                RecurrenceDates?
+                    .Where(t => (start == null || t.DateStart >= start) && (end == null || t.DateStart <= end)).Select(t => t.DateStart)
+                    .OrderBy(t => t)
+                    .Take(amount);
         }
 
         public IEnumerable<CalendarRecurrableObject> GetOccuring(int amount = 1, DateTimeOffset? start = null, bool addStartDay = true, DateTimeOffset? end = null)
@@ -95,13 +99,13 @@ namespace ICalendarNet.Models.Base
             return recurrences?.Select(Clone) ?? [];
         }
 
-        protected abstract CalendarRecurrableObject Clone(CalendarPeriod period);
+        protected abstract CalendarRecurrableObject Clone(DateTimeOffset occurence);
 
-        protected static T CloneComponent<T>(T obj, CalendarPeriod period) where T : CalendarRecurrableObject, new()
+        protected static T CloneComponent<T>(T obj, DateTimeOffset occurence) where T : CalendarRecurrableObject, new()
         {
             var serialized = CalSerializor.SerializeICalObject(obj);
-            var clone = CalSerializor.DeserializeICalComponent<T>(serialized) ?? throw new InvalidOperationException("cloning object failed");
-            clone.DateTimeStart = period.DateStart;
+            var clone = CalSerializor.DeserializeICalComponent<T>(serialized, obj.Metadata.GetTimeZones()) ?? throw new InvalidOperationException("cloning object failed");
+            clone.DateTimeStart = occurence;
             clone.Properties.RemoveAll(t => rruleProperties.Contains(t.Name));
             return clone;
         }
