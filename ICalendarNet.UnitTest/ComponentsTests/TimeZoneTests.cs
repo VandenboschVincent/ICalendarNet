@@ -21,20 +21,18 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         }
 
         // --- 2025 DST transition ---
-        [TestCase("2025-03-30T01:59:59Z", 60)]
+        [TestCase("2025-03-30T01:59:59Z", 120)]   // was 60; EU switches at 01:00 UTC, already CEST
         [TestCase("2025-03-30T02:00:00Z", 120)]
 
         // --- 2025 summer ---
         [TestCase("2025-07-01T12:00:00Z", 120)]
 
         // --- 2025 DST end ---
-        [TestCase("2025-10-26T01:59:59Z", 120)]
-        //[TestCase("2025-10-26T02:00:00Z", 120)]
-        //[TestCase("2025-10-26T02:59:59Z", 120)]
+        [TestCase("2025-10-26T01:59:59Z", 60)]    // was 120; fall-back at 01:00 UTC, already CET
         [TestCase("2025-10-26T03:00:00Z", 60)]
 
         // --- 2026 DST transition ---
-        [TestCase("2026-03-29T01:59:59Z", 60)]
+        [TestCase("2026-03-29T01:59:59Z", 120)]   // was 60; already CEST after 01:00 UTC
         [TestCase("2026-03-29T02:00:00Z", 120)]
 
         // --- 2026 DST end ---
@@ -48,7 +46,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         // --- Far future/past (RRULE correctness) ---
         [TestCase("2030-03-31T02:00:00Z", 120)]
         [TestCase("2030-10-27T03:00:00Z", 60)]
-        [TestCase("1971-03-28T02:00:00Z", 120)]
+        [TestCase("1971-03-28T02:00:00Z", 120)]    // Belgium did NOT observe DST in 1971 (reintroduced 1977)
         [TestCase("2099-10-25T03:00:00Z", 60)]
 
         // 02:30 does NOT exist (clock jumps 02:00 → 03:00)
@@ -75,6 +73,7 @@ TZNAME:CEST
 END:DAYLIGHT
 
 END:VTIMEZONE";
+            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels"));
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
             var offSet = calendar.GetOffsetInMinutes(DateTimeOffset.Parse(date, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.AssumeUniversal));
@@ -82,20 +81,20 @@ END:VTIMEZONE";
         }
 
         [TestCase("2024-01-15T12:00:00Z", -300)]
-        [TestCase("2024-03-10T01:59:59Z", -240)]
-        [TestCase("2024-03-10T02:00:00Z", -240)]
+        [TestCase("2024-03-10T01:59:59Z", -300)]
+        [TestCase("2024-03-10T02:00:00Z", -300)]   // was -240; 02:00 UTC = 21:00 EST prev day, still EST
         [TestCase("2024-06-15T12:00:00Z", -240)]
-        [TestCase("2024-11-03T01:59:59Z", -300)]
-        [TestCase("2024-11-03T02:00:00Z", -300)]
+        [TestCase("2024-11-03T01:59:59Z", -240)]   // was -300; 01:59 UTC = 21:59 EDT prev day, still EDT
+        [TestCase("2024-11-03T02:00:00Z", -240)]   // was -300; 02:00 UTC = 22:00 EDT prev day, still EDT
         [TestCase("2024-12-15T12:00:00Z", -300)]
 
         // Cross-year validation
-        [TestCase("2025-03-09T02:00:00Z", -240)]
-        [TestCase("2025-11-02T02:00:00Z", -300)]
+        [TestCase("2025-03-09T02:00:00Z", -300)]   // was -240; still EST
+        [TestCase("2025-11-02T02:00:00Z", -240)]   // was -300; still EDT
 
         // Far future/past (RRULE check)
-        [TestCase("2030-03-10T02:00:00Z", -240)]
-        [TestCase("2030-11-03T02:00:00Z", -300)]
+        [TestCase("2030-03-10T02:00:00Z", -300)]   // was -240; still EST
+        [TestCase("2030-11-03T02:00:00Z", -240)]   // was -300; still EDT
         public void Test_Try_AmericaNewYork_RRule_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -118,7 +117,7 @@ TZNAME:EDT
 END:DAYLIGHT
 
 END:VTIMEZONE";
-
+            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("US/Eastern"));
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
@@ -146,6 +145,7 @@ TZNAME:JST
 END:STANDARD
 
 END:VTIMEZONE";
+            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("Asia/Tokyo"));
 
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
@@ -156,7 +156,6 @@ END:VTIMEZONE";
 
         [TestCase("2024-03-31T02:00:00Z", 120)]
         [TestCase("2024-06-15T12:00:00Z", 120)]
-        //[TestCase("2024-10-27T02:59:59Z", 120)]
         [TestCase("2024-10-27T03:00:00Z", 60)]
         [TestCase("2024-12-15T12:00:00Z", 60)]
         public void Test_Try_EuropeBrussels_RDATE_Timezone(string date, int offset)
@@ -180,6 +179,7 @@ RDATE:20240331T020000,20250330T020000,20260329T020000
 END:DAYLIGHT
 
 END:VTIMEZONE";
+            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels"));
 
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
@@ -188,9 +188,7 @@ END:VTIMEZONE";
             offSet.Should().Be(offset);
         }
 
-        //[TestCase("2024-03-31T02:00:00Z", 60)]
         [TestCase("2024-06-15T12:00:00Z", 120)]
-        //[TestCase("2024-10-27T02:59:59Z", 120)]
         [TestCase("2024-10-27T03:00:00Z", 60)]
         [TestCase("2024-12-15T12:00:00Z", 60)]
         public void Test_Try_EuropeBrussels_RDATE_End_Timezone(string date, int offset)
@@ -214,6 +212,7 @@ RDATE:20240331T020000/20241027T030000,20250330T020000/20251026T030000,20260329T0
 END:DAYLIGHT
 
 END:VTIMEZONE";
+            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("Europe/Brussels"));
 
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();

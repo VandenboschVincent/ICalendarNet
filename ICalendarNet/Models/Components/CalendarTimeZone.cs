@@ -56,7 +56,8 @@ namespace ICalendarNet.Models.Components
 
         public int GetOffsetInMinutes(DateTimeOffset? dateTime = null)
         {
-            DateTime dt = dateTime?.DateTime ?? DateTime.Now;
+            DateTime dt0 = dateTime?.DateTime ?? DateTime.Now;
+            DateTime dt = new(dt0.Year, dt0.Month, dt0.Day, dt0.Hour, dt0.Minute, dt0.Second, DateTimeKind.Utc);
             cachedTimeZone ??= TimeZoneInfoHelper.GetTimeZone(this);
             if (cachedTimeZone == null) return 0;
             if (cachedTimeZone.IsInvalidTime(dt))
