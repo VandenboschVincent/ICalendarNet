@@ -21,38 +21,38 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         }
 
         // --- 2025 DST transition ---
-        [TestCase("2025-03-30T01:59:59", 60)]
-        [TestCase("2025-03-30T02:00:00", 120)]
+        [TestCase("2025-03-30T01:59:59Z", 60)]
+        [TestCase("2025-03-30T02:00:00Z", 120)]
 
         // --- 2025 summer ---
-        [TestCase("2025-07-01T12:00:00", 120)]
+        [TestCase("2025-07-01T12:00:00Z", 120)]
 
         // --- 2025 DST end ---
-        [TestCase("2025-10-26T01:59:59", 120)]
-        //[TestCase("2025-10-26T02:00:00", 120)]
-        //[TestCase("2025-10-26T02:59:59", 120)]
-        [TestCase("2025-10-26T03:00:00", 60)]
+        [TestCase("2025-10-26T01:59:59Z", 120)]
+        //[TestCase("2025-10-26T02:00:00Z", 120)]
+        //[TestCase("2025-10-26T02:59:59Z", 120)]
+        [TestCase("2025-10-26T03:00:00Z", 60)]
 
         // --- 2026 DST transition ---
-        [TestCase("2026-03-29T01:59:59", 60)]
-        [TestCase("2026-03-29T02:00:00", 120)]
+        [TestCase("2026-03-29T01:59:59Z", 60)]
+        [TestCase("2026-03-29T02:00:00Z", 120)]
 
         // --- 2026 DST end ---
-        //[TestCase("2026-10-25T02:59:59", 120)]
-        [TestCase("2026-10-25T03:00:00", 60)]
+        //[TestCase("2026-10-25T02:59:59Z", 120)]
+        [TestCase("2026-10-25T03:00:00Z", 60)]
 
         // --- Mid-winter / mid-summer sanity checks ---
-        [TestCase("2026-01-10T08:00:00", 60)]
-        [TestCase("2026-08-10T08:00:00", 120)]
+        [TestCase("2026-01-10T08:00:00Z", 60)]
+        [TestCase("2026-08-10T08:00:00Z", 120)]
 
         // --- Far future/past (RRULE correctness) ---
-        [TestCase("2030-03-31T02:00:00", 120)]
-        [TestCase("2030-10-27T03:00:00", 60)]
-        [TestCase("1971-03-28T02:00:00", 120)]
-        [TestCase("2099-10-25T03:00:00", 60)]
+        [TestCase("2030-03-31T02:00:00Z", 120)]
+        [TestCase("2030-10-27T03:00:00Z", 60)]
+        [TestCase("1971-03-28T02:00:00Z", 120)]
+        [TestCase("2099-10-25T03:00:00Z", 60)]
 
         // 02:30 does NOT exist (clock jumps 02:00 → 03:00)
-        [TestCase("2024-03-31T02:30:00", 120)]
+        [TestCase("2024-03-31T02:30:00Z", 120)]
         public void Test_Try_EuropeBrussels_RRule_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -81,21 +81,21 @@ END:VTIMEZONE";
             offSet.Should().Be(offset);
         }
 
-        [TestCase("2024-01-15T12:00:00", -300)]
-        [TestCase("2024-03-10T01:59:59", -240)]
-        [TestCase("2024-03-10T02:00:00", -240)]
-        [TestCase("2024-06-15T12:00:00", -240)]
-        [TestCase("2024-11-03T01:59:59", -300)]
-        [TestCase("2024-11-03T02:00:00", -300)]
-        [TestCase("2024-12-15T12:00:00", -300)]
+        [TestCase("2024-01-15T12:00:00Z", -300)]
+        [TestCase("2024-03-10T01:59:59Z", -240)]
+        [TestCase("2024-03-10T02:00:00Z", -240)]
+        [TestCase("2024-06-15T12:00:00Z", -240)]
+        [TestCase("2024-11-03T01:59:59Z", -300)]
+        [TestCase("2024-11-03T02:00:00Z", -300)]
+        [TestCase("2024-12-15T12:00:00Z", -300)]
 
         // Cross-year validation
-        [TestCase("2025-03-09T02:00:00", -240)]
-        [TestCase("2025-11-02T02:00:00", -300)]
+        [TestCase("2025-03-09T02:00:00Z", -240)]
+        [TestCase("2025-11-02T02:00:00Z", -300)]
 
         // Far future/past (RRULE check)
-        [TestCase("2030-03-10T02:00:00", -240)]
-        [TestCase("2030-11-03T02:00:00", -300)]
+        [TestCase("2030-03-10T02:00:00Z", -240)]
+        [TestCase("2030-11-03T02:00:00Z", -300)]
         public void Test_Try_AmericaNewYork_RRule_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -126,13 +126,13 @@ END:VTIMEZONE";
             offSet.Should().Be(offset);
         }
 
-        [TestCase("2024-01-01T00:00:00", 540)]
-        [TestCase("2024-06-01T12:00:00", 540)]
-        [TestCase("2024-12-31T23:59:59", 540)]
+        [TestCase("2024-01-01T00:00:00Z", 540)]
+        [TestCase("2024-06-01T12:00:00Z", 540)]
+        [TestCase("2024-12-31T23:59:59Z", 540)]
 
         // Cross-year consistency
-        [TestCase("2025-03-10T02:00:00", 540)]
-        [TestCase("2030-10-27T03:00:00", 540)]
+        [TestCase("2025-03-10T02:00:00Z", 540)]
+        [TestCase("2030-10-27T03:00:00Z", 540)]
         public void Test_Try_AsiaTokyo_Fixed_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -154,11 +154,11 @@ END:VTIMEZONE";
             offSet.Should().Be(offset);
         }
 
-        [TestCase("2024-03-31T02:00:00", 120)]
-        [TestCase("2024-06-15T12:00:00", 120)]
-        //[TestCase("2024-10-27T02:59:59", 120)]
-        [TestCase("2024-10-27T03:00:00", 60)]
-        [TestCase("2024-12-15T12:00:00", 60)]
+        [TestCase("2024-03-31T02:00:00Z", 120)]
+        [TestCase("2024-06-15T12:00:00Z", 120)]
+        //[TestCase("2024-10-27T02:59:59Z", 120)]
+        [TestCase("2024-10-27T03:00:00Z", 60)]
+        [TestCase("2024-12-15T12:00:00Z", 60)]
         public void Test_Try_EuropeBrussels_RDATE_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
@@ -188,11 +188,11 @@ END:VTIMEZONE";
             offSet.Should().Be(offset);
         }
 
-        //[TestCase("2024-03-31T02:00:00", 60)]
-        [TestCase("2024-06-15T12:00:00", 120)]
-        //[TestCase("2024-10-27T02:59:59", 120)]
-        [TestCase("2024-10-27T03:00:00", 60)]
-        [TestCase("2024-12-15T12:00:00", 60)]
+        //[TestCase("2024-03-31T02:00:00Z", 60)]
+        [TestCase("2024-06-15T12:00:00Z", 120)]
+        //[TestCase("2024-10-27T02:59:59Z", 120)]
+        [TestCase("2024-10-27T03:00:00Z", 60)]
+        [TestCase("2024-12-15T12:00:00Z", 60)]
         public void Test_Try_EuropeBrussels_RDATE_End_Timezone(string date, int offset)
         {
             string icalString = @"BEGIN:VTIMEZONE
