@@ -47,7 +47,7 @@ namespace ICalendarNet.Logic.Recurrence
                     && x < options.MaxOccurrencesLimit)
                 .ToList();
 
-            if (options.AddStartDate && !periodQuery.Contains(referenceDate) && 
+            if (options.AddStartDate && !periodQuery.Contains(referenceDate) &&
                 periodStart != null && referenceDate >= periodStart)
                 periodQuery.Add(referenceDate);
             else if (options?.AddStartDate == false)

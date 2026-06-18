@@ -92,9 +92,12 @@ namespace ICalendarNet.Extensions
             var names = keys.Select(k => k.GetString()).ToHashSet(StringComparer.OrdinalIgnoreCase);
             return lines.Where(t => names.Contains(t.Name, StringComparer.OrdinalIgnoreCase)).Select(t => t.GetLineValue());
         }
+
 #if NET5_0_OR_GREATER
+
         public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
             => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries));
+
 #else
         public static IEnumerable<string> GetContentlinesSeperatedValue(this List<ICalendarProperty> lines, params ICalProperty[] keys)
             => lines.GetContentlinesValue(keys).SelectMany(v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(t => t.Trim()));
@@ -235,6 +238,7 @@ namespace ICalendarNet.Extensions
         {
             return lines.HasProperty(propertyName.GetString());
         }
+
         public static bool HasProperty(this List<ICalendarProperty> lines, string propertyName)
         {
             return lines.Any(p => p.Name.Equals(propertyName, StringComparison.OrdinalIgnoreCase));

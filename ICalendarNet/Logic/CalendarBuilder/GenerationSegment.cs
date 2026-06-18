@@ -3,7 +3,7 @@ using System;
 
 namespace ICalendarNet.Logic.CalendarBuilder
 {
- #if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER
     /// <summary>
     /// A contiguous time window during which a single generator
     /// (the master, or a THISANDFUTURE override carrying its own RRULE)
@@ -30,7 +30,6 @@ namespace ICalendarNet.Logic.CalendarBuilder
         DateTimeOffset WindowStart,
         DateTimeOffset WindowEnd)
     {
-
         /// <summary>The component used to expand occurrences in this window.</summary>
         public CalendarRecurrableObject Generator { get; } = Generator;
 

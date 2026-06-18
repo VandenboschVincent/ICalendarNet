@@ -81,7 +81,7 @@ namespace ICalendarNet.Extensions
                 tz = TimeZoneInfo.FindSystemTimeZoneById(tzId);
                 return true;
             }
-            catch (TimeZoneNotFoundException) 
+            catch (TimeZoneNotFoundException)
             {
                 //No other method for tryfind in netstandard2.1, so we have to catch the exception and return null if not found
                 tz = null;

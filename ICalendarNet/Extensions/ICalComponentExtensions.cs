@@ -1,4 +1,5 @@
 ﻿using ICalendarNet.Models.Enum;
+
 namespace ICalendarNet.Extensions
 {
     public static class ICalComponentExtensions
@@ -12,6 +13,5 @@ namespace ICalendarNet.Extensions
         {
             return $"END:{component.GetString()}";
         }
-
     }
 }

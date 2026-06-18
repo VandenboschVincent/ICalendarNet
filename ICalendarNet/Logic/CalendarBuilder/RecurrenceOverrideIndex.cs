@@ -1,5 +1,4 @@
-﻿using ICalendarNet.Extensions;
-using ICalendarNet.Models.Base;
+﻿using ICalendarNet.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
