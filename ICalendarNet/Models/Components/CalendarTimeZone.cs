@@ -54,20 +54,20 @@ namespace ICalendarNet.Models.Components
         /// </summary>
         public IEnumerable<CalendarStandard> GetStandards() => SubComponents.Where(t => t.ComponentType == ICalComponent.STANDARD).Cast<CalendarStandard>();
 
-        public int GetOffsetInMinutes(DateTimeOffset? dateTime = null)
+        public int GetOffsetInMinutes(DateTimeOffset? UTCdateTime = null)
         {
-            DateTime dt0 = dateTime?.DateTime ?? DateTime.Now;
-            DateTime dt = new(dt0.Year, dt0.Month, dt0.Day, dt0.Hour, dt0.Minute, dt0.Second, DateTimeKind.Utc);
+            UTCdateTime ??= DateTimeOffset.UtcNow;
+            DateTime dt = UTCdateTime.Value.UtcDateTime;
             cachedTimeZone ??= TimeZoneInfoHelper.GetTimeZone(this);
             if (cachedTimeZone == null) return 0;
             if (cachedTimeZone.IsInvalidTime(dt))
             {
-                // Get the DST delta for this zone (typically +1:00)
+                // Get the DST delta for this zone
                 var adjustment = cachedTimeZone.GetAdjustmentRules()
                     .FirstOrDefault(r => r.DateStart <= dt && dt <= r.DateEnd);
-                dt = dt + (adjustment?.DaylightDelta ?? cachedTimeZone.BaseUtcOffset);
+                UTCdateTime = UTCdateTime + (adjustment?.DaylightDelta ?? cachedTimeZone.BaseUtcOffset);
             }
-            var offset = Convert.ToInt32(cachedTimeZone.GetUtcOffset(dt).TotalMinutes);
+            var offset = Convert.ToInt32(cachedTimeZone.GetUtcOffset(UTCdateTime.Value).TotalMinutes);
             return offset;
         }
     }

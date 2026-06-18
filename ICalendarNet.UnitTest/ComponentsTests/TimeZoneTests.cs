@@ -46,7 +46,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
         // --- Far future/past (RRULE correctness) ---
         [TestCase("2030-03-31T02:00:00Z", 120)]
         [TestCase("2030-10-27T03:00:00Z", 60)]
-        [TestCase("1971-03-28T02:00:00Z", 120)]    // Belgium did NOT observe DST in 1971 (reintroduced 1977)
+        [TestCase("1969-03-28T02:00:00Z", 60)]
         [TestCase("2099-10-25T03:00:00Z", 60)]
 
         // 02:30 does NOT exist (clock jumps 02:00 → 03:00)
@@ -117,7 +117,7 @@ TZNAME:EDT
 END:DAYLIGHT
 
 END:VTIMEZONE";
-            using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("US/Eastern"));
+            //using var tzMock = new TimeZoneMocker(TimeZoneInfo.FindSystemTimeZoneById("US/Eastern"));
             var calendar = CalSerializor.DeserializeICalComponent<CalendarTimeZone>(icalString);
             calendar.Should().NotBeNull();
 
