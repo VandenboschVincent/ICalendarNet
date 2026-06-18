@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class TimeZoneTests : UnitTestBase
+    internal class TimeZoneTests : UnitTestBase
     {
         [Test]
         public void Test_GetTimeZones()

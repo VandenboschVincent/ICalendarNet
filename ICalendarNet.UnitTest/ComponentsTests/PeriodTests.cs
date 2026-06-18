@@ -6,7 +6,7 @@ using static ICalendarNet.Models.Enum.Statics;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class PeriodTests : UnitTestBase
+    internal class PeriodTests : UnitTestBase
     {
         [Test]
         public void Test_Serialize_Period()

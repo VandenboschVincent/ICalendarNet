@@ -3,7 +3,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class TodoTests : UnitTestBase
+    internal class TodoTests : UnitTestBase
     {
         private static IEnumerable<string> IcalFiles => GetIcalFiles("Todo*");
 

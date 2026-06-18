@@ -6,7 +6,7 @@ using System.Globalization;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
-    public class ICalendarPropertyExtensionsTests
+    internal class ICalendarPropertyExtensionsTests
     {
         [TestCase("PT1H0M0S", 3600)]
         [TestCase("PT01H0M0S", 3600)]

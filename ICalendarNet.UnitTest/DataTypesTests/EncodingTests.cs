@@ -3,7 +3,7 @@ using System.Globalization;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
-    public class EncodingTests
+    internal class EncodingTests
     {
         [Test]
         public void Test_Encoding_Deserialize_Serialize()

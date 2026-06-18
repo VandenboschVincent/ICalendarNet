@@ -4,7 +4,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class AlarmTests : UnitTestBase
+    internal class AlarmTests : UnitTestBase
     {
         private static IEnumerable<string> IcalFiles => GetIcalFiles("Alarm*");
 
