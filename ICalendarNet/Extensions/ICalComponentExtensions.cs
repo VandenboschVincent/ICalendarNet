@@ -6,12 +6,12 @@ namespace ICalendarNet.Extensions
     {
         public static string ToBegin(this ICalComponent component)
         {
-            return $"BEGIN:{component}".ToUpper();
+            return $"BEGIN:{component.GetString()}";
         }
 
         public static string ToEnd(this ICalComponent component)
         {
-            return $"END:{component}".ToUpper();
+            return $"END:{component.GetString()}";
         }
     }
 }

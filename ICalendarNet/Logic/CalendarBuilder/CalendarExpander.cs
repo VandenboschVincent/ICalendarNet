@@ -9,12 +9,11 @@ namespace ICalendarNet.Logic.CalendarBuilder
 {
     internal static class CalendarExpander
     {
-        public static IEnumerable<ICalendarComponent> ExpandCalendar(
+        public static IEnumerable<CalendarOccurableObject> ExpandCalendar(
             Calendar calendar, DateTimeOffset start, DateTimeOffset end)
         {
             var recurrable = calendar.SubComponents
-                .OfType<CalendarRecurrableObject>()
-                .ToList();
+                .OfType<CalendarRecurrableObject>();
 
             var overrides = RecurrenceOverrideIndex.Build(recurrable);
             var masters = GetMasters(recurrable);
@@ -33,16 +32,16 @@ namespace ICalendarNet.Logic.CalendarBuilder
                 yield return item;
         }
 
-        private static List<CalendarRecurrableObject> GetMasters(
-            List<CalendarRecurrableObject> recurrable) =>
-            [.. recurrable.Where(t =>
+        private static IEnumerable<CalendarRecurrableObject> GetMasters(
+            IEnumerable<CalendarRecurrableObject> recurrable) =>
+            recurrable.Where(t =>
                     t.RecurrenceID is null &&
                     t.DateTimeStart is not null &&
-                    (t.RecurrenceDates?.Any() == true || t.GetRecurrenceRule() != null))];
+                    (t.RecurrenceDates?.Any() == true || t.GetRecurrenceRule() != null));
 
         private static IEnumerable<CalendarRecurrableObject> GetOrphanOverrides(
-            List<CalendarRecurrableObject> recurrable,
-            List<CalendarRecurrableObject> masters,
+            IEnumerable<CalendarRecurrableObject> recurrable,
+            IEnumerable<CalendarRecurrableObject> masters,
             DateTimeOffset start,
             DateTimeOffset end)
         {

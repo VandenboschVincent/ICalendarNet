@@ -8,24 +8,26 @@ namespace ICalendarNet.Serialization
 {
     public static class CalSerializor
     {
-        public static Calendar? DeserializeCalendar(ReadOnlySpan<char> source)
+        public static Calendar? DeserializeCalendar(ReadOnlySpan<char> source, List<CalendarTimeZone>? timeZones = null)
         {
-            return DeserializeICalComponent<Calendar>(source);
+            return DeserializeICalComponent<Calendar>(source, timeZones);
         }
 
-        public static List<Calendar> DeserializeCalendars(ReadOnlySpan<char> source)
+        public static List<Calendar> DeserializeCalendars(ReadOnlySpan<char> source, List<CalendarTimeZone>? timeZones = null)
         {
-            return DeserializeICalComponents<Calendar>(source);
+            return DeserializeICalComponents<Calendar>(source, timeZones);
         }
 
-        public static T? DeserializeICalComponent<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
+        public static T? DeserializeICalComponent<T>(ReadOnlySpan<char> source, List<CalendarTimeZone>? timeZones = null) where T : ICalendarComponent, new()
         {
-            return DeserializeICalComponents<T>(source).FirstOrDefault();
+            return DeserializeICalComponents<T>(source, timeZones).FirstOrDefault();
         }
 
-        public static List<T> DeserializeICalComponents<T>(ReadOnlySpan<char> source) where T : ICalendarComponent, new()
+        public static List<T> DeserializeICalComponents<T>(ReadOnlySpan<char> source, List<CalendarTimeZone>? timeZones = null) where T : ICalendarComponent, new()
         {
             StringHandler handler = new(source);
+            if (timeZones != null)
+                handler.TimeZones = timeZones;
             if (handler.BlocksLeft < 1)
                 throw new ArgumentException("Could not deserialize source");
 

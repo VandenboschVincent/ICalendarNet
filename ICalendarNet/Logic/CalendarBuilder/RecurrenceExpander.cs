@@ -43,7 +43,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
             CalendarRecurrableObject occur,
             GenerationSegment seg,
             Dictionary<DateTime, CalendarRecurrableObject>? singleOverrides,
-            List<CalendarRecurrableObject>? futureOverrides)
+            IEnumerable<CalendarRecurrableObject>? futureOverrides)
         {
             var originalStart = seg.WindowStart;
 

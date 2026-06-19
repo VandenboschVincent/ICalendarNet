@@ -45,14 +45,6 @@ namespace ICalendarNet.Benchmarking
         public string SerializeCalendar() => CalSerializor.SerializeCalendar(SimpleCalendar());
 
         [Benchmark]
-        public string Deserialize_And_Serialize_Tiny_Calendar()
-        {
-            var icalvar = _sampleData.ICalStrings[^1];
-            Calendar? calendar = Calendar.LoadCalendar(icalvar);
-            return CalSerializor.SerializeCalendar(calendar!);
-        }
-
-        [Benchmark]
         public List<string> Deserialize_And_Serialize_all_Calendars()
         {
             var calendars = Calendar.LoadCalendars(string.Join(Environment.NewLine, _sampleData.ICalStrings));
@@ -60,17 +52,18 @@ namespace ICalendarNet.Benchmarking
         }
 
         [Benchmark]
-        public string Deserialize_And_Serialize_Event()
-        {
-            ICalendarComponent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(SampleData.SampleEvent);
-            return CalSerializor.SerializeICalObject(calendar!);
-        }
-
-        [Benchmark]
         public string Deserialize_And_Serialize_Big_Calendar()
         {
             Calendar? calendar = Calendar.LoadCalendar(_sampleData.AmericanAwernessDays);
             return CalSerializor.SerializeCalendar(calendar!);
+        }
+        [Benchmark]
+        public List<CalendarOccurableObject> Deserialize_And_Expand_Daily_Event()
+        {
+            var dateTime = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            var end = new DateTimeOffset(2021, 1, 1, 0, 0, 0, TimeSpan.Zero);
+            Calendar? calendar = Calendar.LoadCalendar(SampleData.SampleRecurring);
+            return [.. calendar!.ExpandCalendar(dateTime, end)];
         }
     }
 }

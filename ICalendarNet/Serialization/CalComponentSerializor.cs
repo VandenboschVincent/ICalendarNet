@@ -30,7 +30,7 @@ namespace ICalendarNet.Serialization
                 ICalComponent.STANDARD => InternalDeserializeComponentsBlock(ref handler, new CalendarStandard(), parentBlock),
                 ICalComponent.DAYLIGHT => InternalDeserializeComponentsBlock(ref handler, new CalendarDaylight(), parentBlock),
                 ICalComponent.VALARM => InternalDeserializeComponentsBlock(ref handler, new CalendarAlarm(), parentBlock),
-                _ => throw new ArgumentException(message: "invalid component", paramName: parentBlock.CalComponent!.Value.ToString()),
+                _ => throw new ArgumentException(message: "invalid component", paramName: parentBlock.CalComponent!.Value.GetString()),
             };
         }
 
@@ -75,7 +75,7 @@ namespace ICalendarNet.Serialization
         private static T InternalDeserializeComponentsBlock<T>(ref StringHandler handler, T parent, CalComponentBlock parentBlock) where T : ICalendarComponent, new()
         {
             if (!parentBlock.CalComponent.HasValue)
-                throw new ArgumentException($"Could not deserialize to {nameof(parent)}");
+                throw new ArgumentException($"Could not deserialize to {parent.GetType().Name}");
             parent.Properties.AddRange(CalPropertySerializor.InternalDeserializeContentLines(parentBlock.Properties));
             for (int i = 0; i < parentBlock.ComponentCount; i++)
             {

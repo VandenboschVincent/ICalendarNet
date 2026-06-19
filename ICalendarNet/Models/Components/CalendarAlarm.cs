@@ -42,7 +42,7 @@ namespace ICalendarNet.Models.Components
         /// </summary>
         public virtual AlarmAction Action
         {
-            get => Properties.GetContentlineValue<AlarmAction>(ICalProperty.ACTION, AlarmAction.DISPLAY.ToString());
+            get => Properties.GetContentlineValue<AlarmAction>(ICalProperty.ACTION, nameof(AlarmAction.DISPLAY));
             set => Properties.UpdateLineProperty(value, ICalProperty.ACTION);
         }
 

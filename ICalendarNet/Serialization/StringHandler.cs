@@ -146,7 +146,7 @@ namespace ICalendarNet.Serialization
             ICalComponent.VJOURNAL => child == ICalComponent.VALARM,
             ICalComponent.VTIMEZONE => child is ICalComponent.VALARM or ICalComponent.STANDARD or ICalComponent.DAYLIGHT,
             ICalComponent.VFREEBUSY or ICalComponent.STANDARD or ICalComponent.DAYLIGHT or ICalComponent.VALARM => false,
-            _ => throw new ArgumentException("invalid component", nameof(parent))
+            _ => throw new ArgumentException("invalid component", parent.GetType().Name)
         };
 
         private readonly int CountSubComponents(in CalComponentIndex parent)
@@ -212,7 +212,7 @@ namespace ICalendarNet.Serialization
                 case ICalComponent.VALARM:
                     break;
 
-                default: throw new ArgumentException(message: "invalid component", paramName: component.ToString());
+                default: throw new ArgumentException(message: "invalid component", paramName: component.GetString());
             }
             return t => false;
         }

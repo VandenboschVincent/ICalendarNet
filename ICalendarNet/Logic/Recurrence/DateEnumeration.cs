@@ -20,7 +20,7 @@ namespace ICalendarNet.Logic.Recurrence
             DateTimeOffset seed,
             DateTimeOffset? periodStart,
             CalendarRecurrenceRule pattern,
-            EvaluationOptions? options)
+            EvaluationOptions options)
         {
             var originalDate = seed;
             var seedCopy = seed;
@@ -34,7 +34,8 @@ namespace ICalendarNet.Logic.Recurrence
                 IncrementDate(
                     ref seedCopy,
                     pattern,
-                    Calendar.GetIso8601YearOfWeek(seedCopy, pattern.FirstDayOfWeek) - seedCopy.Year);
+                    CalendarExtensions.GetIso8601YearOfWeek(seedCopy, pattern.FirstDayOfWeek) - seedCopy.Year,
+                    options.TimeZone);
             }
 
             // Optimize the start time for selecting candidates (only applicable where
@@ -45,7 +46,7 @@ namespace ICalendarNet.Logic.Recurrence
                 while (incremented < periodStartDt)
                 {
                     seedCopy = incremented;
-                    IncrementDate(ref incremented, pattern, pattern.Interval);
+                    IncrementDate(ref incremented, pattern, pattern.Interval, options.TimeZone);
                 }
             }
             else if (pattern.Count < 1)
@@ -68,7 +69,7 @@ namespace ICalendarNet.Logic.Recurrence
             DateTimeOffset originalDate,
             DateTimeOffset intervalRefTime,
             CalendarRecurrenceRule pattern,
-            EvaluationOptions? options)
+            EvaluationOptions options)
         {
             var expandBehavior = GetExpandBehaviorList(pattern);
             var searchEndDate = GetSearchEndDate(pattern);
@@ -86,7 +87,7 @@ namespace ICalendarNet.Logic.Recurrence
             DateTimeOffset originalDate,
             DateTimeOffset intervalRefTime,
             CalendarRecurrenceRule pattern,
-            EvaluationOptions? options,
+            EvaluationOptions options,
             bool?[] expandBehavior,
             DateTimeOffset? searchEndDate)
         {
@@ -119,11 +120,11 @@ namespace ICalendarNet.Logic.Recurrence
                         yield break;
                 }
 
-                if (noCandidateIncrementCount > options?.MaxUnmatchedIncrementsLimit)
+                if (noCandidateIncrementCount > options.MaxUnmatchedIncrementsLimit)
                     break;
 
                 noCandidateIncrementCount++;
-                IncrementDate(ref intervalRefTime, pattern, pattern.Interval);
+                IncrementDate(ref intervalRefTime, pattern, pattern.Interval, options.TimeZone);
             }
         }
 
@@ -226,7 +227,7 @@ namespace ICalendarNet.Logic.Recurrence
             //  - time  = smallest BYHOUR/BYMINUTE/BYSECOND or original DTSTART time
             var year = intervalRefTime.Year;
             var month = pattern.ByMonth.Min();
-            var daysInMonth = Calendar.GetDaysInMonth(year, month);
+            var daysInMonth = CalendarExtensions.GetDaysInMonth(year, month);
 
             int day;
             if (pattern.ByMonthDay.Count > 0)

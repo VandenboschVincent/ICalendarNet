@@ -36,5 +36,10 @@ namespace ICalendarNet.Models.DataTypes.Recurrence
         /// Gets or sets a value indicating whether a start date should always be added.
         /// </summary>
         public bool AddStartDate { get; set; } = true;
-    }
+
+        /// <summary>
+        /// The time zone to use for evaluating the recurrence rule.
+        /// </summary>
+        public string? TimeZone { get; set; }
+}
 }

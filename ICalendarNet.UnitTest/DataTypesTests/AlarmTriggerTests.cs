@@ -5,7 +5,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
-    public class AlarmTriggerTests : UnitTestBase
+    internal class AlarmTriggerTests : UnitTestBase
     {
         [TestCase("TRIGGER;RELATED=START:PT5M", 300)]
         [TestCase("TRIGGER;RELATED=START:-PT5M", -300)]

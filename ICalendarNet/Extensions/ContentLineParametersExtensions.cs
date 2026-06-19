@@ -19,7 +19,6 @@ namespace ICalendarNet.Extensions
 
         public static void SetOrAddValue(this ContentLineParameters parameters, string key, IEnumerable<string>? value)
         {
-
             parameters.RemoveAll(t => t.Key.Equals(key, System.StringComparison.OrdinalIgnoreCase));
             if (value != null)
                 parameters.Add(new KeyValuePair<string, IEnumerable<string>>(key, value));

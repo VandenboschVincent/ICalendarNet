@@ -1,7 +1,9 @@
-﻿using ICalendarNet.Models.Base;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static ICalendarNet.Models.Enum.Statics;
 
 namespace ICalendarNet.Logic.CalendarBuilder
 {
@@ -13,18 +15,15 @@ namespace ICalendarNet.Logic.CalendarBuilder
     /// </summary>
     internal static class RecurrenceSegmentBuilder
     {
-        public static List<GenerationSegment> Build(
+        public static IEnumerable<GenerationSegment> Build(
             CalendarRecurrableObject master,
-            List<CalendarRecurrableObject>? futureOverrides,
+            IEnumerable<CalendarRecurrableObject>? futureOverrides,
             DateTimeOffset start,
             DateTimeOffset end)
         {
             var splitters = futureOverrides?
-                .Where(o => o.GetRecurrenceRule() != null)
-                .OrderBy(o => o.RecurrenceID!.Value)
-                .ToList() ?? [];
-
-            var segments = new List<GenerationSegment>();
+                .Where(o => o.Properties.HasProperty(ICalProperty.RRULE))
+                .OrderBy(o => o.RecurrenceID).ToList() ?? [];
 
             CalendarRecurrableObject current = master;
             DateTimeOffset currentAnchor = master.DateTimeStart!.Value;
@@ -41,11 +40,11 @@ namespace ICalendarNet.Logic.CalendarBuilder
                     var windowStart = currentAnchor > start ? currentAnchor : start;
                     if (windowStart < segEnd)
                     {
-                        segments.Add(new GenerationSegment(
+                        yield return new GenerationSegment(
                             Generator: current,
                             AnchorStart: currentAnchor,
                             WindowStart: windowStart,
-                            WindowEnd: segEnd));
+                            WindowEnd: segEnd);
                     }
                 }
 
@@ -55,8 +54,6 @@ namespace ICalendarNet.Logic.CalendarBuilder
                     currentAnchor = splitters[i].RecurrenceID!.Value;
                 }
             }
-
-            return segments;
         }
     }
 }

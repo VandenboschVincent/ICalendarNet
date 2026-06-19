@@ -1,5 +1,4 @@
 ﻿using ICalendarNet.Extensions;
-using ICalendarNet.Logic.Recurrence;
 using ICalendarNet.Logic.TimeZone;
 using ICalendarNet.Models.Base;
 using ICalendarNet.Models.Enum;
@@ -16,6 +15,7 @@ namespace ICalendarNet.Models.Components
     public class CalendarTimeZone : CalendarObject
     {
         public override ICalComponent ComponentType => ICalComponent.VTIMEZONE;
+        private TimeZoneInfo? cachedTimeZone = null;
 
         /// <summary>
         ///   <see cref="ICalProperty.LAST_MODIFIED" />
@@ -54,9 +54,21 @@ namespace ICalendarNet.Models.Components
         /// </summary>
         public IEnumerable<CalendarStandard> GetStandards() => SubComponents.Where(t => t.ComponentType == ICalComponent.STANDARD).Cast<CalendarStandard>();
 
-        public int GetOffsetInMinutes(DateTimeOffset? dateTime = null)
+        public int GetOffsetInMinutes(DateTimeOffset? UTCdateTime = null)
         {
-            return TimeZoneHelper.GetOffsetInMinutes(this, dateTime);
+            UTCdateTime ??= DateTimeOffset.UtcNow;
+            DateTime dt = UTCdateTime.Value.UtcDateTime;
+            cachedTimeZone ??= TimeZoneInfoHelper.GetTimeZone(this);
+            if (cachedTimeZone == null) return 0;
+            if (cachedTimeZone.IsInvalidTime(dt))
+            {
+                // Get the DST delta for this zone
+                var adjustment = cachedTimeZone.GetAdjustmentRules()
+                    .FirstOrDefault(r => r.DateStart <= dt && dt <= r.DateEnd);
+                UTCdateTime = UTCdateTime + (adjustment?.DaylightDelta ?? cachedTimeZone.BaseUtcOffset);
+            }
+            var offset = Convert.ToInt32(cachedTimeZone.GetUtcOffset(UTCdateTime.Value).TotalMinutes);
+            return offset;
         }
     }
 }

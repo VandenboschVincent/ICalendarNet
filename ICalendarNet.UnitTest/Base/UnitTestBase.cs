@@ -1,10 +1,10 @@
 ﻿using System.Reflection;
 
-namespace ICalendarNet.UnitTest.Base
+namespace ICalendarNet.UnitTest
 {
-    public class UnitTestBase
+    internal abstract class UnitTestBase
     {
-        public static List<string> GetIcalStrings(string? fileName = null)
+        protected static List<string> GetIcalStrings(string? fileName = null)
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, @"Calendars"));
@@ -17,7 +17,7 @@ namespace ICalendarNet.UnitTest.Base
                                 ];
         }
 
-        public static List<string> GetIcalFiles(string? fileName = null)
+        protected static List<string> GetIcalFiles(string? fileName = null)
         {
             string currentDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? string.Empty;
             string topLevelIcsPath = Path.GetFullPath(Path.Combine(currentDirectory, @"Calendars"));
@@ -27,4 +27,5 @@ namespace ICalendarNet.UnitTest.Base
             ];
         }
     }
+
 }

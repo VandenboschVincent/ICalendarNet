@@ -5,7 +5,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.DataTypesTests
 {
-    public class AttachmentTests : UnitTestBase
+    internal class AttachmentTests : UnitTestBase
     {
         [TestCase("ATTACH;VALUE=BINARY;ENCODING=BASE64:VGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==", "VGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==")]
         [TestCase("ATTACH;VALUE=BINARY;ENCODING=BASE64:\r\nVGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==", "VGhpcyBpcyBhIHRlc3QgdG8gdHJ5IG91dCBiYXNlNjQgZW5jb2Rpbmcgd2l0aG91dCBiZW==")]
@@ -40,6 +40,7 @@ namespace ICalendarNet.UnitTest.DataTypesTests
         {
             ICalendarProperty? prop = CalSerializor.DeserializeICalProperty(value);
             prop.Should().NotBeNull();
+
             CalendarAttachment attachment = prop.Should().BeOfType<CalendarAttachment>().Subject;
             attachment.Should().NotBeNull();
             attachment.FMTTYPE.Should().Be(type);

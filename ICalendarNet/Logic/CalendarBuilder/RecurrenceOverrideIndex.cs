@@ -1,5 +1,4 @@
-﻿using ICalendarNet.Extensions;
-using ICalendarNet.Models.Base;
+﻿using ICalendarNet.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +13,11 @@ namespace ICalendarNet.Logic.CalendarBuilder
     internal sealed class RecurrenceOverrideIndex
     {
         private readonly Dictionary<string, Dictionary<DateTime, CalendarRecurrableObject>> _singleByUid;
-        private readonly Dictionary<string, List<CalendarRecurrableObject>> _futureByUid;
+        private readonly Dictionary<string, IOrderedEnumerable<CalendarRecurrableObject>> _futureByUid;
 
         public RecurrenceOverrideIndex(
             Dictionary<string, Dictionary<DateTime, CalendarRecurrableObject>> single,
-            Dictionary<string, List<CalendarRecurrableObject>> future)
+            Dictionary<string, IOrderedEnumerable<CalendarRecurrableObject>> future)
         {
             _singleByUid = single;
             _futureByUid = future;
@@ -27,8 +26,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
         public static RecurrenceOverrideIndex Build(IEnumerable<CalendarRecurrableObject> recurrable)
         {
             var withRecurrenceId = recurrable
-                .Where(t => t.RecurrenceID != null && !string.IsNullOrEmpty(t.Uid))
-                .ToList();
+                .Where(t => t.RecurrenceID != null && !string.IsNullOrEmpty(t.Uid));
 
             // Single-instance overrides (RANGE != THISANDFUTURE)
             var single = withRecurrenceId
@@ -49,8 +47,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
                     g => g.Key,
                     g => g.GroupBy(i => i.RecurrenceID!.Value.UtcDateTime)
                           .Select(gg => gg.OrderByDescending(i => i.Sequence).First())
-                          .OrderBy(i => i.RecurrenceID!.Value)
-                          .ToList());
+                          .OrderBy(i => i.RecurrenceID!.Value));
 
             return new RecurrenceOverrideIndex(single, future);
         }
@@ -58,7 +55,7 @@ namespace ICalendarNet.Logic.CalendarBuilder
         public Dictionary<DateTime, CalendarRecurrableObject>? GetSingleOverrides(string uid) =>
             _singleByUid.TryGetValue(uid, out var v) ? v : null;
 
-        public List<CalendarRecurrableObject>? GetFutureOverrides(string uid) =>
+        public IEnumerable<CalendarRecurrableObject>? GetFutureOverrides(string uid) =>
             _futureByUid.TryGetValue(uid, out var v) ? v : null;
     }
 }

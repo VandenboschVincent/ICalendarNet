@@ -18,7 +18,7 @@ namespace ICalendarNet.Benchmarking
             await _sampleData.Setup();
         }
 
-        private const string _aTzid = "America/New_York";
+        private const string _aTzid = "US-Eastern";
 
         private static Calendar SimpleCalendar()
         {
@@ -61,6 +61,15 @@ namespace ICalendarNet.Benchmarking
         {
             Calendar? calendar = Calendar.Load(_sampleData.AmericanAwernessDays);
             return new CalendarSerializer().SerializeToString(calendar);
+        }
+
+        [Benchmark]
+        public List<Occurrence> ICal_Net_Deserialize_And_Expand_Daily_Event()
+        {
+            var start = new CalDateTime(2020, 1, 1, 0, 0, 0, _aTzid);
+            var end = new CalDateTime(2021, 1, 1, 0, 0, 0, _aTzid);
+            Calendar? calendar = Calendar.Load(SampleData.SampleRecurring);
+            return [.. calendar!.GetOccurrences(start).TakeWhileBefore(end)];
         }
     }
 }

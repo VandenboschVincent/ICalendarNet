@@ -3,7 +3,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class JournalTests : UnitTestBase
+    internal class JournalTests : UnitTestBase
     {
         private static IEnumerable<string> IcalFiles => GetIcalFiles("Journal*");
 

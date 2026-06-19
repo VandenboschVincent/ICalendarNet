@@ -5,7 +5,7 @@ using ICalendarNet.UnitTest.Base;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    public class EventTests : UnitTestBase
+    internal class EventTests : UnitTestBase
     {
         private static IEnumerable<string> IcalFiles => GetIcalFiles("Event*");
         private static IEnumerable<string> ICalOccerenceIcalFiles => GetIcalFiles("ICalOccerence");
@@ -17,6 +17,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
 DTSTAMP:20060717T210718Z
+X-TEST-PROP:TestValue
 CATEGORY:3
 UID:uuid1153170430406
 SUMMARY:Test event
@@ -28,13 +29,15 @@ DTEND:20060718T110000
 LOCATION:Daywest
 END:VEVENT";
             CalendarEvent? calendar = CalSerializor.DeserializeICalComponent<CalendarEvent>(icalvar);
-            calendar!.Properties.Should().HaveCount(10);
+            calendar!.Properties.Should().HaveCount(11);
             calendar.Uid.Should().Be("uuid1153170430406");
             calendar.Summary.Should().Be($"Test event{Environment.NewLine}Newline Test event{Environment.NewLine}https://learn.microsoft.com/en-us/dotnet/api/system.string.join?view=net-8.0");
             calendar.Location.Should().Be("Daywest");
             calendar.Categories.Should().Contain("3");
             calendar.Organizer!.Value.Should().Be("mailto:c_4eb66b106265305aa178a912be02479cb3c4a71159c9db935e8b515afff2f88f@group.calendar.google.com");
             calendar.Organizer!.Parameters.Should().HaveCount(2);
+            calendar.GetCustomPropertyValue("X-TEST-PROP").Should().Be("TestValue");
+            calendar.SetCustomPropertyValue("X-TEST-PROP", "TestValue2");
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.Should().HaveCount(1);
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Key.Should().Be("testparam");
             calendar!.Properties.GetContentlines(Statics.ICalProperty.LAST_MODIFIED).First().Parameters.First().Value.Should().BeEquivalentTo(new List<string>() { "paramvalue", "paramvalue2" });
@@ -43,6 +46,7 @@ END:VEVENT";
 CREATED:20060717T210517Z
 LAST-MODIFIED;testparam=paramvalue,paramvalue2:20060717T210718Z
 DTSTAMP:20060717T210718Z
+X-TEST-PROP:TestValue2
 CATEGORY:3
 UID:uuid1153170430406
 SUMMARY:Test event

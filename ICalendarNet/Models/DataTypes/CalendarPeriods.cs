@@ -1,4 +1,5 @@
-﻿using ICalendarNet.Models.Base;
+﻿using ICalendarNet.Extensions;
+using ICalendarNet.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,13 +11,13 @@ namespace ICalendarNet.Models.DataTypes
     {
         public IEnumerable<CalendarPeriod> GetPeriods() => Value.Split(",", StringSplitOptions.RemoveEmptyEntries).Select(t => new CalendarPeriod(Name, t, Parameters));
 
-        public CalendarPeriods(ICalProperty key, string value, ContentLineParameters? param) : base(ICalProperties[(int)key], value, param)
+        public CalendarPeriods(ICalProperty key, string value, ContentLineParameters? param) : base(key.GetString(), value, param)
         { }
 
         public CalendarPeriods(string key, string value, ContentLineParameters? param) : base(key, value, param)
         { }
 
-        public CalendarPeriods(ICalProperty key, IEnumerable<CalendarPeriod> calendarPeriods) : base(ICalProperties[(int)key], string.Join(',', calendarPeriods.Select(t => t.Value)), null)
+        public CalendarPeriods(ICalProperty key, IEnumerable<CalendarPeriod> calendarPeriods) : base(key.GetString(), string.Join(',', calendarPeriods.Select(t => t.Value)), null)
         { }
     }
 }

@@ -10,7 +10,6 @@ using System.Reflection;
 
 namespace ICalendarNet.UnitTest.ComponentsTests
 {
-    [TestFixture]
     internal class RecurrenceIdentifierTests : UnitTestBase
     {
         private static IEnumerable<string> RecurrenceIcal => GetIcalFiles("Recurrence/*");
@@ -32,7 +31,7 @@ namespace ICalendarNet.UnitTest.ComponentsTests
             {
                 MaxOccurrencesLimit = limit,
                 AddStartDate = addstart
-            }).Select(t => t.DateStart.DateTime).ToList();
+            }).Select(t => t.DateTime).ToList();
             if (exampleCase.Instances.Count > 0)
             {
                 datesFound.Should().Equal(exampleCase.Instances);

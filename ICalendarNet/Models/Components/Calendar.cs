@@ -169,7 +169,7 @@ namespace ICalendarNet.Models.Components
         /// <param name="start">The start date and time of the range.</param>
         /// <param name="end">The end date and time of the range.</param>
         /// <returns>A list of calendar components that occur within the specified date range.</returns>
-        public IEnumerable<ICalendarComponent> ExpandCalendar(DateTimeOffset start, DateTimeOffset end)
+        public IEnumerable<CalendarOccurableObject> ExpandCalendar(DateTimeOffset start, DateTimeOffset end)
         {
             return CalendarExpander.ExpandCalendar(this, start, end);
         }

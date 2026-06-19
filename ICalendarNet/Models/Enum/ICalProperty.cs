@@ -1,4 +1,5 @@
-﻿namespace ICalendarNet.Models.Enum
+﻿using System.Runtime.Serialization;
+namespace ICalendarNet.Models.Enum
 {
     public static class Statics
     {
@@ -7,7 +8,9 @@
             ALTREP,
             CN,
             CUTYPE,
+            [EnumMember(Value = "DELEGATED-FROM")]
             DELEGATED_FROM,
+            [EnumMember(Value = "DELEGATED-TO")]
             DELEGATED_TO,
             DIR,
             ENCODING,
@@ -21,12 +24,10 @@
             RELTYPE,
             ROLE,
             RSVP,
+            [EnumMember(Value = "SENT-BY")]
             SENT_BY,
             TZID,
             VALUE,
-            X_FILENAME,
-            X_MS_OLK_RESPTIME,
-            X_MICROSOFT_ISLEAPMONTH,
             DISPLAY,
             EMAIL,
             FEATURE,
@@ -37,42 +38,6 @@
             GAP,
             LINKREL
         }
-
-        public static readonly string[] ICalParameters = [
-            "ALTREP",
-            "CN",
-            "CUTYPE",
-            "DELEGATED-FROM",
-            "DELEGATED-TO",
-            "DIR",
-            "ENCODING",
-            "FMTTYPE",
-            "FBTYPE",
-            "LANGUAGE",
-            "MEMBER",
-            "PARTSTAT",
-            "RANGE",
-            "RELATED",
-            "RELTYPE",
-            "ROLE",
-            "RSVP",
-            "SENT-BY",
-            "TZID",
-            "VALUE",
-            "X-FILENAME",
-            "X-MS-OLK-RESPTIME",
-            "X-MICROSOFT-ISLEAPMONTH",
-            "DISPLAY",
-            "EMAIL",
-            "FEATURE",
-            "LABEL",
-            "ORDER",
-            "SCHEMA",
-            "DERIVED",
-            "GAP",
-            "LINKREL"
-        ];
-
         public enum ICalProperty
         {
             /// <summary>
@@ -106,21 +71,8 @@
             /// </summary>
             VERSION,
 
-            X_CALEND,
-            X_CALSTART,
-            X_CLIPEND,
-            X_CLIPSTART,
-            X_MICROSOFT_CALSCALE,
-            X_MS_OLK_FORCEINSPECTOROPEN,
-            X_MS_WKHRDAYS,
-            X_MS_WKHREND,
-            X_MS_WKHRSTART,
+            [EnumMember(Value = "X-OWNER")]
             X_OWNER,
-            X_PRIMARY_CALENDAR,
-            X_PUBLISHED_TTL,
-            X_WR_CALDESC,
-            X_WR_CALNAME,
-            X_WR_RELCALID,
 
             /// <summary>
             /// 3.8.1.1 Value Type: URI or BINARY
@@ -179,6 +131,7 @@
             /// This property is used by an assignee or delegatee of a to-do to convey the percent completion of a to-do to the "Organizer".
             /// This property can be specified once in a "VTODO" calendar component.
             /// </summary>
+            [EnumMember(Value = "PERCENT-COMPLETE")]
             PERCENT_COMPLETE,
 
             /// <summary>
@@ -331,6 +284,7 @@
             /// The property value is the original value of the "DTSTART" property of the recurrence instance.
             /// This property can be specified in an iCalendar object containing a recurring calendar component.
             /// </summary>
+            [EnumMember(Value = "RECURRENCE-ID")]
             RECURRENCE_ID,
 
             /// <summary>
@@ -338,6 +292,7 @@
             /// This property is used to represent a relationship or reference between one calendar component and another.
             /// This property can be specified in the "VEVENT", "VTODO", and "VJOURNAL" calendar components.
             /// </summary>
+            [EnumMember(Value = "")]
             RELATED_TO,
 
             /// <summary>
@@ -428,10 +383,12 @@
             /// This property specifies the date and time that the information associated with the calendar component was last revised in the calendar store.
             /// This property can be specified in the "VEVENT", "VTODO", "VJOURNAL", or "VTIMEZONE" calendar components.
             /// </summary>
+            [EnumMember(Value = "LAST-MODIFIED")]
             LAST_MODIFIED,
 
             /// <summary>
-            /// 3.8.7.4 Sequence Number Value Type: INTEGER
+            /// 3.8.7.4 Seque
+            /// nce Number Value Type: INTEGER
             /// This property defines the revision sequence number of the calendar component within a sequence of revisions.
             /// The property can be specified in "VEVENT", "VTODO", or "VJOURNAL" calendar component.
             /// </summary>
@@ -442,6 +399,7 @@
             /// This property defines the status code returned for a scheduling request.
             /// The property can be specified in the "VEVENT", "VTODO", "VJOURNAL", or "VFREEBUSY" calendar component.
             /// </summary>
+            [EnumMember(Value = "REQUEST-STATUS")]
             REQUEST_STATUS,
 
             /// <summary>
@@ -449,51 +407,25 @@
             /// </summary>
             EXRULE,
 
-            X_ALT_DESC,
-            X_MICROSOFT_CDO_ALLDAYEVENT,
-            X_MICROSOFT_CDO_APPT_SEQUENCE,
-            X_MICROSOFT_CDO_ATTENDEE_CRITICAL_CHANGE,
-            X_MICROSOFT_CDO_BUSYSTATUS,
-            X_MICROSOFT_CDO_IMPORTANCE,
-            X_MICROSOFT_CDO_INSTTYPE,
-            X_MICROSOFT_CDO_INTENDEDSTATUS,
-            X_MICROSOFT_CDO_OWNERAPPTID,
-            X_MICROSOFT_CDO_OWNER_CRITICAL_CHANGE,
-            X_MICROSOFT_CDO_REPLYTIME,
-            X_MICROSOFT_DISALLOW_COUNTER,
-            X_MICROSOFT_EXDATE,
-            X_MICROSOFT_ISDRAFT,
-            X_MICROSOFT_MSNCALENDAR_ALLDAYEVENT,
-            X_MICROSOFT_MSNCALENDAR_BUSYSTATUS,
-            X_MICROSOFT_MSNCALENDAR_IMPORTANCE,
-            X_MICROSOFT_MSNCALENDAR_INTENDEDSTATUS,
-            X_MICROSOFT_RRULE,
-            X_MS_OLK_ALLOWEXTERNCHECK,
-            X_MS_OLK_APPTLASTSEQUENCE,
-            X_MS_OLK_APPTSEQTIME,
-            X_MS_OLK_AUTOFILLLOCATION,
-            X_MS_OLK_AUTOSTARTCHECK,
-            X_MS_OLK_COLLABORATEDOC,
-            X_MS_OLK_CONFCHECK,
-            X_MS_OLK_CONFTYPE,
-            X_MS_OLK_DIRECTORY,
-            X_MS_OLK_MWSURL,
-            X_MS_OLK_NETSHOWURL,
-            X_MS_OLK_ONLINEPASSWORD,
-            X_MS_OLK_ORGALIAS,
-            X_MS_OLK_SENDER,
             BUSYTYPE,
             NAME,
+            [EnumMember(Value = "REFRESH-INTERVAL")]
             REFRESH_INTERVAL,
             SOURCE,
             COLOR,
             IMAGE,
             CONFERENCE,
+            [EnumMember(Value = "CALENDAR-ADDRESS")]
             CALENDAR_ADDRESS,
+            [EnumMember(Value = "LOCATION-TYPE")]
             LOCATION_TYPE,
+            [EnumMember(Value = "PARTICIPANT-TYPE")]
             PARTICIPANT_TYPE,
+            [EnumMember(Value = "RESOURCE-TYPE")]
             RESOURCE_TYPE,
+            [EnumMember(Value = "STRUCTURED-DATA")]
             STRUCTURED_DATA,
+            [EnumMember(Value = "STYLED-DESCRIPTION")]
             STYLED_DESCRIPTION,
             ACKNOWLEDGED,
             PROXIMITY,
@@ -502,127 +434,7 @@
             REFID,
             SYNCTOKEN,
             ETAG,
-            CATEGORY,
-            X_APPLE_STRUCTURED_LOCATION
+            CATEGORY
         };
-
-        public static readonly string[] ICalProperties = [
-            "CALSCALE",
-            "METHOD",
-            "PRODID",
-            "VERSION",
-            "X-CALEND",
-            "X-CALSTART",
-            "X-CLIPEND",
-            "X-CLIPSTART",
-            "X-MICROSOFT-CALSCALE",
-            "X-MS-OLK-FORCEINSPECTOROPEN",
-            "X-MS-WKHRDAYS",
-            "X-MS-WKHREND",
-            "X-MS-WKHRSTART",
-            "X-OWNER",
-            "X-PRIMARY-CALENDAR",
-            "X-PUBLISHED-TTL",
-            "X-WR-CALDESC",
-            "X-WR-CALNAME",
-            "X-WR-RELCALID",
-            "ATTACH",
-            "CATEGORIES",
-            "CLASS",
-            "COMMENT",
-            "DESCRIPTION",
-            "GEO",
-            "LOCATION",
-            "PERCENT-COMPLETE",
-            "PRIORITY",
-            "RESOURCES",
-            "STATUS",
-            "SUMMARY",
-            "COMPLETED",
-            "DTEND",
-            "DUE",
-            "DTSTART",
-            "DURATION",
-            "FREEBUSY",
-            "TRANSP",
-            "TZID",
-            "TZNAME",
-            "TZOFFSETFROM",
-            "TZOFFSETTO",
-            "TZURL",
-            "ATTENDEE",
-            "CONTACT",
-            "ORGANIZER",
-            "RECURRENCE-ID",
-            "RELATED-TO",
-            "URL",
-            "UID",
-            "EXDATE",
-            "RDATE",
-            "RRULE",
-            "ACTION",
-            "REPEAT",
-            "TRIGGER",
-            "CREATED",
-            "DTSTAMP",
-            "LAST-MODIFIED",
-            "SEQUENCE",
-            "REQUEST-STATUS",
-            "EXRULE",
-            "X-ALT-DESC",
-            "X-MICROSOFT-CDO-ALLDAYEVENT",
-            "X-MICROSOFT-CDO-APPT-SEQUENCE",
-            "X-MICROSOFT-CDO-ATTENDEE-CRITICAL-CHANGE",
-            "X-MICROSOFT-CDO-BUSYSTATUS",
-            "X-MICROSOFT-CDO-IMPORTANCE",
-            "X-MICROSOFT-CDO-INSTTYPE",
-            "X-MICROSOFT-CDO-INTENDEDSTATUS",
-            "X-MICROSOFT-CDO-OWNERAPPTID",
-            "X-MICROSOFT-CDO-OWNER-CRITICAL-CHANGE",
-            "X-MICROSOFT-CDO-REPLYTIME",
-            "X-MICROSOFT-DISALLOW-COUNTER",
-            "X-MICROSOFT-EXDATE",
-            "X-MICROSOFT-ISDRAFT",
-            "X-MICROSOFT-MSNCALENDAR-ALLDAYEVENT",
-            "X-MICROSOFT-MSNCALENDAR-BUSYSTATUS",
-            "X-MICROSOFT-MSNCALENDAR-IMPORTANCE",
-            "X-MICROSOFT-MSNCALENDAR-INTENDEDSTATUS",
-            "X-MICROSOFT-RRULE",
-            "X-MS-OLK-ALLOWEXTERNCHECK",
-            "X-MS-OLK-APPTLASTSEQUENCE",
-            "X-MS-OLK-APPTSEQTIME",
-            "X-MS-OLK-AUTOFILLLOCATION",
-            "X-MS-OLK-AUTOSTARTCHECK",
-            "X-MS-OLK-COLLABORATEDOC",
-            "X-MS-OLK-CONFCHECK",
-            "X-MS-OLK-CONFTYPE",
-            "X-MS-OLK-DIRECTORY",
-            "X-MS-OLK-MWSURL",
-            "X-MS-OLK-NETSHOWURL",
-            "X-MS-OLK-ONLINEPASSWORD",
-            "X-MS-OLK-ORGALIAS",
-            "X-MS-OLK-SENDER",
-            "BUSYTYPE",
-            "NAME",
-            "REFRESH-INTERVAL",
-            "SOURCE",
-            "COLOR",
-            "IMAGE",
-            "CONFERENCE",
-            "CALENDAR-ADDRESS",
-            "LOCATION-TYPE",
-            "PARTICIPANT-TYPE",
-            "RESOURCE-TYPE",
-            "STRUCTURED-DATA",
-            "STYLED-DESCRIPTION",
-            "ACKNOWLEDGED",
-            "PROXIMITY",
-            "CONCEPT",
-            "LINK",
-            "REFID",
-            "SYNCTOKEN",
-            "ETAG",
-            "CATEGORY"
-        ];
     }
 }

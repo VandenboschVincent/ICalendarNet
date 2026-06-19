@@ -164,7 +164,7 @@ namespace ICalendarNet.Models.DataTypes
             set
             {
                 if (!string.IsNullOrWhiteSpace(value))
-                    ValueParameters = new ContentLineParameters(value.Split(";").Select(t => t.Split('=')).ToDictionary(t => t[0], t => t[1].Split(",").AsEnumerable()));
+                    ValueParameters = [.. value.Split(";").Select(t => t.Split('=')).ToDictionary(t => t[0], t => t[1].Split(",").AsEnumerable())];
             }
         }
 
@@ -177,7 +177,7 @@ namespace ICalendarNet.Models.DataTypes
             set;
         }
 
-        public CalendarRecurrenceRule(string value) : this(Statics.ICalProperties[(int)Statics.ICalProperty.RRULE], value, null)
+        public CalendarRecurrenceRule(string value) : this(nameof(Statics.ICalProperty.RRULE), value, null)
         {
         }
 
