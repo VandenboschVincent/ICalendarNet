@@ -7,8 +7,8 @@ image: mcr.microsoft.com/dotnet/sdk:10.0
 
 before_script:
   - dotnet --version
-  - dotnet tool install --global dotnet-sonarscanner
   - export PATH=\"$PATH:$HOME/.dotnet/tools\"
+  - dotnet tool install --global dotnet-sonarscanner
 
 test:
   variables:
