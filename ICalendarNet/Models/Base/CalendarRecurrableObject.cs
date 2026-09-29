@@ -99,7 +99,7 @@ namespace ICalendarNet.Models.Base
             return recurrences?.Select(Clone) ?? [];
         }
 
-        protected abstract CalendarRecurrableObject Clone(DateTimeOffset occurence);
+        public abstract CalendarRecurrableObject Clone(DateTimeOffset occurence);
 
         protected static T CloneComponent<T>(T obj, DateTimeOffset occurence) where T : CalendarRecurrableObject, new()
         {

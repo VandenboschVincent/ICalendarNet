@@ -23,8 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastEnum" Version="2.0.6" />
-    <PackageReference Include="NodaTime" Version="3.3.2" />
+    <PackageReference Include="FastEnum" Version="2.0.8" />
+    <PackageReference Include="NodaTime" Version="3.3.4" />
   </ItemGroup>
 
 </Project>
