@@ -60,9 +60,16 @@ namespace ICalendarNet.Logic.CalendarBuilder
             //    with an RRULE, its property edits are already baked into `occur`.)
             var decoration = futureOverrides?
                 .LastOrDefault(o =>
-                    o.RecurrenceID!.Value <= originalStart &&
+                    o.RecurrenceID!.Value.UtcDateTime <= occur.DateTimeStart!.Value.UtcDateTime &&
                     o.GetRecurrenceRule() == null &&
                     o.RecurrenceID!.Value >= seg.AnchorStart);
+
+            if (decoration != null && decoration.RecurrenceID!.Value.UtcDateTime != occur.DateTimeStart!.Value.UtcDateTime)
+            {
+                TimeSpan timeDiff = decoration.DateTimeStart!.Value.UtcDateTime.TimeOfDay
+                    - occur.DateTimeStart!.Value.UtcDateTime.TimeOfDay;
+                decoration = decoration.Clone(occur.DateTimeStart!.Value.UtcDateTime.Add(timeDiff));
+            }
 
             return decoration ?? occur;
         }

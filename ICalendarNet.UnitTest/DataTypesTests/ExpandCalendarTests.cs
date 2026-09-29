@@ -114,6 +114,15 @@ namespace ICalendarNet.UnitTest.DataTypesTests
                   new DateTime(2026, 1, 13, 8, 0, 0, DateTimeKind.Utc),
                   new DateTime(2026, 1, 14, 8, 0, 0, DateTimeKind.Utc),
                   ], opt => opt.WithStrictOrdering());
+            result.OfType<CalendarEvent>().Select(c => c.DateTimeEnd!.Value.UtcDateTime)
+                  .Should().BeEquivalentTo(
+                  [
+                  new DateTime(2026, 1, 10, 9, 0, 0, DateTimeKind.Utc),
+                  new DateTime(2026, 1, 11, 9, 0, 0, DateTimeKind.Utc),
+                  new DateTime(2026, 1, 12, 9, 0, 0, DateTimeKind.Utc),
+                  new DateTime(2026, 1, 13, 9, 0, 0, DateTimeKind.Utc),
+                  new DateTime(2026, 1, 14, 9, 0, 0, DateTimeKind.Utc),
+                  ], opt => opt.WithStrictOrdering());
         }
 
         [Test]
@@ -177,10 +186,72 @@ namespace ICalendarNet.UnitTest.DataTypesTests
             // Feb 2 09:00 should be replaced by Feb 2 11:00 "Moved instance".
             result.OfType<CalendarEvent>().Should().ContainSingle(c =>
                 c.DateTimeStart == new DateTimeOffset(2026, 2, 2, 11, 0, 0, TimeSpan.Zero)
+                && c.DateTimeEnd == new DateTimeOffset(2026, 2, 2, 12, 0, 0, TimeSpan.Zero)
+                && c.Summary == "Moved instance");
+            
+            // Should remain original
+            result.OfType<CalendarEvent>().Should().ContainSingle(c =>
+                c.DateTimeStart == new DateTimeOffset(2026, 2, 3, 9, 0, 0, TimeSpan.Zero)
+                && c.Summary == "Original");
+
+            result.OfType<CalendarEvent>().Should().NotContain(c =>
+                c.DateTimeStart == new DateTimeOffset(2026, 2, 2, 9, 0, 0, TimeSpan.Zero));
+        }
+
+        [Test]
+        public void BuildCalendar_OverrideReplacesSeries()
+        {
+            // Master: 3 daily occurrences starting Feb 1 09:00.
+            // Override: move the occurrences to 11:00 with a new summary.
+            const string ical = """
+            BEGIN:VCALENDAR
+            VERSION:2.0
+            PRODID:-//Test//EN
+            BEGIN:VEVENT
+            UID:evt-with-override@test
+            DTSTAMP:20260201T000000Z
+            DTSTART:20260201T090000Z
+            DTEND:20260201T100000Z
+            RRULE:FREQ=DAILY;COUNT=3
+            SUMMARY:Original
+            END:VEVENT
+            BEGIN:VEVENT
+            UID:evt-with-override@test
+            RECURRENCE-ID;RANGE=THISANDFUTURE:20260202T090000Z
+            DTSTAMP:20260202T000000Z
+            DTSTART:20260202T110000Z
+            DTEND:20260202T120000Z
+            SUMMARY:Moved instance
+            END:VEVENT
+            END:VCALENDAR
+            """;
+
+            var result = ExpandCalendar(Parse(ical), RangeStart, RangeEnd)
+                .Cast<CalendarRecurrableObject>()
+                .OrderBy(c => c.DateTimeStart)
+                .ToList();
+
+            result.Should().HaveCount(3);
+
+            // Feb 2 09:00 should be replaced by Feb 2 11:00 "Moved instance".
+            result.OfType<CalendarEvent>().Should().ContainSingle(c =>
+                c.DateTimeStart == new DateTimeOffset(2026, 2, 2, 11, 0, 0, TimeSpan.Zero)
+                && c.DateTimeEnd == new DateTimeOffset(2026, 2, 2, 12, 0, 0, TimeSpan.Zero)
+                && c.DateTimeStamp == new DateTimeOffset(2026, 2, 2, 0, 0, 0, TimeSpan.Zero)
+                && c.Summary == "Moved instance");
+
+            // Should also be moved
+            result.OfType<CalendarEvent>().Should().ContainSingle(c =>
+                c.DateTimeStart == new DateTimeOffset(2026, 2, 3, 11, 0, 0, TimeSpan.Zero)
+                && c.DateTimeEnd == new DateTimeOffset(2026, 2, 3, 12, 0, 0, TimeSpan.Zero)
+                && c.DateTimeStamp == new DateTimeOffset(2026, 2, 2, 0, 0, 0, TimeSpan.Zero)
                 && c.Summary == "Moved instance");
 
             result.OfType<CalendarEvent>().Should().NotContain(c =>
                 c.DateTimeStart == new DateTimeOffset(2026, 2, 2, 9, 0, 0, TimeSpan.Zero));
+
+            result.OfType<CalendarEvent>().Should().NotContain(c =>
+                c.DateTimeStart == new DateTimeOffset(2026, 2, 3, 9, 0, 0, TimeSpan.Zero));
         }
 
         [Test]

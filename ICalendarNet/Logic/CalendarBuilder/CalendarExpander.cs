@@ -15,8 +15,8 @@ namespace ICalendarNet.Logic.CalendarBuilder
             var recurrable = calendar.SubComponents
                 .OfType<CalendarRecurrableObject>();
 
-            var overrides = RecurrenceOverrideIndex.Build(recurrable);
-            var masters = GetMasters(recurrable);
+            var overrides = RecurrenceOverrideIndex.Build(recurrable); //makes changes to existing recurring masters
+            var masters = GetMasters(recurrable); //recurring masters
 
             // 1. Recurring components: expand each master.
             foreach (var master in masters)

@@ -46,7 +46,7 @@ namespace ICalendarNet.Models.Components
             set => Properties.UpdateLineProperty(value, ICalProperty.TZNAME);
         }
 
-        protected override CalendarRecurrableObject Clone(DateTimeOffset occurence)
+        public override CalendarRecurrableObject Clone(DateTimeOffset occurence)
         {
             return CloneComponent(this, occurence);
         }

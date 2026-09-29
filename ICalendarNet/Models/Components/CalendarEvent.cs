@@ -231,7 +231,7 @@ namespace ICalendarNet.Models.Components
             return $"VEVENT: {Summary} {DateTimeStart.GetValueOrDefault().UtcDateTime:dd/MM/yy HH:mm} - {DateTimeEnd.GetValueOrDefault().UtcDateTime:dd/MM/yy HH:mm}";
         }
 
-        protected override CalendarRecurrableObject Clone(DateTimeOffset occurence)
+        public override CalendarRecurrableObject Clone(DateTimeOffset occurence)
         {
             var cloned = CloneComponent(this, occurence);
             var oldEnd = DateTimeEnd;
